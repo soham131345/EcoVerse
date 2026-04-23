@@ -8923,7 +8923,7 @@ def init_db():
         db.create_all()
         init_greentoken_market()
         init_city_builder_tables()
-        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY', 'sk-proj-NiR1Rh9hR3T4YaBjb10hUcqDe0pgVqQ8dwjx0qI6PNGKtFthR6r3a6HWWPc6vmVg9FhJxVTf4T3BlbkFJST4u2o7TqnCLp_7sTmsSJrwMkiv8J2RFwLjrW2s2EtXPornxkWRKfx5L5cwXElfjwEPDoJtUUA'))
+        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY', 'ur key here'))
         if CertificationRequirement.query.count() == 0:
             requirements = get_certification_requirements_new()
             
