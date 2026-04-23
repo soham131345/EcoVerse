@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head><title>SYSTEM ACCESS</title>
+<style>
+body{background:#000;color:#00ffea;font-family:'Courier New';height:100vh;display:flex;align-items:center;justify-content:center;margin:0}
+.container{background:rgba(10,25,47,0.9);padding:40px;border:1px solid #00ffea;width:400px}
+h1{text-align:center;margin-bottom:30px;text-transform:uppercase;letter-spacing:3px}
+input{background:rgba(0,0,0,0.5);border:1px solid #00ffea;color:#00ffea;padding:12px;margin:10px 0;width:100%;font-family:'Courier New'}
+button{background:#00ffea;color:#000;border:none;padding:12px;width:100%;font-family:'Courier New';font-weight:bold;text-transform:uppercase;letter-spacing:2px;cursor:pointer;margin-top:20px;transition:all 0.3s}
+button:hover{background:#ff00ff;transform:translateY(-2px)}
+.error{color:#ff0000;text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>SYSTEM ACCESS</h1>
+<form method="POST">
+<input type="text" name="username" placeholder="USERNAME" required>
+<input type="password" name="password" placeholder="PASSWORD" required>
+<button type="submit">AUTHENTICATE</button>
+</form>
+{% with messages = get_flashed_messages() %}
+{% if messages %}<div class="error">{{ messages[0] }}</div>{% endif %}
+{% endwith %}
+<div style="text-align:center;margin-top:20px">
+<a href="/register" style="color:#00ffea;text-decoration:none">REQUEST ACCESS</a>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EcoTwin Avatar Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .user-info h1 {
+            color: #2ecc71;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 16px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2ecc71;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.secondary {
+            background: #3498db;
+        }
+
+        .nav-btn.secondary:hover {
+            background: #2980b9;
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .avatar-preview {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .avatar-display {
+            width: 250px;
+            height: 350px;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            border-radius: 20px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-canvas {
+            font-size: 100px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .level-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f39c12;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .avatar-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .xp-bar {
+            width: 100%;
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #3498db);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .customization-panel h2 {
+            color: #2ecc71;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .category {
+            margin-bottom: 25px;
+        }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .option-card {
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-card:hover {
+            border-color: #2ecc71;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.2);
+        }
+
+        .option-card.selected {
+            border-color: #2ecc71;
+            background: #e8f6f3;
+        }
+
+        .option-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .option-card.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+        }
+
+        .option-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .option-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .option-cost {
+            color: #e74c3c;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .option-level {
+            color: #f39c12;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .stats-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .token-balance {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .token-amount {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .token-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .current-stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .stat-name {
+            color: #7f8c8d;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .save-button {
+            width: 100%;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .save-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3);
+        }
+
+        .save-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .total-cost {
+            text-align: center;
+            margin-top: 10px;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .unlocked-items {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .unlocked-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .unlocked-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .unlocked-badge {
+            background: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            border-left: 5px solid #2ecc71;
+            max-width: 300px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .help-tip {
+            background: #3498db;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: help;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            max-width: 200px;
+            z-index: 100;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="user-info">
+                <h1>{{ user.username }}'s EcoTwin</h1>
+                <div class="user-stats">
+                    <div class="stat-box">
+                        <div class="stat-label">Level</div>
+                        <div class="stat-value">{{ user.level }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Eco Score</div>
+                        <div class="stat-value">{{ user.eco_score }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avatar Level</div>
+                        <div class="stat-value">{{ user.avatar_level }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn secondary" onclick="location.href='/dashboard'">
+                    ← Dashboard
+                </button>
+                <button class="nav-btn" onclick="location.href='/ecoworld'">
+                    Play EcoWorld
+                </button>
+            </div>
+        </div>
+
+        <div class="editor-container">
+            <!-- Left Panel: Avatar Preview -->
+            <div class="panel avatar-preview">
+                <div class="avatar-display">
+                    <div class="avatar-canvas" id="avatarCanvas">🤖</div>
+                    <div class="level-badge">Level {{ user.avatar_level }}</div>
+                </div>
+                <div class="avatar-name" id="avatarName">EcoTwin</div>
+                <div class="xp-bar">
+                    <div class="xp-fill" id="xpFill" 
+                         style="width: {{ (user.avatar_xp / (user.avatar_level * 100)) * 100 }}%"></div>
+                </div>
+                <div style="font-size: 14px; color: #7f8c8d;">
+                    {{ user.avatar_xp }}/{{ user.avatar_level * 100 }} XP to next level
+                </div>
+            </div>
+
+            <!-- Center Panel: Customization -->
+            <div class="panel customization-panel">
+                <h2>Customize Your EcoTwin</h2>
+                
+                <div class="category">
+                    <div class="category-title">
+                        🎨 Skin Color
+                        <div class="help-tip" title="Your avatar's base color">?</div>
+                    </div>
+                    <div class="options-grid" id="skinOptions">
+                        <div class="option-card selected" data-type="skin" data-value="green" data-cost="0">
+                            <div class="option-icon" style="color: #2ecc71;">●</div>
+                            <div class="option-name">Green</div>
+                            <div class="option-cost">Free</div>
+                        </div>
+                        <div class="option-card" data-type="skin" data-value="blue" data-cost="50" data-level="2">
+                            <div class="option-icon" style="color: #3498db;">●</div>
+                            <div class="option-name">Blue</div>
+                            <div class="option-cost">50 Tokens</div>
+                            <div class="option-level">Level 2+</div>
+                        </div>
+                        <div class="option-card" data-type="skin" data-value="earth" data-cost="100" data-level="5">
+                            <div class="option-icon" style="color: #8b4513;">●</div>
+                            <div class="option-name">Earth</div>
+                            <div class="option-cost">100 Tokens</div>
+                            <div class="option-level">Level 5+</div>
+                        </div>
+                        <div class="option-card" data-type="skin" data-value="solar" data-cost="200" data-level="10">
+                            <div class="option-icon" style="color: #f1c40f;">●</div>
+                            <div class="option-name">Solar</div>
+                            <div class="option-cost">200 Tokens</div>
+                            <div class="option-level">Level 10+</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">
+                        👕 Outfit Style
+                        <div class="help-tip" title="Change your avatar's clothing">?</div>
+                    </div>
+                    <div class="options-grid" id="outfitOptions">
+                        <div class="option-card selected" data-type="outfit" data-value="basic" data-cost="0">
+                            <div class="option-icon">👕</div>
+                            <div class="option-name">Basic Tee</div>
+                            <div class="option-cost">Free</div>
+                        </div>
+                        <div class="option-card" data-type="outfit" data-value="recycle" data-cost="75" data-level="3">
+                            <div class="option-icon">♻️</div>
+                            <div class="option-name">Recycler</div>
+                            <div class="option-cost">75 Tokens</div>
+                            <div class="option-level">Level 3+</div>
+                        </div>
+                        <div class="option-card" data-type="outfit" data-value="solar" data-cost="150" data-level="7">
+                            <div class="option-icon">☀️</div>
+                            <div class="option-name">Solar Suit</div>
+                            <div class="option-cost">150 Tokens</div>
+                            <div class="option-level">Level 7+</div>
+                        </div>
+                        <div class="option-card" data-type="outfit" data-value="eco" data-cost="300" data-level="15">
+                            <div class="option-icon">🌍</div>
+                            <div class="option-name">Eco Hero</div>
+                            <div class="option-cost">300 Tokens</div>
+                            <div class="option-level">Level 15+</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">
+                        💇 Hair Style
+                        <div class="help-tip" title="Change your avatar's hair">?</div>
+                    </div>
+                    <div class="options-grid" id="hairOptions">
+                        <div class="option-card selected" data-type="hair" data-value="default" data-cost="0">
+                            <div class="option-icon">💇</div>
+                            <div class="option-name">Default</div>
+                            <div class="option-cost">Free</div>
+                        </div>
+                        <div class="option-card" data-type="hair" data-value="wind" data-cost="40" data-level="2">
+                            <div class="option-icon">💨</div>
+                            <div class="option-name">Wind</div>
+                            <div class="option-cost">40 Tokens</div>
+                            <div class="option-level">Level 2+</div>
+                        </div>
+                        <div class="option-card" data-type="hair" data-value="leaf" data-cost="90" data-level="6">
+                            <div class="option-icon">🍃</div>
+                            <div class="option-name">Leaf Crown</div>
+                            <div class="option-cost">90 Tokens</div>
+                            <div class="option-level">Level 6+</div>
+                        </div>
+                        <div class="option-card" data-type="hair" data-value="energy" data-cost="180" data-level="12">
+                            <div class="option-icon">⚡</div>
+                            <div class="option-name">Energy Flow</div>
+                            <div class="option-cost">180 Tokens</div>
+                            <div class="option-level">Level 12+</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-title">
+                        ✨ Special Effects
+                        <div class="help-tip" title="Add glowing effects to your avatar">?</div>
+                    </div>
+                    <div class="options-grid" id="effectOptions">
+                        <div class="option-card selected" data-type="effect" data-value="none" data-cost="0">
+                            <div class="option-icon">✨</div>
+                            <div class="option-name">None</div>
+                            <div class="option-cost">Free</div>
+                        </div>
+                        <div class="option-card" data-type="effect" data-value="glow" data-cost="60" data-level="4">
+                            <div class="option-icon">🌟</div>
+                            <div class="option-name">Eco Glow</div>
+                            <div class="option-cost">60 Tokens</div>
+                            <div class="option-level">Level 4+</div>
+                        </div>
+                        <div class="option-card" data-type="effect" data-value="particles" data-cost="120" data-level="8">
+                            <div class="option-icon">💫</div>
+                            <div class="option-name">Particles</div>
+                            <div class="option-cost">120 Tokens</div>
+                            <div class="option-level">Level 8+</div>
+                        </div>
+                        <div class="option-card" data-type="effect" data-value="aura" data-cost="250" data-level="20">
+                            <div class="option-icon">🌀</div>
+                            <div class="option-name">Full Aura</div>
+                            <div class="option-cost">250 Tokens</div>
+                            <div class="option-level">Level 20+</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="save-button" id="saveButton" onclick="saveAvatar()">
+                    💾 Save Changes
+                </button>
+                <div class="total-cost" id="totalCost">
+                    Total Cost: <span id="costAmount">0</span> Tokens
+                </div>
+            </div>
+
+            <!-- Right Panel: Stats & Info -->
+            <div class="panel stats-panel">
+                <div class="token-balance">
+                    <div class="token-amount">{{ user.token_balance|int }}</div>
+                    <div class="token-label">GreenTokens Available</div>
+                </div>
+
+                <div class="current-stats">
+                    <div class="stat-item">
+                        <span class="stat-name">Current Skin:</span>
+                        <span class="stat-value" id="currentSkin">Green</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-name">Current Outfit:</span>
+                        <span class="stat-value" id="currentOutfit">Basic Tee</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-name">Current Hair:</span>
+                        <span class="stat-value" id="currentHair">Default</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-name">Current Effect:</span>
+                        <span class="stat-value" id="currentEffect">None</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-name">Unlocked Styles:</span>
+                        <span class="stat-value" id="unlockedCount">4</span>
+                    </div>
+                </div>
+
+                <div class="unlocked-items">
+                    <div class="unlocked-title">Recently Unlocked</div>
+                    <div class="unlocked-list" id="unlockedList">
+                        <div class="unlocked-badge">Green Skin</div>
+                        <div class="unlocked-badge">Basic Tee</div>
+                        <div class="unlocked-badge">Default Hair</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 20px; background: #e8f6f3; border-radius: 10px;">
+                    <h4 style="color: #27ae60; margin-bottom: 10px;">How to Earn More Tokens</h4>
+                    <ul style="font-size: 14px; color: #2c3e50; padding-left: 20px; line-height: 1.6;">
+                        <li>Build sustainable cities in EcoWorld</li>
+                        <li>Plant trees and increase biodiversity</li>
+                        <li>Complete daily challenges</li>
+                        <li>Level up your avatar</li>
+                        <li>Participate in community events</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationArea"></div>
+
+    <script>
+        // Avatar configuration
+        let avatarConfig = {
+            skin: 'green',
+            outfit: 'basic',
+            hair: 'default',
+            effect: 'none',
+            tokens: {{ user.token_balance }},
+            level: {{ user.level }},
+            avatarLevel: {{ user.avatar_level }}
+        };
+
+        let selectedOptions = {
+            skin: {value: 'green', cost: 0},
+            outfit: {value: 'basic', cost: 0},
+            hair: {value: 'default', cost: 0},
+            effect: {value: 'none', cost: 0}
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAvatarData();
+            setupOptionCards();
+            updateAvatarPreview();
+            updateTotalCost();
+        });
+
+        // Load saved avatar data
+        async function loadAvatarData() {
+            try {
+                const response = await fetch('/avatar/data');
+                const data = await response.json();
+                
+                if (data) {
+                    // Update config with saved data
+                    avatarConfig.skin = data.skin || 'green';
+                    avatarConfig.outfit = data.outfit || 'basic';
+                    avatarConfig.hair = data.hair || 'default';
+                    avatarConfig.effect = data.aura || 'none';
+                    avatarConfig.tokens = data.tokens || {{ user.token_balance }};
+                    avatarConfig.avatarLevel = data.level || {{ user.avatar_level }};
+                    
+                    // Update selected options
+                    selectedOptions.skin.value = avatarConfig.skin;
+                    selectedOptions.outfit.value = avatarConfig.outfit;
+                    selectedOptions.hair.value = avatarConfig.hair;
+                    selectedOptions.effect.value = avatarConfig.effect;
+                    
+                    // Update UI
+                    updateCurrentStats();
+                    updateSelectedCards();
+                }
+            } catch (error) {
+                console.error('Error loading avatar data:', error);
+            }
+        }
+
+        // Setup option card click handlers
+        function setupOptionCards() {
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    if (this.classList.contains('locked')) return;
+                    
+                    const type = this.dataset.type;
+                    const value = this.dataset.value;
+                    const cost = parseInt(this.dataset.cost);
+                    const requiredLevel = parseInt(this.dataset.level) || 1;
+                    
+                    // Check level requirement
+                    if (requiredLevel > avatarConfig.level) {
+                        showNotification(`Requires Level ${requiredLevel}`, 'error');
+                        return;
+                    }
+                    
+                    // Check if affordable
+                    if (cost > avatarConfig.tokens) {
+                        showNotification('Not enough tokens!', 'error');
+                        return;
+                    }
+                    
+                    // Update selection
+                    selectedOptions[type] = {value, cost};
+                    
+                    // Update UI
+                    updateSelectedCards();
+                    updateAvatarPreview();
+                    updateTotalCost();
+                    
+                    // Show preview notification
+                    showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} changed to ${value}`, 'info');
+                });
+            });
+        }
+
+        // Update which cards are selected
+        function updateSelectedCards() {
+            document.querySelectorAll('.option-card').forEach(card => {
+                const type = card.dataset.type;
+                const value = card.dataset.value;
+                
+                card.classList.remove('selected');
+                if (selectedOptions[type] && selectedOptions[type].value === value) {
+                    card.classList.add('selected');
+                }
+                
+                // Check if locked
+                const requiredLevel = parseInt(card.dataset.level) || 1;
+                if (requiredLevel > avatarConfig.level) {
+                    card.classList.add('locked');
+                } else {
+                    card.classList.remove('locked');
+                }
+            });
+            
+            updateCurrentStats();
+        }
+
+        // Update avatar preview
+        function updateAvatarPreview() {
+            const canvas = document.getElementById('avatarCanvas');
+            const skinColors = {
+                green: '#2ecc71',
+                blue: '#3498db',
+                earth: '#8b4513',
+                solar: '#f1c40f'
+            };
+            
+            const skinColor = skinColors[selectedOptions.skin.value] || '#2ecc71';
+            const avatarName = document.getElementById('avatarName');
+            
+            // Simple avatar representation
+            let avatarHTML = '';
+            
+            // Hair
+            if (selectedOptions.hair.value === 'wind') {
+                avatarHTML += '<div style="font-size: 40px; margin-bottom: -20px;">💨</div>';
+            } else if (selectedOptions.hair.value === 'leaf') {
+                avatarHTML += '<div style="font-size: 30px; margin-bottom: -10px;">🍃</div>';
+            } else if (selectedOptions.hair.value === 'energy') {
+                avatarHTML += '<div style="font-size: 40px; margin-bottom: -20px;">⚡</div>';
+            }
+            
+            // Head with skin color
+            avatarHTML += `<div style="font-size: 80px; color: ${skinColor};">●</div>`;
+            
+            // Outfit
+            if (selectedOptions.outfit.value === 'recycle') {
+                avatarHTML += '<div style="font-size: 30px; margin-top: -15px;">♻️</div>';
+            } else if (selectedOptions.outfit.value === 'solar') {
+                avatarHTML += '<div style="font-size: 30px; margin-top: -15px;">☀️</div>';
+            } else if (selectedOptions.outfit.value === 'eco') {
+                avatarHTML += '<div style="font-size: 30px; margin-top: -15px;">🌍</div>';
+            }
+            
+            // Effect
+            if (selectedOptions.effect.value === 'glow') {
+                avatarHTML += '<div style="font-size: 30px; margin-top: -10px; animation: pulse 1s infinite;">🌟</div>';
+            } else if (selectedOptions.effect.value === 'particles') {
+                avatarHTML += '<div style="font-size: 30px; margin-top: -10px;">💫</div>';
+            } else if (selectedOptions.effect.value === 'aura') {
+                avatarHTML += '<div style="font-size: 40px; margin-top: -20px; animation: spin 3s linear infinite;">🌀</div>';
+            }
+            
+            canvas.innerHTML = avatarHTML;
+            
+            // Update name based on level
+            const levelNames = {
+                1: 'Eco Sprout',
+                5: 'Eco Guardian',
+                10: 'Eco Champion',
+                15: 'Eco Hero',
+                20: 'Eco Legend'
+            };
+            
+            let levelName = 'EcoTwin';
+            for (const [minLevel, name] of Object.entries(levelNames).reverse()) {
+                if (avatarConfig.avatarLevel >= parseInt(minLevel)) {
+                    levelName = name;
+                    break;
+                }
+            }
+            
+            avatarName.textContent = levelName;
+            
+            // Update XP bar
+            const xpPercent = ({{ user.avatar_xp }} / ({{ user.avatar_level }} * 100)) * 100;
+            document.getElementById('xpFill').style.width = `${xpPercent}%`;
+        }
+
+        // Update current stats display
+        function updateCurrentStats() {
+            document.getElementById('currentSkin').textContent = 
+                selectedOptions.skin.value.charAt(0).toUpperCase() + selectedOptions.skin.value.slice(1);
+            document.getElementById('currentOutfit').textContent = 
+                selectedOptions.outfit.value.charAt(0).toUpperCase() + selectedOptions.outfit.value.slice(1);
+            document.getElementById('currentHair').textContent = 
+                selectedOptions.hair.value.charAt(0).toUpperCase() + selectedOptions.hair.value.slice(1);
+            document.getElementById('currentEffect').textContent = 
+                selectedOptions.effect.value.charAt(0).toUpperCase() + selectedOptions.effect.value.slice(1);
+        }
+
+        // Calculate and update total cost
+        function updateTotalCost() {
+            let total = 0;
+            for (const option in selectedOptions) {
+                total += selectedOptions[option].cost;
+            }
+            
+            document.getElementById('costAmount').textContent = total;
+            
+            // Disable save button if not enough tokens
+            const saveButton = document.getElementById('saveButton');
+            if (total > avatarConfig.tokens) {
+                saveButton.disabled = true;
+                saveButton.textContent = 'Not Enough Tokens';
+            } else {
+                saveButton.disabled = false;
+                saveButton.textContent = '💾 Save Changes';
+            }
+        }
+
+        // Save avatar to server
+        async function saveAvatar() {
+            const totalCost = parseInt(document.getElementById('costAmount').textContent);
+            
+            if (totalCost > avatarConfig.tokens) {
+                showNotification('Not enough tokens!', 'error');
+                return;
+            }
+            
+            const saveButton = document.getElementById('saveButton');
+            saveButton.disabled = true;
+            saveButton.textContent = 'Saving...';
+            
+            try {
+                const response = await fetch('/avatar/save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        skin: selectedOptions.skin.value,
+                        outfit: selectedOptions.outfit.value,
+                        hair: selectedOptions.hair.value,
+                        aura: selectedOptions.effect.value,
+                        accessories: [],
+                        cost: totalCost
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update token balance
+                    avatarConfig.tokens = data.tokens;
+                    document.querySelector('.token-amount').textContent = Math.floor(data.tokens);
+                    
+                    // Update level if increased
+                    if (data.level_up) {
+                        avatarConfig.avatarLevel = data.level;
+                        document.querySelector('.level-badge').textContent = `Level ${data.level}`;
+                        showNotification(`🎉 Level Up! You're now Level ${data.level}!`, 'success');
+                    }
+                    
+                    showNotification('Avatar saved successfully!', 'success');
+                    
+                    // Reload page after a moment
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error saving avatar:', error);
+                showNotification('Error saving avatar. Please try again.', 'error');
+            } finally {
+                saveButton.disabled = false;
+                saveButton.textContent = '💾 Save Changes';
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notificationArea = document.getElementById('notificationArea');
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.borderLeftColor = type === 'error' ? '#e74c3c' : 
+                                               type === 'success' ? '#2ecc71' : '#3498db';
+            notification.innerHTML = message;
+            
+            notificationArea.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Tooltip handling
+        document.querySelectorAll('.help-tip').forEach(tip => {
+            tip.addEventListener('mouseenter', function(e) {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = this.title;
+                tooltip.style.left = e.clientX + 'px';
+                tooltip.style.top = e.clientY + 'px';
+                tooltip.style.display = 'block';
+                document.body.appendChild(tooltip);
+                
+                this.tooltip = tooltip;
+            });
+            
+            tip.addEventListener('mousemove', function(e) {
+                if (this.tooltip) {
+                    this.tooltip.style.left = e.clientX + 10 + 'px';
+                    this.tooltip.style.top = e.clientY + 10 + 'px';
+                }
+            });
+            
+            tip.addEventListener('mouseleave', function() {
+                if (this.tooltip) {
+                    this.tooltip.remove();
+                    this.tooltip = null;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

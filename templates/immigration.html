@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Immigration Control | Carbon Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #4FC3F7;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            color: #B3E5FC;
+            font-size: 1.1rem;
+        }
+
+        .status-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+        }
+
+        .country-flag {
+            width: 60px;
+            height: 40px;
+            background: var(--flag-color);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .route {
+            font-size: 1.2rem;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .route-arrow {
+            font-size: 24px;
+            color: #4FC3F7;
+        }
+
+        /* Visa Decision Styles */
+        .visa-decision {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(79, 195, 247, 0.1) 0%, rgba(33, 150, 243, 0.1) 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(79, 195, 247, 0.3);
+        }
+
+        .decision-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .decision-title {
+            font-size: 2rem;
+            color: #4FC3F7;
+            margin-bottom: 10px;
+        }
+
+        .decision-message {
+            font-size: 1.2rem;
+            color: #B3E5FC;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .seal-container {
+            margin: 30px 0;
+        }
+
+        .seal {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            background: radial-gradient(circle, #FFD700 0%, #FFA000 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+            position: relative;
+        }
+
+        .seal::before {
+            content: '';
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border: 3px solid #FFA000;
+            border-radius: 50%;
+        }
+
+        /* Visa Application Form */
+        .visa-form {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 40px;
+            color: #333;
+            display: none;
+        }
+
+        .form-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: 500;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #333;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #4FC3F7;
+            box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2);
+        }
+
+        input:read-only {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        /* Visa Document */
+        .visa-document {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 40px;
+            color: #333;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .visa-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #4FC3F7;
+        }
+
+        .visa-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .visa-number {
+            font-size: 1.2rem;
+            color: #666;
+            letter-spacing: 2px;
+        }
+
+        .visa-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .visa-field {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .visa-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .visa-value {
+            font-size: 16px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .visa-stamp {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .stamp-preview {
+            display: inline-block;
+            padding: 20px 40px;
+            background: #FFD700;
+            color: #2c3e50;
+            font-weight: bold;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            transform: rotate(-5deg);
+        }
+
+        /* Buttons */
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #4FC3F7 0%, #2196F3 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(33, 150, 243, 0.3);
+            margin: 0 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* Country flag colors */
+        .flag-india { --flag-color: linear-gradient(90deg, #FF9933 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #138808 66.6%); }
+        .flag-usa { --flag-color: linear-gradient(180deg, #B31942 40%, #FFFFFF 40%, #FFFFFF 60%, #B31942 60%); }
+        .flag-japan { --flag-color: #BC002D; }
+        .flag-germany { --flag-color: linear-gradient(180deg, #000000 33.3%, #DD0000 33.3%, #DD0000 66.6%, #FFCC00 66.6%); }
+        .flag-uae { --flag-color: linear-gradient(90deg, #FF0000 25%, #008000 25%, #008000 50%, #FFFFFF 50%, #FFFFFF 75%, #000000 75%); }
+        .flag-singapore { --flag-color: linear-gradient(180deg, #ED2939 50%, #FFFFFF 50%); }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <div class="header">
+            <h1>IMMIGRATION CONTROL</h1>
+            <p>Visa Processing for {{ passport_country }} Passport Holder</p>
+        </div>
+
+        <div class="status-container">
+            <div class="country-flag flag-{{ passport_country.lower().replace(' ', '-') }}">🇮🇳</div>
+            <div class="route">{{ passport_country }} → {{ destination_country }}</div>
+            <div class="route-arrow">→</div>
+            <div class="country-flag flag-{{ destination_country.lower().replace(' ', '-') }}">🇸🇬</div>
+        </div>
+
+        <!-- Visa Decision (for visa-free access) -->
+        {% if not requires_visa %}
+        <div class="visa-decision" id="visaDecision">
+            <div class="decision-icon">✅</div>
+            <div class="decision-title">VISA-FREE ACCESS GRANTED</div>
+            <div class="decision-message">
+                Holders of {{ passport_country }} passports are permitted visa-free entry to {{ destination_country }} for tourism purposes.
+                <br>Maximum stay: 90 days
+            </div>
+            
+            <div class="seal-container">
+                <div class="seal">✓</div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-success" onclick="proceedToStamping()">Continue to Stamping →</button>
+            </div>
+        </div>
+        {% else %}
+        <!-- Visa Required - Show Application Form -->
+        <div class="visa-form fade-in" id="visaForm">
+            <h2 class="form-title">VISA APPLICATION FORM</h2>
+            
+            <form id="visaApplicationForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nationality">Nationality</label>
+                        <input type="text" id="nationality" value="{{ passport_country }}" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="destination">Destination Country</label>
+                        <input type="text" id="destination" value="{{ destination_country }}" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" value="{{ user.username }}" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="passportNumber">Passport Number</label>
+                        <input type="text" id="passportNumber" value="P{{ '%06d' % user.id }}" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="travelPurpose">Purpose of Travel *</label>
+                        <select id="travelPurpose" required>
+                            <option value="">Select purpose</option>
+                            <option value="Tourism">Tourism / Vacation</option>
+                            <option value="Business">Business Meeting</option>
+                            <option value="Conference">Conference / Seminar</option>
+                            <option value="Education">Education / Training</option>
+                            <option value="Transit">Transit</option>
+                            <option value="Medical">Medical Treatment</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="duration">Duration of Stay (Days) *</label>
+                        <select id="duration" required>
+                            <option value="">Select duration</option>
+                            <option value="7">7 days</option>
+                            <option value="14">14 days</option>
+                            <option value="30">30 days</option>
+                            <option value="60">60 days</option>
+                            <option value="90">90 days</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="occupation">Occupation *</label>
+                        <select id="occupation" required>
+                            <option value="">Select occupation</option>
+                            <option value="Student">Student</option>
+                            <option value="Professional">Professional</option>
+                            <option value="Business Owner">Business Owner</option>
+                            <option value="Government Employee">Government Employee</option>
+                            <option value="Retired">Retired</option>
+                            <option value="Self-Employed">Self-Employed</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="btn-container">
+                    <button type="submit" class="btn">Submit Visa Application</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Visa Document (hidden initially) -->
+        <div class="visa-document fade-in" id="visaDocument">
+            <div class="visa-header">
+                <div class="visa-title">ENTRY VISA</div>
+                <div class="visa-number" id="visaNumber">VISA-XXXXXX-XXXX</div>
+            </div>
+            
+            <div class="visa-details">
+                <div class="visa-field">
+                    <div class="visa-label">Visa Type</div>
+                    <div class="visa-value" id="visaType">TOURIST VISA</div>
+                </div>
+                <div class="visa-field">
+                    <div class="visa-label">Visa Number</div>
+                    <div class="visa-value" id="visaNumberDisplay">VISA-XXXXXX-XXXX</div>
+                </div>
+                <div class="visa-field">
+                    <div class="visa-label">Passport Holder</div>
+                    <div class="visa-value">{{ user.username }}</div>
+                </div>
+                <div class="visa-field">
+                    <div class="visa-label">Passport Number</div>
+                    <div class="visa-value">P{{ '%06d' % user.id }}</div>
+                </div>
+                <div class="visa-field">
+                    <div class="visa-label">Nationality</div>
+                    <div class="visa-value">{{ passport_country }}</div>
+                </div>
+                <div class="visa-field">
+                    <div class="visa-label">Destination</div>
+                    <div class="visa-value">{{ destination_country }}</div>
+                </div>
+                <div class="visa-field">
+                    <div class="visa-label">Purpose of Travel</div>
+                    <div class="visa-value" id="documentPurpose">Tourism</div>
+                </div>
+                <div class="visa-field">
+                    <div class="visa-label">Duration</div>
+                    <div class="visa-value" id="documentDuration">14 days</div>
+                </div>
+                <div class="visa-field">
+                    <div class="visa-label">Occupation</div>
+                    <div class="visa-value" id="documentOccupation">Professional</div>
+                </div>
+                <div class="visa-field">
+                    <div class="visa-label">Date of Issue</div>
+                    <div class="visa-value" id="issueDate">{{ datetime.now().strftime('%d %b %Y') }}</div>
+                </div>
+                <div class="visa-field">
+                    <div class="visa-label">Date of Expiry</div>
+                    <div class="visa-value" id="expiryDate">{{ (datetime.now() + timedelta(days=365)).strftime('%d %b %Y') }}</div>
+                </div>
+                <div class="visa-field">
+                    <div class="visa-label">Status</div>
+                    <div class="visa-value" style="color: #4CAF50; font-weight: bold;">APPROVED</div>
+                </div>
+            </div>
+            
+            <div class="visa-stamp">
+                <div class="stamp-preview">VISA GRANTED</div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-success" onclick="submitToImmigration()">Submit to Immigration →</button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if requires_visa %}
+            // Show visa form for visa-required countries
+            document.getElementById('visaForm').style.display = 'block';
+            {% endif %}
+        });
+
+        // Handle visa application form submission
+        document.getElementById('visaApplicationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                travel_purpose: document.getElementById('travelPurpose').value,
+                duration: document.getElementById('duration').value,
+                occupation: document.getElementById('occupation').value
+            };
+            
+            // Submit to server
+            fetch('/process-visa', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update visa document with received data
+                    document.getElementById('visaNumber').textContent = data.visa.visa_number;
+                    document.getElementById('visaNumberDisplay').textContent = data.visa.visa_number;
+                    document.getElementById('documentPurpose').textContent = data.visa.purpose;
+                    document.getElementById('documentDuration').textContent = data.visa.duration_days + ' days';
+                    document.getElementById('documentOccupation').textContent = data.visa.occupation;
+                    document.getElementById('issueDate').textContent = data.visa.issue_date;
+                    document.getElementById('expiryDate').textContent = data.visa.expiry_date;
+                    
+                    // Hide form and show visa document
+                    document.getElementById('visaForm').style.display = 'none';
+                    document.getElementById('visaDocument').style.display = 'block';
+                }
+            });
+        });
+
+        function proceedToStamping() {
+            window.location.href = "/stamp";
+        }
+
+        function submitToImmigration() {
+            window.location.href = "/stamp";
+        }
+    </script>
+</body>
+</html>

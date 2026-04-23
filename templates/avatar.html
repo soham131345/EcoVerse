@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NEXUS AVATAR</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ffea;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 255, 234, 0.03) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+            animation: scan 8s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+        
+        .grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 255, 234, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 234, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 998;
+        }
+        
+        .nexus-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            height: 100vh;
+            padding: 20px;
+            gap: 20px;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .panel {
+            background: rgba(10, 25, 47, 0.85);
+            border: 1px solid rgba(0, 255, 234, 0.3);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ffea, #ff00ff, #00ffea);
+            z-index: -1;
+            animation: borderPulse 3s infinite;
+            opacity: 0.3;
+        }
+        
+        @keyframes borderPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .panel:hover {
+            border-color: #00ffea;
+            box-shadow: 0 0 30px rgba(0, 255, 234, 0.2);
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: #00ffea;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .panel-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: #00ffea;
+        }
+        
+        .stats-grid {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 255, 234, 0.05);
+            border: 1px solid rgba(0, 255, 234, 0.1);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: rgba(0, 255, 234, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .avatar-display {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #avatarCanvas {
+            width: 400px;
+            height: 500px;
+            image-rendering: crisp-edges;
+            filter: drop-shadow(0 0 30px rgba(0, 255, 234, 0.3));
+        }
+        
+        .aura {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            height: 550px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 234, 0.1) 0%, transparent 70%);
+            animation: auraPulse 3s infinite;
+        }
+        
+        @keyframes auraPulse {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.05); }
+        }
+        
+        .customization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .customization-grid::-webkit-scrollbar {
+            width: 3px;
+        }
+        
+        .customization-grid::-webkit-scrollbar-track {
+            background: rgba(0, 40, 80, 0.3);
+        }
+        
+        .customization-grid::-webkit-scrollbar-thumb {
+            background: #00ffea;
+        }
+        
+        .style-option {
+            background: rgba(0, 30, 60, 0.5);
+            border: 1px solid rgba(0, 255, 234, 0.2);
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            position: relative;
+        }
+        
+        .style-option:hover {
+            background: rgba(0, 100, 200, 0.3);
+            border-color: #00ffea;
+            transform: translateY(-2px);
+        }
+        
+        .style-option.selected {
+            background: rgba(0, 255, 234, 0.1);
+            border-color: #00ffea;
+            box-shadow: 0 0 20px rgba(0, 255, 234, 0.3);
+        }
+        
+        .style-option.locked {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .style-option.locked::after {
+            content: 'LOCKED';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            color: #ff0000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .style-name {
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            color: #fff;
+        }
+        
+        .style-cost {
+            font-size: 11px;
+            color: #ff00ff;
+        }
+        
+        .style-level {
+            font-size: 10px;
+            color: rgba(0, 255, 234, 0.7);
+        }
+        
+        .execute-btn {
+            background: linear-gradient(45deg, #000, #00ffea);
+            border: none;
+            color: #000;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .execute-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .execute-btn:hover::before {
+            left: 100%;
+        }
+        
+        .execute-btn:hover {
+            background: linear-gradient(45deg, #00ffea, #000);
+            box-shadow: 0 0 40px rgba(0, 255, 234, 0.5);
+            transform: scale(1.02);
+        }
+        
+        .execute-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .nav {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            background: transparent;
+            border: 1px solid #00ffea;
+            color: #00ffea;
+            padding: 10px 20px;
+            font-family: 'Courier New';
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(0, 255, 234, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 234, 0.3);
+        }
+        
+        .terminal {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffea;
+            padding: 15px;
+            font-family: 'Courier New';
+            font-size: 12px;
+            color: #00ff00;
+            max-width: 400px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .terminal-line {
+            margin-bottom: 5px;
+        }
+        
+        .logo {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ffea;
+            z-index: 1001;
+        }
+        
+        .logo span {
+            color: #ff00ff;
+        }
+        
+        .xp-bar {
+            height: 4px;
+            background: rgba(0, 255, 234, 0.1);
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffea, #ff00ff);
+            transition: width 1s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        
+        .category-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 20px 0 10px 0;
+            color: #00ffea;
+        }
+        
+        .cost-display {
+            font-size: 12px;
+            margin-top: 10px;
+            color: rgba(0, 255, 234, 0.7);
+            text-align: center;
+        }
+        
+        .cost-display span {
+            color: #ff00ff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="grid"></div>
+    <div class="particles" id="particles"></div>
+    
+    <div class="logo">NEXUS<span>::</span>AVATAR</div>
+    
+    <div class="nav">
+        <button class="nav-btn" onclick="location.href='/dashboard'">DASHBOARD</button>
+        <button class="nav-btn" onclick="exportAvatar()">EXPORT</button>
+        <button class="nav-btn" onclick="location.href='/logout'">LOGOUT</button>
+    </div>
+    
+    <div class="terminal" id="terminal">
+        <div class="terminal-line">> SYSTEM: AVATAR NEXUS LOADED</div>
+        <div class="terminal-line">> USER: {{ user.username|upper }}</div>
+        <div class="terminal-line">> STATUS: READY FOR CONFIGURATION</div>
+    </div>
+    
+    <div class="nexus-container">
+        <div class="panel">
+            <div class="panel-title">USER STATS</div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">TOKENS</div>
+                    <div class="stat-value" id="tokenDisplay">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">LEVEL</div>
+                    <div class="stat-value" id="levelDisplay">1</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">XP</div>
+                    <div class="stat-value" id="xpDisplay">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">NEXT LEVEL</div>
+                    <div class="stat-value" id="xpNeeded">100</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <div class="stat-label">LEVEL PROGRESSION</div>
+                <div class="xp-bar">
+                    <div class="xp-fill" id="xpBar"></div>
+                </div>
+                <div style="font-size: 11px; margin-top: 5px; color: rgba(0, 255, 234, 0.7);">
+                    <span id="xpText">0/100</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <div class="panel-title">CURRENT LOADOUT</div>
+                <div id="currentLoadout" style="font-size: 12px; line-height: 1.8;">
+                    Loading...
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div class="avatar-display">
+                <div class="aura"></div>
+                <canvas id="avatarCanvas"></canvas>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="execute-btn" onclick="saveConfiguration()">
+                    EXECUTE CONFIGURATION
+                </button>
+                <div class="cost-display">
+                    COST: <span id="totalCost">0</span> TOKENS
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div class="panel-title">CUSTOMIZATION MATRIX</div>
+            <div class="category-title">SKIN</div>
+            <div class="customization-grid" id="skinOptions"></div>
+            <div class="category-title">HAIR</div>
+            <div class="customization-grid" id="hairOptions"></div>
+            <div class="category-title">OUTFIT</div>
+            <div class="customization-grid" id="outfitOptions"></div>
+            <div class="category-title">AURA</div>
+            <div class="customization-grid" id="auraOptions"></div>
+            <div class="category-title">ACCESSORIES</div>
+            <div class="customization-grid" id="accessoryOptions"></div>
+        </div>
+    </div>
+    
+    <script>
+        let config = {
+            skin: 'void',
+            hair: 'flow',
+            outfit: 'nexus',
+            aura: 'pulse',
+            accessories: [],
+            tokens: 0,
+            level: 1,
+            xp: 0,
+            xpNeeded: 100
+        };
+        
+        let selected = {
+            skin: {value: 'void', cost: 0},
+            hair: {value: 'flow', cost: 0},
+            outfit: {value: 'nexus', cost: 0},
+            aura: {value: 'pulse', cost: 0},
+            accessory: {value: 'none', cost: 0}
+        };
+        
+        const styles = {
+            skin: [
+                {id: 'void', name: 'VOID', cost: 0, level: 1},
+                {id: 'quantum', name: 'QUANTUM', cost: 500, level: 10},
+                {id: 'nebula', name: 'NEBULA', cost: 800, level: 20},
+                {id: 'obsidian', name: 'OBSIDIAN', cost: 1200, level: 30}
+            ],
+            hair: [
+                {id: 'flow', name: 'FLOW', cost: 0, level: 1},
+                {id: 'neural', name: 'NEURAL', cost: 300, level: 5},
+                {id: 'static', name: 'STATIC', cost: 600, level: 15},
+                {id: 'phase', name: 'PHASE', cost: 900, level: 25}
+            ],
+            outfit: [
+                {id: 'nexus', name: 'NEXUS', cost: 0, level: 1},
+                {id: 'matrix', name: 'MATRIX', cost: 400, level: 8},
+                {id: 'grid', name: 'GRID', cost: 700, level: 18},
+                {id: 'core', name: 'CORE', cost: 1100, level: 28}
+            ],
+            aura: [
+                {id: 'pulse', name: 'PULSE', cost: 0, level: 1},
+                {id: 'wave', name: 'WAVE', cost: 600, level: 12},
+                {id: 'field', name: 'FIELD', cost: 1000, level: 22},
+                {id: 'vortex', name: 'VORTEX', cost: 1400, level: 35}
+            ],
+            accessories: [
+                {id: 'none', name: 'NONE', cost: 0, level: 1},
+                {id: 'node', name: 'NODE', cost: 200, level: 3},
+                {id: 'circuit', name: 'CIRCUIT', cost: 450, level: 10},
+                {id: 'orbital', name: 'ORBITAL', cost: 800, level: 20}
+            ]
+        };
+        
+        let canvas, ctx;
+        let terminalLines = [];
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * window.innerWidth;
+                this.y = Math.random() * window.innerHeight;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.color = Math.random() > 0.5 ? '#00ffea' : '#ff00ff';
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x > window.innerWidth) this.x = 0;
+                if (this.x < 0) this.x = window.innerWidth;
+                if (this.y > window.innerHeight) this.y = 0;
+                if (this.y < 0) this.y = window.innerHeight;
+            }
+            
+            draw(ctx) {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        let particles = [];
+        
+        function initParticles() {
+            const particlesCanvas = document.getElementById('particles');
+            const particlesCtx = particlesCanvas.getContext('2d');
+            
+            particlesCanvas.width = window.innerWidth;
+            particlesCanvas.height = window.innerHeight;
+            
+            particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle());
+            }
+            
+            function animateParticles() {
+                particlesCtx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
+                
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw(particlesCtx);
+                }
+                
+                requestAnimationFrame(animateParticles);
+            }
+            
+            animateParticles();
+            
+            window.addEventListener('resize', function() {
+                particlesCanvas.width = window.innerWidth;
+                particlesCanvas.height = window.innerHeight;
+            });
+        }
+        
+        function init() {
+            canvas = document.getElementById('avatarCanvas');
+            ctx = canvas.getContext('2d');
+            canvas.width = 400;
+            canvas.height = 500;
+            
+            loadAvatarData();
+            setupOptions();
+            initParticles();
+            drawAvatar();
+        }
+        
+        function loadAvatarData() {
+            fetch('/avatar/data')
+                .then(r => r.json())
+                .then(data => {
+                    config = {...config, ...data};
+                    selected.skin.value = config.skin;
+                    selected.hair.value = config.hair;
+                    selected.outfit.value = config.outfit;
+                    selected.aura.value = config.aura;
+                    selected.accessory.value = config.accessories[0] || 'none';
+                    
+                    updateDisplay();
+                    updateOptions();
+                    updateCurrentLoadout();
+                });
+        }
+        
+        function setupOptions() {
+            for (const category in styles) {
+                const container = document.getElementById(category + 'Options');
+                if (!container) continue;
+                
+                styles[category].forEach(style => {
+                    const div = document.createElement('div');
+                    div.className = 'style-option';
+                    div.dataset.value = style.id;
+                    div.dataset.cost = style.cost;
+                    div.dataset.level = style.level;
+                    
+                    div.innerHTML = `
+                        <div class="style-name">${style.name}</div>
+                        <div class="style-cost">${style.cost} TOKENS</div>
+                        <div class="style-level">LEVEL ${style.level}</div>
+                    `;
+                    
+                    div.onclick = () => selectStyle(category, style.id, style.cost, style.level);
+                    container.appendChild(div);
+                });
+            }
+        }
+        
+        function selectStyle(category, value, cost, requiredLevel) {
+            if (requiredLevel > config.level) {
+                addTerminalLine(`> ERROR: REQUIRES LEVEL ${requiredLevel}`);
+                return;
+            }
+            
+            selected[category] = {value, cost};
+            config[category] = value;
+            if (category === 'accessory') config.accessories = [value];
+            
+            updateOptions();
+            updateCurrentLoadout();
+            calculateTotal();
+            drawAvatar();
+            addTerminalLine(`> SELECTED: ${value.toUpperCase()}`);
+        }
+        
+        function updateOptions() {
+            for (const category in styles) {
+                styles[category].forEach(style => {
+                    const el = document.querySelector(`[data-value="${style.id}"]`);
+                    if (el) {
+                        el.classList.toggle('selected', selected[category].value === style.id);
+                        el.classList.toggle('locked', style.level > config.level);
+                    }
+                });
+            }
+        }
+        
+        function calculateTotal() {
+            let total = 0;
+            for (const key in selected) {
+                total += selected[key].cost;
+            }
+            document.getElementById('totalCost').textContent = total;
+            return total;
+        }
+        
+        function updateDisplay() {
+            document.getElementById('tokenDisplay').textContent = Math.floor(config.tokens);
+            document.getElementById('levelDisplay').textContent = config.level;
+            document.getElementById('xpDisplay').textContent = config.xp;
+            document.getElementById('xpNeeded').textContent = config.level * 100;
+            document.getElementById('xpText').textContent = `${config.xp}/${config.level * 100}`;
+            document.getElementById('xpBar').style.width = `${(config.xp / (config.level * 100)) * 100}%`;
+        }
+        
+        function updateCurrentLoadout() {
+            const loadout = document.getElementById('currentLoadout');
+            loadout.innerHTML = `
+                <div>SKIN: <strong>${config.skin.toUpperCase()}</strong></div>
+                <div>HAIR: <strong>${config.hair.toUpperCase()}</strong></div>
+                <div>OUTFIT: <strong>${config.outfit.toUpperCase()}</strong></div>
+                <div>AURA: <strong>${config.aura.toUpperCase()}</strong></div>
+                <div>ACCESSORY: <strong>${(config.accessories[0] || 'none').toUpperCase()}</strong></div>
+            `;
+        }
+        
+        function drawAvatar() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const time = Date.now() * 0.001;
+            
+            drawBody(centerX, centerY, time);
+            drawHair(centerX, centerY, time);
+            drawOutfit(centerX, centerY, time);
+            drawAccessory(centerX, centerY, time);
+        }
+        
+        function drawBody(x, y, time) {
+            const colors = {
+                void: ['#000', '#111'],
+                quantum: ['#00ffff', '#0088ff'],
+                nebula: ['#ff00ff', '#8800ff'],
+                obsidian: ['#222222', '#444444']
+            };
+            
+            const colorSet = colors[config.skin] || colors.void;
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, 100);
+            gradient.addColorStop(0, colorSet[0]);
+            gradient.addColorStop(1, colorSet[1]);
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x, y, 80, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#00ffea';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(x, y, 85 + Math.sin(time * 2) * 5, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        function drawHair(x, y, time) {
+            const hairY = y - 60;
+            
+            if (config.hair === 'neural') {
+                ctx.strokeStyle = '#00ffea';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i / 12) * Math.PI * 2 + time;
+                    const length = 40 + Math.sin(time * 3 + i) * 20;
+                    const endX = x + Math.cos(angle) * length;
+                    const endY = hairY + Math.sin(angle) * length;
+                    
+                    ctx.moveTo(x, hairY);
+                    ctx.lineTo(endX, endY);
+                }
+                ctx.stroke();
+            } else if (config.hair === 'static') {
+                ctx.strokeStyle = '#ff00ff';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    ctx.beginPath();
+                    for (let j = 0; j < 5; j++) {
+                        const segmentX = x + Math.cos(angle) * (20 + j * 15);
+                        const segmentY = hairY + Math.sin(angle) * (20 + j * 15) + Math.sin(time * 4 + i + j) * 10;
+                        
+                        if (j == 0) {
+                            ctx.moveTo(segmentX, segmentY);
+                        } else {
+                            ctx.lineTo(segmentX, segmentY);
+                        }
+                    }
+                    ctx.stroke();
+                }
+            } else if (config.hair === 'phase') {
+                ctx.globalAlpha = 0.7;
+                ctx.fillStyle = '#00ffaa';
+                ctx.beginPath();
+                for (let i = 0; i < 24; i++) {
+                    const angle = (i / 24) * Math.PI * 2;
+                    const radius = 35 + Math.sin(time * 2 + i * 0.5) * 15;
+                    const px = x + Math.cos(angle) * radius;
+                    const py = hairY + Math.sin(angle) * radius;
+                    
+                    if (i == 0) {
+                        ctx.moveTo(px, py);
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+        
+        function drawOutfit(x, y, time) {
+            const outfitY = y + 40;
+            
+            if (config.outfit === 'matrix') {
+                ctx.strokeStyle = '#007766';
+                ctx.lineWidth = 2;
+                
+                for (let i = 0; i < 8; i++) {
+                    const xPos = x - 60 + i * 15;
+                    ctx.beginPath();
+                    ctx.moveTo(xPos, outfitY);
+                    ctx.lineTo(xPos, outfitY + 80);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(x - 60, outfitY + i * 10);
+                    ctx.lineTo(x + 60, outfitY + i * 10);
+                    ctx.stroke();
+                }
+            } else if (config.outfit === 'grid') {
+                ctx.fillStyle = 'rgba(0, 255, 234, 0.1)';
+                ctx.fillRect(x - 50, outfitY, 100, 80);
+                
+                ctx.strokeStyle = '#0077ff';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 6; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(x - 50 + i * 20, outfitY);
+                    ctx.lineTo(x - 50 + i * 20, outfitY + 80);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(x - 50, outfitY + i * 16);
+                    ctx.lineTo(x + 50, outfitY + i * 16);
+                    ctx.stroke();
+                }
+            } else if (config.outfit === 'core') {
+                const gradient = ctx.createLinearGradient(x, outfitY, x, outfitY + 80);
+                gradient.addColorStop(0, '#ff00ff');
+                gradient.addColorStop(1, '#00ffff');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x - 40, outfitY, 80, 80);
+                
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x - 40, outfitY, 80, 80);
+                
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(x, outfitY + 40, 20, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function drawAccessory(x, y, time) {
+            if (config.accessories[0] === 'node') {
+                ctx.fillStyle = '#ffff00';
+                ctx.beginPath();
+                ctx.arc(x, y - 100, 10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.strokeStyle = '#ffff00';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(x, y - 100, 15 + Math.sin(time * 3) * 5, 0, Math.PI * 2);
+                ctx.stroke();
+            } else if (config.accessories[0] === 'circuit') {
+                const points = [
+                    [x - 60, y - 120],
+                    [x - 30, y - 120],
+                    [x, y - 100],
+                    [x + 30, y - 120],
+                    [x + 60, y - 120]
+                ];
+                
+                ctx.strokeStyle = '#00ffea';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                points.forEach((point, i) => {
+                    if (i == 0) {
+                        ctx.moveTo(point[0], point[1]);
+                    } else {
+                        ctx.lineTo(point[0], point[1]);
+                    }
+                });
+                ctx.stroke();
+                
+                points.forEach(point => {
+                    ctx.fillStyle = '#ff00ff';
+                    ctx.beginPath();
+                    ctx.arc(point[0], point[1], 5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            } else if (config.accessories[0] === 'orbital') {
+                ctx.save();
+                ctx.translate(x, y - 80);
+                ctx.rotate(time);
+                
+                ctx.strokeStyle = '#ff00ff';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 3; i++) {
+                    ctx.rotate(Math.PI * 2 / 3);
+                    ctx.beginPath();
+                    ctx.arc(0, 40, 20, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#00ffea';
+                    ctx.beginPath();
+                    ctx.arc(0, 40, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            }
+        }
+        
+        function saveConfiguration() {
+            const totalCost = calculateTotal();
+            
+            if (totalCost > config.tokens) {
+                addTerminalLine('> ERROR: INSUFFICIENT TOKENS');
+                return;
+            }
+            
+            const data = {
+                skin: selected.skin.value,
+                hair: selected.hair.value,
+                outfit: selected.outfit.value,
+                aura: selected.aura.value,
+                accessories: [selected.accessory.value],
+                cost: totalCost
+            };
+            
+            fetch('/avatar/save', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(response => {
+                if (response.success) {
+                    config.tokens = response.tokens;
+                    config.level = response.level;
+                    config.xp = response.xp;
+                    
+                    updateDisplay();
+                    updateOptions();
+                    addTerminalLine('> CONFIGURATION EXECUTED');
+                    
+                    if (response.level_up) {
+                        addTerminalLine('> LEVEL INCREASED');
+                        triggerLevelUpEffect();
+                    }
+                } else {
+                    addTerminalLine('> ERROR: ' + response.message);
+                }
+            })
+            .catch(() => {
+                addTerminalLine('> NETWORK ERROR');
+            });
+        }
+        
+        function addTerminalLine(msg) {
+            const terminal = document.getElementById('terminal');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.textContent = msg;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+            
+            if (terminal.children.length > 10) {
+                terminal.removeChild(terminal.children[0]);
+            }
+        }
+        
+        function triggerLevelUpEffect() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    particles.push(new Particle());
+                }, i * 50);
+            }
+        }
+        
+        function exportAvatar() {
+            const link = document.createElement('a');
+            link.download = `avatar_${config.level}_${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+            addTerminalLine('> AVATAR EXPORTED');
+        }
+        
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SYSTEM SHORTCUTS :: ECOVERSE NEXUS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #0ff;
+            font-family: 'Courier New', 'Consolas', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient( to bottom, transparent 50%, rgba(0, 255, 255, 0.02) 50% );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1;
+            animation: scan 4s linear infinite;
+        }
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+
+        .grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.3;
+        }
+
+        .glitch {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 3;
+            animation: glitch 5s infinite;
+        }
+        @keyframes glitch {
+            0%, 100% { opacity: 0.08; transform: translateX(0); }
+            25% { opacity: 0.12; transform: translateX(-1px); }
+            50% { opacity: 0.1; transform: translateX(1px); }
+            75% { opacity: 0.15; transform: translateX(0); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            background: rgba(0, 15, 20, 0.9);
+            border: 2px solid #0ff;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+            border-radius: 2px;
+            border-image: linear-gradient(45deg, #0ff, #0f0, #0ff) 1;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #0ff, #0f0, #0ff);
+            z-index: -1;
+            filter: blur(8px);
+            opacity: 0.4;
+            border-radius: 4px;
+        }
+
+        .header-content {
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #0ff;
+            text-shadow: 0 0 15px #0ff;
+        }
+
+        .header h2 {
+            font-size: 18px;
+            color: #0a9;
+            font-weight: normal;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            background: rgba(0, 30, 30, 0.8);
+            border: 1px solid #0ff;
+            color: #0ff;
+            padding: 12px 30px;
+            font-family: 'Courier New';
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            width: 18px;
+            height: 18px;
+            filter: invert(69%) sepia(78%) saturate(434%) hue-rotate(133deg) brightness(107%) contrast(101%);
+        }
+
+        .shortcuts-section {
+            background: rgba(0, 15, 20, 0.9);
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            border-radius: 2px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(5px);
+        }
+
+        .section-title {
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            color: #0ff;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 1px;
+            background: linear-gradient(90deg, #0ff, transparent);
+        }
+
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .shortcut-category {
+            background: rgba(0, 20, 25, 0.9);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 2px;
+            padding: 20px;
+        }
+
+        .category-title {
+            font-size: 18px;
+            color: #0ff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .shortcut-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(0, 30, 30, 0.5);
+            border-radius: 2px;
+            border-left: 3px solid #0ff;
+            transition: all 0.3s;
+        }
+
+        .shortcut-item:hover {
+            background: rgba(0, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .shortcut-combo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .key {
+            background: rgba(0, 30, 30, 0.8);
+            border: 1px solid #0ff;
+            color: #0ff;
+            padding: 4px 10px;
+            border-radius: 2px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .key.plus {
+            background: transparent;
+            border: none;
+            color: #0a9;
+            font-size: 14px;
+        }
+
+        .key.ctrl {
+            background: linear-gradient(45deg, #0ff, #0a9);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .shortcut-desc {
+            font-size: 13px;
+            color: #0a9;
+            line-height: 1.5;
+        }
+
+        .hotkey-legend {
+            background: rgba(0, 20, 25, 0.9);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 2px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: #0a9;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 2px;
+            border: 1px solid currentColor;
+        }
+
+        .legend-color.cyan {
+            background: rgba(0, 255, 255, 0.2);
+            color: #0ff;
+        }
+
+        .legend-color.green {
+            background: rgba(0, 255, 0, 0.2);
+            color: #0f0;
+        }
+
+        .legend-color.yellow {
+            background: rgba(255, 255, 0, 0.2);
+            color: #ff0;
+        }
+
+        .legend-color.purple {
+            background: rgba(108, 92, 231, 0.2);
+            color: #6c5ce7;
+        }
+
+        .legend-color.red {
+            background: rgba(255, 0, 0, 0.2);
+            color: #f00;
+        }
+
+        .quick-tips {
+            background: rgba(0, 20, 30, 0.9);
+            border: 1px solid #0a9;
+            border-radius: 2px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .tips-title {
+            font-size: 16px;
+            color: #0a9;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .tip-item {
+            font-size: 13px;
+            color: #0a9;
+            margin-bottom: 10px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .tip-item::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: #0ff;
+        }
+
+        .terminal-footer {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(0, 10, 15, 0.95);
+            border: 1px solid #0ff;
+            padding: 12px;
+            font-family: 'Courier New';
+            font-size: 11px;
+            color: #0ff;
+            max-width: 350px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            border-radius: 2px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .terminal-line {
+            margin-bottom: 4px;
+            font-family: 'Consolas', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .shortcuts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .terminal-footer {
+                position: relative;
+                bottom: 0;
+                left: 0;
+                max-width: 100%;
+                margin-top: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .section-title {
+                font-size: 20px;
+            }
+            
+            .shortcut-category {
+                padding: 15px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="grid"></div>
+    <div class="glitch"></div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>NEXUS SYSTEM SHORTCUTS</h1>
+                <h2>KEYBOARD COMMANDS & HOTKEYS</h2>
+                <p style="color: #0a9; margin-top: 10px; font-size: 14px;">
+                    Press CTRL + Key combos for instant module access
+                </p>
+                <a href="/dashboard" class="back-btn">
+                    <img src="https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/arrow_back/default/24px.svg" class="btn-icon" alt="Back">
+                    RETURN TO DASHBOARD
+                </a>
+            </div>
+        </div>
+
+        <div class="shortcuts-section">
+            <h2 class="section-title">SYSTEM COMMANDS</h2>
+            
+            <div class="shortcuts-grid">
+                <div class="shortcut-category">
+                    <h3 class="category-title">📱 MODULE NAVIGATION</h3>
+                    
+                    <div class="shortcut-item">
+                        <div class="shortcut-combo">
+                            <span class="key ctrl">CTRL</span>
+                            <span class="key plus">+</span>
+                            <span class="key">D</span>
+                        </div>
+                        <div class="shortcut-desc">Dashboard - Return to main dashboard</div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <div class="shortcut-combo">
+                            <span class="key ctrl">CTRL</span>
+                            <span class="key plus">+</span>
+                            <span class="key">E</span>
+                        </div>
+                        <div class="shortcut-desc">EcoWorld - Open city simulator</div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <div class="shortcut-combo">
+                            <span class="key ctrl">CTRL</span>
+                            <span class="key plus">+</span>
+                            <span class="key">N</span>
+                        </div>
+                        <div class="shortcut-desc">Nexus Avatar - Open avatar customization</div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <div class="shortcut-combo">
+                            <span class="key ctrl">CTRL</span>
+                            <span class="key plus">+</span>
+                            <span class="key">S</span>
+                        </div>
+                        <div class="shortcut-desc">AI Stories - Generate animated stories</div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <div class="shortcut-combo">
+                            <span class="key ctrl">CTRL</span>
+                            <span class="key plus">+</span>
+                            <span class="key">C</span>
+                        </div>
+                        <div class="shortcut-desc">Carbon Dashboard - View footprint analytics</div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <div class="shortcut-combo">
+                            <span class="key ctrl">CTRL</span>
+                            <span class="key plus">+</span>
+                            <span class="key">G</span>
+                        </div>
+                        <div class="shortcut-desc">GreenToken - Open investment dashboard</div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <div class="shortcut-combo">
+                            <span class="key ctrl">CTRL</span>
+                            <span class="key plus">+</span>
+                            <span class="key">T</span>
+                        </div>
+                        <div class="shortcut-desc">Climate Timeline - Travel through climate history</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="terminal-footer">
+        <div class="terminal-line">> SYSTEM SHORTCUTS LOADED</div>
+        <div class="terminal-line">> READY FOR COMMANDS...</div>
+        <div class="terminal-line">> PRESS ESC TO CLOSE ANY MODAL</div>
+        <div class="terminal-line">> PRESS F5 FOR HARD REFRESH</div>
+        <div class="terminal-line">> SYSTEM TIME: <span id="system-time">--:--:--</span></div>
+        <div class="terminal-line">> STATUS: <span style="color:#0f0;">ACTIVE</span></div>
+    </div>
+
+    <script>
+        function updateSystemTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+            const timeElement = document.getElementById('system-time');
+            if(timeElement) timeElement.textContent = timeString;
+        }
+        
+        updateSystemTime();
+        setInterval(updateSystemTime, 1000);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                window.history.back();
+            }
+            
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                window.location.href = '/dashboard';
+            }
+            
+            if (e.key === 'F5') {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 100);
+            }
+            
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+        });
+
+        document.querySelectorAll('.key').forEach(key => {
+            key.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1)';
+                this.style.boxShadow = '0 0 10px currentColor';
+            });
+            
+            key.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

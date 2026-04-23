@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EcoTwin Tutorial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 20px;
+        }
+
+        .tutorial-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tutorial-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .tutorial-header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00ffea, #00ffaa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .tutorial-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .tutorial-steps {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .step-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #00ffea, #00ffaa);
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .step-title {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #00ffea;
+        }
+
+        .step-description {
+            font-size: 15px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .avatar-preview {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .avatar-demo {
+            width: 150px;
+            height: 200px;
+            background: linear-gradient(135deg, #00ffea, #00ffaa);
+            border-radius: 10px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .tutorial-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ffea, #00ffaa);
+            color: #000;
+            box-shadow: 0 10px 20px rgba(0, 255, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 255, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #00ffea;
+            color: #00ffea;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 234, 0.2);
+        }
+
+        .skip-tutorial {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .skip-tutorial a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .skip-tutorial a:hover {
+            color: #00ffea;
+        }
+
+        .feature-badge {
+            display: inline-block;
+            background: rgba(0, 255, 234, 0.2);
+            color: #00ffea;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="tutorial-container">
+        <div class="tutorial-header">
+            <h1>🌟 Welcome to Your EcoTwin!</h1>
+            <p>Your digital avatar that grows with your sustainability journey</p>
+        </div>
+
+        <div class="avatar-preview">
+            <div class="avatar-demo">🤖</div>
+            <h3>Meet Your EcoTwin</h3>
+            <p>A digital representation of your environmental impact</p>
+        </div>
+
+        <div class="tutorial-steps">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <div class="step-title">How It Works</div>
+                <div class="step-description">
+                    Your EcoTwin starts as a basic avatar. As you complete eco-actions in EcoWorld and earn tokens, your avatar will level up and evolve.
+                </div>
+                <div class="feature-badge">Level System</div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <div class="step-title">Earn Tokens</div>
+                <div class="step-description">
+                    Play EcoWorld Simulator, complete challenges, and make sustainable choices to earn GreenTokens. Use tokens to customize your avatar.
+                </div>
+                <div class="feature-badge">GreenTokens</div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <div class="step-title">Customize Everything</div>
+                <div class="step-description">
+                    Change your avatar's appearance, outfits, and accessories. Unlock new styles as you level up. Make it uniquely yours!
+                </div>
+                <div class="feature-badge">Customization</div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <div class="step-title">Show Your Progress</div>
+                <div class="step-description">
+                    Your avatar visually represents your sustainability score. The better you do for the environment, the cooler your EcoTwin looks!
+                </div>
+                <div class="feature-badge">Visual Feedback</div>
+            </div>
+        </div>
+
+        <div class="tutorial-buttons">
+            <button class="btn btn-secondary" onclick="location.href='/dashboard'">
+                ← Back to Dashboard
+            </button>
+            <button class="btn btn-primary" onclick="startAvatarCustomization()">
+                Start Customizing →
+            </button>
+        </div>
+
+        <div class="skip-tutorial">
+            <a href="/avatar/simple">Skip tutorial and go straight to avatar editor</a>
+        </div>
+    </div>
+
+    <script>
+        function startAvatarCustomization() {
+            localStorage.setItem('avatar_tutorial_seen', 'true');
+            window.location.href = '/avatar/simple';
+        }
+        if (localStorage.getItem('avatar_tutorial_seen') === 'true') {
+            window.location.href = '/avatar/simple';
+        }
+    </script>
+</body>
+</html>

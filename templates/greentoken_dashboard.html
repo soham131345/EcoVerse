@@ -1,0 +1,3539 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GreenToken Dashboard - Ecoverse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a1a1a 0%, #0a2a2a 100%);
+            color: #00ffff;
+            font-family: 'Courier New', 'Monaco', 'Consolas', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 255, 255, 0.03) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+
+        .grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .terminal-nav {
+            background: rgba(10, 30, 30, 0.95);
+            border-bottom: 1px solid #00ffff;
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .prompt-symbol {
+            color: #00ffff;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .user-display {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #88ffff;
+        }
+
+        .terminal-commands {
+            display: flex;
+            gap: 10px;
+        }
+
+        .terminal-btn {
+            background: transparent;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            padding: 8px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-btn::before {
+            content: '>';
+            position: absolute;
+            left: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .terminal-btn:hover::before {
+            opacity: 1;
+        }
+
+        .terminal-btn:hover {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+        }
+
+        .token-display {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 5px 15px;
+            border: 1px solid #00ffff;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #88ffff;
+        }
+
+        /* Main Dashboard */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            min-height: calc(100vh - 60px);
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panels */
+        .dashboard-panel {
+            background: rgba(15, 40, 40, 0.9);
+            border: 1px solid #00ffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .dashboard-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+        }
+
+        .dashboard-panel::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .panel-title {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #00ffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .panel-title::before {
+            content: '>>';
+            color: #00ffff;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(0, 200, 255, 0.1) 100%);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .stat-card:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 200, 255, 0.15) 100%);
+            border-color: #00ffff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            color: #00ffff;
+            margin: 10px 0;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #88ffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        /* Crypto Market */
+        .crypto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .crypto-card {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(0, 200, 255, 0.1) 100%);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .crypto-card:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 200, 255, 0.15) 100%);
+            border-color: #00ffff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.1);
+        }
+
+        .crypto-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .crypto-symbol {
+            font-size: 16px;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+        }
+
+        .crypto-price {
+            font-size: 18px;
+            color: #ffffff;
+        }
+
+        .crypto-change {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .crypto-change.positive {
+            background: rgba(0, 255, 200, 0.2);
+            color: #00ffcc;
+            border: 1px solid rgba(0, 255, 200, 0.3);
+        }
+
+        .crypto-change.negative {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+            border: 1px solid rgba(255, 68, 68, 0.3);
+        }
+
+        /* Investment Cards */
+        .investment-card {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(0, 200, 255, 0.1) 100%);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+        }
+
+        .investment-card:hover {
+            border-color: #00ffff;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 200, 255, 0.15) 100%);
+        }
+
+        .investment-info {
+            flex: 1;
+        }
+
+        .investment-name {
+            font-size: 16px;
+            color: #00ffff;
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+        }
+
+        .investment-details {
+            font-size: 12px;
+            color: #88ffff;
+            opacity: 0.8;
+        }
+
+        .investment-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Flight Credits */
+        .flight-credit-card {
+            background: linear-gradient(135deg, rgba(0, 200, 255, 0.05) 0%, rgba(0, 150, 255, 0.1) 100%);
+            border: 1px solid rgba(0, 200, 255, 0.3);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .flight-credit-card:hover {
+            border-color: #00ccff;
+            background: linear-gradient(135deg, rgba(0, 200, 255, 0.1) 0%, rgba(0, 150, 255, 0.15) 100%);
+        }
+
+        .flight-credit-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .flight-count {
+            font-size: 24px;
+            color: #00ccff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 204, 255, 0.3);
+        }
+
+        /* Charts */
+        .chart-container {
+            height: 300px;
+            width: 100%;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #00ffff;
+            margin-bottom: 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: #00ffff;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: #00ffff;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        /* Buttons */
+        .action-btn {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 200, 255, 0.2) 100%);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            padding: 12px 24px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 4px;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 200, 255, 0.3) 100%);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 180, 255, 0.3) 100%);
+            font-weight: bold;
+            border-color: #00ccff;
+        }
+
+        /* Timer */
+        .timer-display {
+            font-size: 20px;
+            color: #00ffff;
+            text-align: center;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .timer-progress {
+            height: 10px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .timer-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #00cccc);
+            width: 0%;
+            transition: width 1s linear;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 200, 255, 0.2) 100%);
+            color: #00ffff;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+            font-size: 14px;
+            color: #88ffff;
+        }
+
+        .data-table tr:hover {
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 10, 20, 0.85);
+            z-index: 3000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(10, 40, 50, 0.95) 0%, rgba(10, 30, 40, 0.95) 100%);
+            border: 2px solid #00ffff;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+            border-radius: 4px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            color: #00ffff;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-top-color: #00ffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.9) 0%, rgba(0, 200, 255, 0.9) 100%);
+            color: #001a1a;
+            border: 1px solid #00ffff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, rgba(255, 68, 68, 0.9) 0%, rgba(220, 50, 50, 0.9) 100%);
+            border-color: #ff4444;
+            color: #fff;
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, rgba(255, 255, 100, 0.9) 0%, rgba(255, 220, 50, 0.9) 100%);
+            border-color: #ffff00;
+            color: #001a1a;
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, rgba(0, 255, 200, 0.9) 0%, rgba(0, 220, 180, 0.9) 100%);
+            border-color: #00ffcc;
+            color: #001a1a;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Animation Keyframes */
+        @keyframes tokenPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            }
+            50% { 
+                transform: scale(1.05); 
+                text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+            }
+        }
+
+        @keyframes priceUp {
+            0% { 
+                color: #00ffcc;
+                text-shadow: 0 0 10px rgba(0, 255, 200, 0.5);
+            }
+            100% { 
+                color: #ffffff;
+                text-shadow: none;
+            }
+        }
+
+        @keyframes priceDown {
+            0% { 
+                color: #ff6666;
+                text-shadow: 0 0 10px rgba(255, 100, 100, 0.5);
+            }
+            100% { 
+                color: #ffffff;
+                text-shadow: none;
+            }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { 
+                box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+            }
+        }
+
+        .token-pulse {
+            animation: tokenPulse 2s infinite;
+        }
+
+        .price-up {
+            animation: priceUp 1s ease;
+        }
+
+        .price-down {
+            animation: priceDown 1s ease;
+        }
+
+        .glow-pulse {
+            animation: glowPulse 2s infinite;
+        }
+
+        /* Badge Colors */
+        .badge-bronze {
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.2) 0%, rgba(205, 127, 50, 0.3) 100%);
+            border-color: #CD7F32;
+            color: #CD7F32;
+        }
+
+        .badge-silver {
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.2) 0%, rgba(192, 192, 192, 0.3) 100%);
+            border-color: #C0C0C0;
+            color: #C0C0C0;
+        }
+
+        .badge-gold {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.3) 100%);
+            border-color: #FFD700;
+            color: #FFD700;
+        }
+
+        .badge-platinum {
+            background: linear-gradient(135deg, rgba(229, 228, 226, 0.2) 0%, rgba(229, 228, 226, 0.3) 100%);
+            border-color: #E5E4E2;
+            color: #E5E4E2;
+        }
+
+        /* Progress Bars */
+        .progress-bar {
+            height: 10px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #00cccc);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid transparent;
+            border-bottom: none;
+            color: #88ffff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tab:hover {
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+        }
+
+        .tab.active {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: rgba(0, 255, 255, 0.3);
+            color: #00ffff;
+            position: relative;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #00ffff;
+        }
+
+        /* Avatar Elements */
+        .avatar-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #00ffff;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 200, 255, 0.2) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #00ffff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid,
+            .crypto-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .terminal-nav {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .terminal-commands {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .dashboard-container {
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .panel-title {
+                font-size: 16px;
+            }
+            
+            .stat-value {
+                font-size: 24px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .scanlines, .grid, .terminal-btn, .modal-close {
+                display: none;
+            }
+            
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .dashboard-panel {
+                border: 1px solid #ccc;
+                break-inside: avoid;
+            }
+        }
+
+        /* High Contrast Mode */
+        @media (prefers-contrast: high) {
+            body {
+                background: #000;
+                color: #0ff;
+            }
+            
+            .dashboard-panel {
+                background: #000;
+                border: 2px solid #0ff;
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .scanlines, .token-pulse, .price-up, .price-down, .glow-pulse, .loading {
+                animation: none;
+            }
+            
+            .terminal-btn:hover, .stat-card:hover, .crypto-card:hover {
+                transform: none;
+            }
+        }
+
+        /* NEW STYLES FOR REALISTIC INVESTING */
+        
+        /* Tutorial Panel */
+        .tutorial-panel {
+            background: linear-gradient(135deg, rgba(0, 50, 100, 0.9) 0%, rgba(0, 30, 70, 0.9) 100%);
+            border: 2px solid #00ccff;
+            border-left: 5px solid #00ccff;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tutorial-panel::before {
+            content: '💡';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            opacity: 0.3;
+        }
+
+        .tutorial-header {
+            color: #00ccff;
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tutorial-content {
+            color: #88ffff;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .tutorial-step {
+            margin: 15px 0;
+            padding-left: 20px;
+            border-left: 2px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .tutorial-tip {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 13px;
+            border-left: 3px solid #00ffcc;
+        }
+
+        /* Investment Strategy Cards */
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .strategy-card {
+            background: linear-gradient(135deg, rgba(0, 50, 100, 0.7) 0%, rgba(0, 30, 70, 0.7) 100%);
+            border: 1px solid rgba(0, 200, 255, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .strategy-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ccff;
+            box-shadow: 0 10px 20px rgba(0, 200, 255, 0.2);
+        }
+
+        .strategy-card.selected {
+            border-color: #00ffcc;
+            background: linear-gradient(135deg, rgba(0, 100, 100, 0.7) 0%, rgba(0, 70, 70, 0.7) 100%);
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
+        }
+
+        .strategy-title {
+            color: #00ccff;
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .strategy-risk {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .risk-low {
+            background: rgba(0, 255, 100, 0.2);
+            color: #00ff66;
+            border: 1px solid rgba(0, 255, 100, 0.3);
+        }
+
+        .risk-medium {
+            background: rgba(255, 200, 0, 0.2);
+            color: #ffcc00;
+            border: 1px solid rgba(255, 200, 0, 0.3);
+        }
+
+        .risk-high {
+            background: rgba(255, 50, 50, 0.2);
+            color: #ff3333;
+            border: 1px solid rgba(255, 50, 50, 0.3);
+        }
+
+        .strategy-details {
+            font-size: 12px;
+            color: #88ffff;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .strategy-returns {
+            font-size: 14px;
+            color: #00ffcc;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        /* Realistic Chart */
+        .realistic-chart {
+            background: rgba(10, 30, 40, 0.9);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .chart-timeframe {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            color: #88ffff;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .chart-timeframe.active {
+            background: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+            border-color: #00ffff;
+        }
+
+        .chart-timeframe:hover:not(.active) {
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        /* Realistic Crypto Details */
+        .crypto-detail-panel {
+            background: linear-gradient(135deg, rgba(0, 30, 60, 0.9) 0%, rgba(0, 20, 40, 0.9) 100%);
+            border: 1px solid rgba(0, 200, 255, 0.3);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .crypto-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric-card {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            padding: 15px;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #88ffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        /* Realistic Investment Calculator */
+        .investment-calculator {
+            background: rgba(10, 40, 50, 0.9);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .calculator-results {
+            background: rgba(0, 30, 50, 0.8);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            border-left: 4px solid #00ccff;
+        }
+
+        .calculator-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .calculator-row.total {
+            font-size: 16px;
+            font-weight: bold;
+            color: #00ffcc;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        /* Advanced Trading Features */
+        .trading-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: rgba(0, 30, 50, 0.7);
+            border: 1px solid rgba(0, 200, 255, 0.2);
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: #00ccff;
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            color: #00ccff;
+            margin-bottom: 10px;
+        }
+
+        .feature-title {
+            color: #00ffff;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .feature-desc {
+            font-size: 12px;
+            color: #88ffff;
+        }
+
+        /* Real-time Data */
+        .real-time-data {
+            background: rgba(0, 20, 40, 0.9);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .data-stream {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #88ffff;
+            line-height: 1.8;
+        }
+
+        .data-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        /* Performance Metrics */
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .performance-card {
+            background: rgba(0, 30, 50, 0.8);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .performance-value {
+            font-size: 24px;
+            color: #00ffcc;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        /* Educational Content */
+        .educational-content {
+            background: linear-gradient(135deg, rgba(0, 40, 80, 0.9) 0%, rgba(0, 20, 50, 0.9) 100%);
+            border: 1px solid rgba(0, 200, 255, 0.3);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .edu-section {
+            margin: 15px 0;
+            padding-left: 10px;
+            border-left: 3px solid #00ccff;
+        }
+
+        .edu-title {
+            color: #00ccff;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .edu-text {
+            color: #88ffff;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="grid"></div>
+
+    <!-- Navigation -->
+    <nav class="terminal-nav">
+        <div class="terminal-header">
+            <span class="prompt-symbol">$</span>
+            <span class="user-display">{{ user.username|upper }}@GREENTOKEN-DASHBOARD</span>
+            <span class="blink">_</span>
+        </div>
+        <div class="terminal-commands">
+            <button class="terminal-btn" onclick="location.href='/dashboard'">
+                <i class="fas fa-home"></i> DASHBOARD
+            </button>
+            <button class="terminal-btn" onclick="location.href='/carbon-dashboard'">
+                <i class="fas fa-plane"></i> FLIGHTS
+            </button>
+            <button class="terminal-btn" onclick="location.href='/ecoworld'">
+                <i class="fas fa-globe"></i> ECOSIM
+            </button>
+            <div class="token-display">
+                <i class="fas fa-coins"></i>
+                <span id="tokenBalance">{{ user.token_balance|int }}</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard-container">
+        <!-- Left Column -->
+        <div class="left-column">
+            <!-- Tutorial Panel -->
+            <div class="tutorial-panel" id="tutorialPanel">
+                <div class="tutorial-header">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>REALISTIC INVESTING TUTORIAL</span>
+                    <button class="action-btn" onclick="skipTutorial()" style="font-size: 11px; padding: 5px 10px; margin-left: auto;">
+                        SKIP
+                    </button>
+                </div>
+                <div class="tutorial-content">
+                    <div class="tutorial-step">
+                        <strong>Step 1:</strong> Start with 100-500 GT for testing strategies
+                    </div>
+                    <div class="tutorial-step">
+                        <strong>Step 2:</strong> Choose a strategy based on risk tolerance
+                    </div>
+                    <div class="tutorial-step">
+                        <strong>Step 3:</strong> Diversify across different crypto types
+                    </div>
+                    <div class="tutorial-tip">
+                        💡 <strong>Pro Tip:</strong> Green cryptos (ECOG, SOLAR) tend to be more stable. High-risk cryptos can give 30-50% returns but also big losses.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="dashboard-panel">
+                <div class="panel-header">
+                    <div class="panel-title">INVESTMENT PORTFOLIO</div>
+                    <button class="action-btn" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt"></i> REFRESH
+                    </button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">TOTAL PORTFOLIO</div>
+                        <div class="stat-value" id="totalPortfolioValue">0</div>
+                        <div style="font-size: 12px; color: #88ff88;">Current Value</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">24H RETURN</div>
+                        <div class="stat-value" id="dailyReturn">0%</div>
+                        <div style="font-size: 12px; color: #88ff88;">Daily Change</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">RISK LEVEL</div>
+                        <div class="stat-value" id="riskLevel">LOW</div>
+                        <div style="font-size: 12px; color: #88ff88;">Portfolio Risk</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">SHARPE RATIO</div>
+                        <div class="stat-value" id="sharpeRatio">0.0</div>
+                        <div style="font-size: 12px; color: #88ff88;">Risk-Adjusted Return</div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="performance-metrics">
+                    <div class="performance-card">
+                        <div style="font-size: 11px; color: #88ff88;">ANNUALIZED RETURN</div>
+                        <div class="performance-value" id="annualReturn">0%</div>
+                    </div>
+                    <div class="performance-card">
+                        <div style="font-size: 11px; color: #88ff88;">MAX DRAWDOWN</div>
+                        <div class="performance-value" id="maxDrawdown">0%</div>
+                    </div>
+                    <div class="performance-card">
+                        <div style="font-size: 11px; color: #88ff88;">VOLATILITY</div>
+                        <div class="performance-value" id="volatility">0%</div>
+                    </div>
+                    <div class="performance-card">
+                        <div style="font-size: 11px; color: #88ff88;">WIN RATE</div>
+                        <div class="performance-value" id="winRate">0%</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <div style="color: #00ff00; margin-bottom: 15px; font-size: 14px;">PORTFOLIO ACTIONS</div>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <button class="action-btn primary" onclick="showAdvancedInvestModal()">
+                            <i class="fas fa-chart-line"></i> ADVANCED INVEST
+                        </button>
+                        <button class="action-btn" onclick="showPortfolioRebalance()">
+                            <i class="fas fa-balance-scale"></i> REBALANCE
+                        </button>
+                        <button class="action-btn" onclick="showStrategyBuilder()">
+                            <i class="fas fa-chess-queen"></i> STRATEGY BUILDER
+                        </button>
+                        <button class="action-btn" onclick="showConvertModal()">
+                            <i class="fas fa-plane"></i> CONVERT TO FLIGHTS
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investment Strategies -->
+            <div class="dashboard-panel">
+                <div class="panel-header">
+                    <div class="panel-title">INVESTMENT STRATEGIES</div>
+                    <div style="font-size: 12px; color: #88ff88;" id="selectedStrategy">None selected</div>
+                </div>
+                
+                <div class="strategy-grid">
+                    <div class="strategy-card" onclick="selectStrategy('conservative')">
+                        <div class="strategy-title">
+                            <i class="fas fa-shield-alt"></i>
+                            CONSERVATIVE
+                            <span class="strategy-risk risk-low">LOW RISK</span>
+                        </div>
+                        <div class="strategy-details">
+                            Focus on stable green cryptos. 5-15% annual returns with minimal risk.
+                        </div>
+                        <div class="strategy-returns">
+                            Expected Returns: 8-12% per year
+                        </div>
+                        <div style="font-size: 11px; color: #88ff88;">
+                            • 70% ECOG/SOLAR<br>
+                            • 20% CARB/TREE<br>
+                            • 10% Cash reserve
+                        </div>
+                    </div>
+                    
+                    <div class="strategy-card" onclick="selectStrategy('balanced')">
+                        <div class="strategy-title">
+                            <i class="fas fa-balance-scale"></i>
+                            BALANCED
+                            <span class="strategy-risk risk-medium">MEDIUM RISK</span>
+                        </div>
+                        <div class="strategy-details">
+                            Mix of growth and stability. 15-30% returns with moderate risk.
+                        </div>
+                        <div class="strategy-returns">
+                            Expected Returns: 18-25% per year
+                        </div>
+                        <div style="font-size: 11px; color: #88ff88;">
+                            • 40% Green cryptos<br>
+                            • 40% Growth cryptos<br>
+                            • 20% Alternative cryptos
+                        </div>
+                    </div>
+                    
+                    <div class="strategy-card" onclick="selectStrategy('aggressive')">
+                        <div class="strategy-title">
+                            <i class="fas fa-bolt"></i>
+                            AGGRESSIVE
+                            <span class="strategy-risk risk-high">HIGH RISK</span>
+                        </div>
+                        <div class="strategy-details">
+                            High-growth cryptos with potential for 30-50%+ returns. High volatility.
+                        </div>
+                        <div class="strategy-returns">
+                            Expected Returns: 25-40% per year
+                        </div>
+                        <div style="font-size: 11px; color: #88ff88;">
+                            • 60% High-growth cryptos<br>
+                            • 30% Speculative cryptos<br>
+                            • 10% Stable cryptos
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="strategyAllocation" style="display: none; margin-top: 20px;">
+                    <div style="color: #00ff00; margin-bottom: 10px;">STRATEGY ALLOCATION</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <div style="font-size: 12px; color: #88ff88;">Recommended Allocation:</div>
+                            <div id="allocationDetails" style="font-size: 11px; color: #88ff88; margin-top: 5px;"></div>
+                        </div>
+                        <div>
+                            <button class="action-btn primary" onclick="applyStrategy()" style="width: 100%;">
+                                APPLY STRATEGY
+                            </button>
+                            <button class="action-btn" onclick="backtestStrategy()" style="width: 100%; margin-top: 10px;">
+                                BACKTEST
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Realistic Chart -->
+            <div class="dashboard-panel">
+                <div class="panel-header">
+                    <div class="panel-title">REAL-TIME MARKET ANALYSIS</div>
+                    <div class="chart-controls">
+                        <span class="chart-timeframe active" onclick="changeTimeframe('1D')">1D</span>
+                        <span class="chart-timeframe" onclick="changeTimeframe('1W')">1W</span>
+                        <span class="chart-timeframe" onclick="changeTimeframe('1M')">1M</span>
+                        <span class="chart-timeframe" onclick="changeTimeframe('1Y')">1Y</span>
+                        <span class="chart-timeframe" onclick="changeTimeframe('ALL')">ALL</span>
+                    </div>
+                </div>
+                
+                <div class="realistic-chart">
+                    <canvas id="advancedChart"></canvas>
+                </div>
+                
+                <div class="crypto-metrics">
+                    <div class="metric-card">
+                        <div class="metric-label">RSI (14)</div>
+                        <div class="metric-value" id="rsiValue">50.0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">MACD</div>
+                        <div class="metric-value" id="macdValue">0.00</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">VOLUME</div>
+                        <div class="metric-value" id="volumeValue">0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">SUPPORT</div>
+                        <div class="metric-value" id="supportValue">0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">RESISTANCE</div>
+                        <div class="metric-value" id="resistanceValue">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Investments -->
+            <div class="dashboard-panel">
+                <div class="panel-header">
+                    <div class="panel-title">ACTIVE INVESTMENTS</div>
+                    <div style="font-size: 12px; color: #88ff88;" id="investmentsCount">0 active</div>
+                </div>
+                
+                <div id="investmentsContainer">
+                    <!-- Investments loaded dynamically -->
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px; color: #88ff88; font-size: 12px;" id="noInvestmentsMessage">
+                    No active investments. Select a strategy to begin.
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="right-column">
+            <!-- Educational Content -->
+            <div class="educational-content">
+                <div style="color: #00ccff; font-size: 16px; margin-bottom: 15px;">
+                    <i class="fas fa-university"></i> INVESTING EDUCATION
+                </div>
+                
+                <div class="edu-section">
+                    <div class="edu-title">WHAT IS GREEN CRYPTO INVESTING?</div>
+                    <div class="edu-text">
+                        Green cryptos are blockchain tokens tied to real environmental projects. 
+                        Your investments fund solar farms, reforestation, and clean energy.
+                    </div>
+                </div>
+                
+                <div class="edu-section">
+                    <div class="edu-title">HOW RETURNS ARE CALCULATED</div>
+                    <div class="edu-text">
+                        Returns come from: 1) Project revenue, 2) Carbon credit sales, 3) Token appreciation.
+                        Real projects = real returns of 8-40% annually.
+                    </div>
+                </div>
+                
+                <div class="edu-section">
+                    <div class="edu-title">RISK MANAGEMENT</div>
+                    <div class="edu-text">
+                        • Diversify across 3-5 cryptos<br>
+                        • Never invest more than 20% in one crypto<br>
+                        • Keep 10% cash for opportunities<br>
+                        • Set stop-loss at 15% below purchase
+                    </div>
+                </div>
+                
+                <div class="tutorial-tip">
+                    🎯 <strong>Advanced Strategy:</strong> Use dollar-cost averaging - invest fixed amounts weekly instead of all at once.
+                </div>
+            </div>
+
+            <!-- Real-time Market Data -->
+            <div class="dashboard-panel">
+                <div class="panel-header">
+                    <div class="panel-title">REAL-TIME MARKET DATA</div>
+                    <div style="font-size: 12px; color: #88ff88;" id="marketUpdateTime">--:--:--</div>
+                </div>
+                
+                <div class="real-time-data">
+                    <div class="data-stream" id="marketDataStream">
+                        <!-- Real-time data stream -->
+                    </div>
+                </div>
+                
+                <div class="trading-features">
+                    <div class="feature-card" onclick="showLimitOrderModal()">
+                        <div class="feature-icon"><i class="fas fa-stopwatch"></i></div>
+                        <div class="feature-title">LIMIT ORDERS</div>
+                        <div class="feature-desc">Set buy/sell at specific prices</div>
+                    </div>
+                    
+                    <div class="feature-card" onclick="showStopLossModal()">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="feature-title">STOP LOSS</div>
+                        <div class="feature-desc">Auto-sell if price drops</div>
+                    </div>
+                    
+                    <div class="feature-card" onclick="showTakeProfitModal()">
+                        <div class="feature-icon"><i class="fas fa-trophy"></i></div>
+                        <div class="feature-title">TAKE PROFIT</div>
+                        <div class="feature-desc">Auto-sell at target profit</div>
+                    </div>
+                    
+                    <div class="feature-card" onclick="showDividendsModal()">
+                        <div class="feature-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        <div class="feature-title">DIVIDENDS</div>
+                        <div class="feature-desc">Earn project revenue shares</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flight Credits -->
+            <div class="dashboard-panel">
+                <div class="panel-header">
+                    <div class="panel-title">FLIGHT CREDITS</div>
+                    <button class="action-btn" onclick="useFlightCredit()">
+                        <i class="fas fa-ticket-alt"></i> USE CREDIT
+                    </button>
+                </div>
+                
+                <div id="flightCreditsContainer">
+                    <!-- Flight credits loaded dynamically -->
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px; color: #88ff88; font-size: 12px;" id="noCreditsMessage">
+                    No flight credits available.
+                </div>
+            </div>
+
+            <!-- Advanced Calculator -->
+            <div class="investment-calculator">
+                <div style="color: #00ccff; margin-bottom: 15px;">
+                    <i class="fas fa-calculator"></i> INVESTMENT CALCULATOR
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">INVESTMENT AMOUNT (GT)</label>
+                    <input type="number" class="form-input" id="calcAmount" min="100" step="100" value="1000" oninput="updateCalculator()">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">EXPECTED ANNUAL RETURN (%)</label>
+                    <input type="range" min="5" max="50" value="15" class="form-input" id="calcReturn" oninput="updateCalculator()">
+                    <div style="text-align: center; color: #88ff88; font-size: 12px;">
+                        <span id="returnValue">15%</span> per year
+                    </div>
+                </div>
+                
+                <div class="calculator-results">
+                    <div class="calculator-row">
+                        <span>5-Year Return:</span>
+                        <span id="calc5Year">2,011 GT</span>
+                    </div>
+                    <div class="calculator-row">
+                        <span>10-Year Return:</span>
+                        <span id="calc10Year">4,046 GT</span>
+                    </div>
+                    <div class="calculator-row total">
+                        <span>Total Profit (10Y):</span>
+                        <span id="calcTotalProfit">3,046 GT</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="dashboard-panel">
+                <div class="panel-header">
+                    <div class="panel-title">RECENT TRANSACTIONS</div>
+                </div>
+                
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>TYPE</th>
+                                <th>AMOUNT</th>
+                                <th>DATE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTable">
+                            <!-- Transactions loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Invest Modal -->
+    <div id="advancedInvestModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeAdvancedInvestModal()">×</div>
+            <div class="modal-header">ADVANCED INVESTMENT</div>
+            
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                <div>
+                    <div class="form-group">
+                        <label class="form-label">SELECT CRYPTO</label>
+                        <select class="form-select" id="advCryptoSelect" onchange="updateAdvancedAnalysis()">
+                            <!-- Options loaded dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="crypto-detail-panel" id="advancedCryptoDetails">
+                        <div style="color: #00ccff; margin-bottom: 15px;">
+                            <i class="fas fa-chart-bar"></i> CRYPTO ANALYSIS
+                        </div>
+                        <div id="cryptoAnalysisContent">
+                            Select a crypto to see detailed analysis
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">INVESTMENT TYPE</label>
+                        <select class="form-select" id="investmentType">
+                            <option value="market">Market Order (Instant)</option>
+                            <option value="limit">Limit Order (Set Price)</option>
+                            <option value="dca">DCA (Weekly Investment)</option>
+                        </select>
+                    </div>
+                    
+                    <div id="limitOrderSection" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">LIMIT PRICE (GT)</label>
+                            <input type="number" class="form-input" id="limitPrice" step="0.01" placeholder="Set your target price">
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="form-group">
+                        <label class="form-label">INVESTMENT AMOUNT (GT)</label>
+                        <input type="number" class="form-input" id="advInvestAmount" min="10" step="10" value="100" oninput="updateInvestmentPreview()">
+                        <div style="font-size: 12px; color: #88ff88; margin-top: 5px;">
+                            Available: <span id="advAvailableBalance">0</span> GT
+                        </div>
+                    </div>
+                    
+                    <div style="border: 1px solid rgba(0, 255, 0, 0.3); padding: 15px; margin: 20px 0;">
+                        <div style="color: #88ff88; font-size: 12px;">INVESTMENT PREVIEW</div>
+                        <div id="advancedInvestmentPreview">
+                            <div style="margin-top: 10px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                                    <div>Tokens to invest:</div>
+                                    <div id="previewAmount">100 GT</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                                    <div>Transaction fee (0.5%):</div>
+                                    <div style="color: #ff4444;" id="previewFee">-0.5 GT</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                                    <div>Crypto amount:</div>
+                                    <div id="previewCryptoAmount">0.00</div>
+                                </div>
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0, 255, 0, 0.2);">
+                                    <div style="font-size: 11px; color: #88ff88;">EXPECTED RETURNS</div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 5px;">
+                                        <div>1 Month:</div>
+                                        <div id="preview1Month">2-8%</div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                                        <div>1 Year:</div>
+                                        <div id="preview1Year">15-40%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button class="action-btn primary" onclick="submitAdvancedInvestment()" id="submitAdvancedBtn">
+                            <i class="fas fa-rocket"></i> EXECUTE INVESTMENT
+                        </button>
+                        <button class="action-btn" onclick="closeAdvancedInvestModal()" style="margin-top: 10px; width: 100%;">
+                            CANCEL
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 12px; color: #88ff88;">
+                <div><i class="fas fa-info-circle"></i> Investments are backed by real environmental projects</div>
+                <div><i class="fas fa-chart-line"></i> Historical returns: 8-40% annually based on project type</div>
+                <div><i class="fas fa-shield-alt"></i> All projects are verified and audited monthly</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Convert to Flights Modal -->
+    <div id="convertModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeConvertModal()">×</div>
+            <div class="modal-header">CONVERT TO FLIGHTS</div>
+            
+            <div class="form-group">
+                <label class="form-label">GREEN TOKENS TO CONVERT</label>
+                <input type="number" class="form-input" id="convertAmount" min="100" step="10" placeholder="Minimum 100 tokens">
+                <div style="font-size: 12px; color: #88ff88; margin-top: 5px;">
+                    Available: <span id="availableForConvert">0</span> GreenTokens
+                </div>
+            </div>
+            
+            <div id="conversionDetails" style="border: 1px solid rgba(0, 255, 0, 0.3); padding: 15px; margin: 20px 0;">
+                <div style="color: #88ff88; font-size: 12px;">CONVERSION DETAILS</div>
+                <div id="conversionInfo">Enter amount to see conversion rate</div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="action-btn primary" onclick="submitConversion()" id="submitConvertBtn">
+                    CONVERT NOW
+                </button>
+                <button class="action-btn" onclick="closeConvertModal()" style="margin-left: 10px;">
+                    CANCEL
+                </button>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 12px; color: #88ff88;">
+                <div>✓ Base rate: 100 tokens = 1 flight</div>
+                <div>✓ 500+ tokens: 5% discount (95 tokens/flight)</div>
+                <div>✓ 1000+ tokens: 10% discount (90 tokens/flight)</div>
+                <div>✓ Flight credits valid for 30 days</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Rebalance Modal -->
+    <div id="rebalanceModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeRebalanceModal()">×</div>
+            <div class="modal-header">PORTFOLIO REBALANCE</div>
+            
+            <div style="margin-bottom: 20px;">
+                <div style="color: #88ff88; font-size: 12px;">CURRENT ALLOCATION</div>
+                <div id="currentAllocation" style="margin-top: 10px;">
+                    <!-- Current allocation bars -->
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <div style="color: #88ff88; font-size: 12px;">TARGET ALLOCATION</div>
+                <div id="targetAllocation" style="margin-top: 10px;">
+                    <!-- Target allocation input -->
+                </div>
+            </div>
+            
+            <div id="rebalanceResults" style="border: 1px solid rgba(0, 255, 0, 0.3); padding: 15px; margin: 20px 0; display: none;">
+                <div style="color: #88ff88; font-size: 12px;">REBALANCE ACTIONS</div>
+                <div id="rebalanceActions" style="margin-top: 10px; font-size: 11px;">
+                    <!-- Rebalance actions -->
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="action-btn primary" onclick="executeRebalance()">
+                    EXECUTE REBALANCE
+                </button>
+                <button class="action-btn" onclick="closeRebalanceModal()" style="margin-left: 10px;">
+                    CANCEL
+                </button>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 12px; color: #88ff88;">
+                <div>✓ Rebalancing improves risk-adjusted returns by 20-30%</div>
+                <div>✓ Automatically sells winners, buys losers (buy low, sell high)</div>
+                <div>✓ Recommended quarterly for optimal performance</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Limit Order Modal -->
+    <div id="limitOrderModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeLimitOrderModal()">×</div>
+            <div class="modal-header">SET LIMIT ORDER</div>
+            
+            <div class="form-group">
+                <label class="form-label">CRYPTO</label>
+                <select class="form-select" id="limitCryptoSelect">
+                    <!-- Options loaded dynamically -->
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">ORDER TYPE</label>
+                <select class="form-select" id="limitOrderType">
+                    <option value="buy">Buy Limit</option>
+                    <option value="sell">Sell Limit</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">LIMIT PRICE (GT)</label>
+                <input type="number" class="form-input" id="limitOrderPrice" step="0.01" placeholder="Set target price">
+                <div style="font-size: 12px; color: #88ff88; margin-top: 5px;">
+                    Current Price: <span id="limitCurrentPrice">0</span> GT
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">AMOUNT</label>
+                <input type="number" class="form-input" id="limitOrderAmount" min="10" step="10">
+                <div style="font-size: 12px; color: #88ff88; margin-top: 5px;">
+                    Available: <span id="limitAvailableBalance">0</span> GT
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">ORDER EXPIRY</label>
+                <select class="form-select" id="limitOrderExpiry">
+                    <option value="24">24 Hours</option>
+                    <option value="168" selected>7 Days</option>
+                    <option value="720">30 Days</option>
+                    <option value="0">Good 'Til Cancelled</option>
+                </select>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="action-btn primary" onclick="submitLimitOrder()">
+                    PLACE LIMIT ORDER
+                </button>
+                <button class="action-btn" onclick="closeLimitOrderModal()" style="margin-left: 10px;">
+                    CANCEL
+                </button>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 12px; color: #88ff88;">
+                <div>✓ Buy limit: Buy when price drops TO your target</div>
+                <div>✓ Sell limit: Sell when price rises TO your target</div>
+                <div>✓ Get better prices than market orders</div>
+                <div>✓ No fees until order executes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stop Loss Modal -->
+    <div id="stopLossModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeStopLossModal()">×</div>
+            <div class="modal-header">SET STOP LOSS</div>
+            
+            <div class="form-group">
+                <label class="form-label">SELECT INVESTMENT</label>
+                <select class="form-select" id="stopLossInvestment">
+                    <!-- Options loaded dynamically -->
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">STOP PRICE (GT)</label>
+                <input type="number" class="form-input" id="stopLossPrice" step="0.01" placeholder="Auto-sell if price drops below">
+                <div style="font-size: 12px; color: #88ff88; margin-top: 5px;">
+                    Current Price: <span id="stopLossCurrentPrice">0</span> GT • 
+                    Purchase Price: <span id="stopLossPurchasePrice">0</span> GT
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">STOP TYPE</label>
+                <select class="form-select" id="stopLossType">
+                    <option value="percentage">Percentage Below Purchase</option>
+                    <option value="absolute">Absolute Price</option>
+                    <option value="trailing">Trailing Stop</option>
+                </select>
+            </div>
+            
+            <div id="stopLossPercentageSection">
+                <div class="form-group">
+                    <label class="form-label">STOP PERCENTAGE (%)</label>
+                    <input type="range" min="5" max="30" value="15" class="form-input" id="stopLossPercentage" oninput="updateStopLossPreview()">
+                    <div style="text-align: center; color: #88ff88; font-size: 12px;">
+                        Sell if price drops <span id="stopLossPercentValue">15%</span> below purchase
+                    </div>
+                </div>
+            </div>
+            
+            <div style="border: 1px solid rgba(255, 68, 68, 0.3); padding: 15px; margin: 20px 0;">
+                <div style="color: #ff4444; font-size: 12px;">STOP LOSS PREVIEW</div>
+                <div id="stopLossPreview" style="margin-top: 10px; font-size: 11px;">
+                    <!-- Stop loss preview -->
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="action-btn primary" onclick="submitStopLoss()">
+                    SET STOP LOSS
+                </button>
+                <button class="action-btn" onclick="closeStopLossModal()" style="margin-left: 10px;">
+                    CANCEL
+                </button>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 12px; color: #88ff88;">
+                <div>✓ Stop loss limits your maximum loss to 5-30%</div>
+                <div>✓ Essential for risk management</div>
+                <div>✓ Trailing stops lock in profits as price rises</div>
+                <div>✓ 0.5% fee on triggered stop losses</div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Global State
+    let dashboardState = {
+        balance: 0,
+        investments: [],
+        flightCredits: [],
+        marketData: [],
+        transactions: [],
+        selectedStrategy: null,
+        selectedCrypto: null,
+        advancedChart: null,
+        currentTimeframe: '1D',
+        tutorialCompleted: localStorage.getItem('gt_tutorial_completed') === 'true',
+        portfolioMetrics: {
+            totalValue: 0,
+            dailyReturn: 0,
+            annualReturn: 0,
+            sharpeRatio: 0,
+            volatility: 0,
+            maxDrawdown: 0,
+            winRate: 0
+        },
+        limitOrders: [],
+        stopLosses: []
+    };
+
+    const current_user_token_balance = parseInt(document.getElementById('tokenBalance')?.textContent || '1000');
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('SYSTEM: Realistic GreenToken Dashboard initialized');
+        
+        // Check tutorial
+        if (!dashboardState.tutorialCompleted) {
+            showTutorial();
+        } else {
+            document.getElementById('tutorialPanel').style.display = 'none';
+        }
+        
+        loadDashboardData();
+        
+        // Setup event listeners
+        document.getElementById('investmentType').addEventListener('change', function() {
+            const limitSection = document.getElementById('limitOrderSection');
+            limitSection.style.display = this.value === 'limit' ? 'block' : 'none';
+        });
+        
+        document.getElementById('stopLossType').addEventListener('change', function() {
+            const percentSection = document.getElementById('stopLossPercentageSection');
+            percentSection.style.display = this.value === 'percentage' ? 'block' : 'none';
+            updateStopLossPreview();
+        });
+        
+        document.getElementById('calcReturn').addEventListener('input', function() {
+            document.getElementById('returnValue').textContent = this.value + '%';
+            updateCalculator();
+        });
+
+        const cryptoSelect = document.getElementById('advCryptoSelect');
+        if (cryptoSelect) {
+            cryptoSelect.addEventListener('change', function() {
+                updateAdvancedAnalysis();
+            });
+        }
+        
+        // Initialize calculator
+        updateCalculator();
+        
+        // Initialize crypto select
+        loadMarketData();
+    });
+
+    // Tutorial Functions
+    function showTutorial() {
+        document.getElementById('tutorialPanel').style.display = 'block';
+    }
+
+    function skipTutorial() {
+        dashboardState.tutorialCompleted = true;
+        localStorage.setItem('gt_tutorial_completed', 'true');
+        document.getElementById('tutorialPanel').style.display = 'none';
+    }
+
+    // Load Dashboard Data
+    async function loadDashboardData() {
+        try {
+            const response = await fetch('/api/greentoken/realistic-data');
+            const data = await response.json();
+            
+            if (data.success) {
+                updateDashboard(data);
+                updateMarketStream();
+                updatePortfolioMetrics();
+                updateMarketUpdateTime();
+            }
+        } catch (error) {
+            console.error('Error loading dashboard:', error);
+            showNotification('Market data connection issue', 'warning');
+            // Load fallback data
+            loadFallbackData();
+        }
+    }
+
+    // Update Dashboard
+    function updateDashboard(data) {
+        dashboardState.balance = data.balance;
+        dashboardState.investments = data.investments || [];
+        dashboardState.flightCredits = data.flight_credits || [];
+        dashboardState.marketData = data.market_data || [];
+        dashboardState.transactions = data.recent_transactions || [];
+        dashboardState.portfolioMetrics = data.portfolio_metrics || dashboardState.portfolioMetrics;
+        dashboardState.limitOrders = data.limit_orders || [];
+        dashboardState.stopLosses = data.stop_losses || [];
+        
+        // Update displays
+        document.getElementById('tokenBalance').textContent = Math.floor(data.balance);
+        document.getElementById('totalPortfolioValue').textContent = formatNumber(data.portfolio_metrics?.total_value || 0);
+        document.getElementById('dailyReturn').textContent = formatPercentage(data.portfolio_metrics?.daily_return || 0);
+        document.getElementById('riskLevel').textContent = data.portfolio_metrics?.risk_level || 'LOW';
+        document.getElementById('sharpeRatio').textContent = (data.portfolio_metrics?.sharpe_ratio || 0).toFixed(2);
+        
+        // Update performance metrics
+        document.getElementById('annualReturn').textContent = formatPercentage(data.portfolio_metrics?.annual_return || 0);
+        document.getElementById('maxDrawdown').textContent = formatPercentage(data.portfolio_metrics?.max_drawdown || 0);
+        document.getElementById('volatility').textContent = formatPercentage(data.portfolio_metrics?.volatility || 0);
+        document.getElementById('winRate').textContent = formatPercentage(data.portfolio_metrics?.win_rate || 0);
+        
+        // Update containers
+        updateInvestmentsContainer();
+        updateFlightCreditsContainer();
+        updateTransactionsTable();
+        updateAdvancedChart();
+        updateMarketAnalysis();
+        
+        // Update modals
+        updateAdvCryptoSelect(data.market_data || []);
+        updateAvailableAmounts();
+    }
+
+    // Format numbers
+    function formatNumber(num) {
+        if (num === null || num === undefined) return '0.00';
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(2) + 'M';
+        }
+        if (num >= 1000) {
+            return (num / 1000).toFixed(2) + 'K';
+        }
+        if (num >= 0) {
+            return num.toFixed(2);
+        }
+        return '-' + Math.abs(num).toFixed(2);
+    }
+
+    function formatPercentage(num) {
+        if (num === null || num === undefined) return '0.00%';
+        return (num >= 0 ? '+' : '') + num.toFixed(2) + '%';
+    }
+
+    // Update Investments Container
+    function updateInvestmentsContainer() {
+        const container = document.getElementById('investmentsContainer');
+        const countDisplay = document.getElementById('investmentsCount');
+        const noInvestmentsMsg = document.getElementById('noInvestmentsMessage');
+        
+        if (!dashboardState.investments || dashboardState.investments.length === 0) {
+            container.innerHTML = '';
+            countDisplay.textContent = '0 active';
+            noInvestmentsMsg.style.display = 'block';
+            return;
+        }
+        
+        noInvestmentsMsg.style.display = 'none';
+        countDisplay.textContent = `${dashboardState.investments.length} active`;
+        
+        let html = '';
+        dashboardState.investments.forEach(investment => {
+            const profitLoss = investment.profit_loss || 0;
+            const profitClass = profitLoss >= 0 ? 'positive' : 'negative';
+            const profitText = profitLoss >= 0 ? `+${formatNumber(profitLoss)}` : formatNumber(profitLoss);
+            const returnRate = ((investment.current_value - investment.amount_invested) / investment.amount_invested * 100).toFixed(2);
+            const annualizedReturn = calculateAnnualizedReturn(investment);
+            
+            html += `
+                <div class="investment-card">
+                    <div class="investment-info">
+                        <div class="investment-name">
+                            ${investment.crypto_name} (${investment.crypto_symbol})
+                            <span style="font-size: 11px; color: ${profitLoss >= 0 ? '#00ff00' : '#ff4444'}">
+                                ${profitLoss >= 0 ? '↗' : '↘'} ${returnRate}%
+                            </span>
+                        </div>
+                        <div class="investment-details">
+                            Invested: ${formatNumber(investment.amount_invested)} GT • 
+                            Current: ${formatNumber(investment.current_value)} GT • 
+                            Annualized: <span style="color: ${annualizedReturn >= 0 ? '#00ff00' : '#ff4444'}">${annualizedReturn.toFixed(2)}%</span>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 5px;">
+                            <span style="font-size: 11px; color: #88ff88;">Risk: ${investment.risk_level || 'Medium'}</span>
+                            <span style="font-size: 11px; color: #88ff88;">Type: ${investment.crypto_type || 'Green'}</span>
+                            <span style="font-size: 11px; color: #88ff88;">Days: ${investment.days_held || 0}</span>
+                        </div>
+                    </div>
+                    <div class="investment-actions">
+                        <button class="action-btn" style="font-size: 12px; padding: 8px 12px;" 
+                                onclick="setStopLossForInvestment(${investment.id})">
+                            <i class="fas fa-shield-alt"></i>
+                        </button>
+                        <button class="action-btn" style="font-size: 12px; padding: 8px 12px;" 
+                                onclick="sellInvestment(${investment.id})">
+                            <i class="fas fa-dollar-sign"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+
+    function calculateAnnualizedReturn(investment) {
+        if (!investment.investment_date) return 0;
+        const daysHeld = investment.days_held || 1;
+        const totalReturn = ((investment.current_value - investment.amount_invested) / investment.amount_invested) * 100;
+        return (Math.pow(1 + totalReturn/100, 365/daysHeld) - 1) * 100;
+    }
+
+    // Update Flight Credits Container
+    function updateFlightCreditsContainer() {
+        const container = document.getElementById('flightCreditsContainer');
+        const noCreditsMsg = document.getElementById('noCreditsMessage');
+        
+        if (!dashboardState.flightCredits || dashboardState.flightCredits.length === 0) {
+            container.innerHTML = '';
+            noCreditsMsg.style.display = 'block';
+            return;
+        }
+        
+        noCreditsMsg.style.display = 'none';
+        
+        let html = '';
+        dashboardState.flightCredits.forEach(credit => {
+            const validUntil = credit.valid_until ? new Date(credit.valid_until).toLocaleDateString() : 'No expiry';
+            
+            html += `
+                <div class="flight-credit-card">
+                    <div class="flight-credit-header">
+                        <div>
+                            <div style="font-size: 12px; color: #88ff88;">FLIGHT CREDIT</div>
+                            <div style="font-size: 11px; color: #88ff88;">Rate: ${credit.conversion_rate} tokens/flight</div>
+                        </div>
+                        <div class="flight-count">${credit.remaining_flights}</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #88ff88;">
+                        <div>Spent: ${formatNumber(credit.tokens_spent)} GT</div>
+                        <div>Valid until: ${validUntil}</div>
+                    </div>
+                    <div style="margin-top: 10px; text-align: center;">
+                        <button class="action-btn" style="font-size: 12px; padding: 8px 16px; width: 100%;"
+                                onclick="useSpecificFlightCredit(${credit.id})">
+                            <i class="fas fa-ticket-alt"></i> USE THIS CREDIT
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+
+    // Update Transactions Table
+    function updateTransactionsTable() {
+        const table = document.getElementById('transactionsTable');
+        
+        if (!dashboardState.transactions || dashboardState.transactions.length === 0) {
+            table.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #88ff88;">No transactions</td></tr>';
+            return;
+        }
+        
+        let html = '';
+        dashboardState.transactions.slice(0, 5).forEach(transaction => {
+            const typeClass = transaction.type.includes('investment') ? 'warning' : 
+                            transaction.type.includes('conversion') ? 'info' : 'success';
+            const typeIcon = transaction.type.includes('investment') ? 'fa-chart-line' :
+                           transaction.type.includes('conversion') ? 'fa-plane' : 'fa-exchange-alt';
+            
+            html += `
+                <tr>
+                    <td>
+                        <i class="fas ${typeIcon}" style="color: #00ff00; margin-right: 8px;"></i>
+                        ${transaction.type.replace('_', ' ').toUpperCase()}
+                    </td>
+                    <td style="color: ${transaction.amount >= 0 ? '#00ff00' : '#ff4444'}">
+                        ${transaction.amount >= 0 ? '+' : ''}${formatNumber(transaction.amount)}
+                    </td>
+                    <td style="font-size: 11px; color: #88ff88;">
+                        ${new Date(transaction.created_at).toLocaleDateString()}
+                    </td>
+                </tr>
+            `;
+        });
+        
+        table.innerHTML = html;
+    }
+
+    // Update Advanced Chart
+    function updateAdvancedChart() {
+        const ctx = document.getElementById('advancedChart').getContext('2d');
+        
+        if (dashboardState.advancedChart) {
+            dashboardState.advancedChart.destroy();
+        }
+        
+        if (!dashboardState.marketData || dashboardState.marketData.length === 0) {
+            return;
+        }
+        
+        // Generate realistic price data
+        const timeframes = {
+            '1D': 24,
+            '1W': 168,
+            '1M': 720,
+            '1Y': 8760,
+            'ALL': 17520
+        };
+        
+        const hours = timeframes[dashboardState.currentTimeframe] || 24;
+        const labels = generateTimeLabels(hours);
+        const data = generateRealisticPriceData(hours);
+        
+        // Calculate technical indicators
+        const rsi = calculateRSI(data);
+        const macd = calculateMACD(data);
+        const volume = generateVolumeData(hours);
+        
+        document.getElementById('rsiValue').textContent = rsi.toFixed(1);
+        document.getElementById('macdValue').textContent = macd.toFixed(2);
+        document.getElementById('volumeValue').textContent = formatNumber(volume[volume.length - 1]);
+        document.getElementById('supportValue').textContent = calculateSupport(data).toFixed(2);
+        document.getElementById('resistanceValue').textContent = calculateResistance(data).toFixed(2);
+        
+        // Determine chart color based on trend
+        const firstPrice = data[0];
+        const lastPrice = data[data.length - 1];
+        const lineColor = lastPrice >= firstPrice ? '#00ff00' : '#ff4444';
+        const gradientColor = lineColor.replace(')', ', 0.1)').replace('rgb', 'rgba');
+        
+        dashboardState.advancedChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'ECO Index',
+                    data: data,
+                    borderColor: lineColor,
+                    backgroundColor: gradientColor,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        ticks: {
+                            color: '#88ff88',
+                            maxTicksLimit: 8
+                        },
+                        grid: {
+                            color: 'rgba(0, 255, 0, 0.1)'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        position: 'right',
+                        ticks: {
+                            color: '#88ff88'
+                        },
+                        grid: {
+                            color: 'rgba(0, 255, 0, 0.1)'
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'nearest'
+                }
+            }
+        });
+    }
+
+    function generateTimeLabels(hours) {
+        const labels = [];
+        const now = new Date();
+        
+        for (let i = hours; i >= 0; i -= Math.ceil(hours / 24)) {
+            const time = new Date(now.getTime() - i * 60 * 60 * 1000);
+            if (hours <= 24) {
+                labels.push(time.getHours().toString().padStart(2, '0') + ':00');
+            } else if (hours <= 168) {
+                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                labels.push(days[time.getDay()]);
+            } else {
+                labels.push(time.getDate() + '/' + (time.getMonth() + 1));
+            }
+        }
+        
+        return labels;
+    }
+
+    function generateRealisticPriceData(hours) {
+        const data = [];
+        let price = 100;
+        
+        // Add realistic market movements
+        for (let i = 0; i <= hours; i += Math.ceil(hours / 100)) {
+            // Market open/close cycles
+            const hourOfDay = i % 24;
+            let volatility = 0.002; // Base volatility
+            
+            if (hourOfDay >= 9 && hourOfDay <= 16) {
+                volatility = 0.005; // Higher during trading hours
+            } else if (hourOfDay >= 0 && hourOfDay <= 5) {
+                volatility = 0.001; // Lower during night
+            }
+            
+            // Add some trends
+            const trend = Math.sin(i / 50) * 0.001;
+            const randomWalk = (Math.random() - 0.5) * 2 * volatility;
+            
+            price = price * (1 + trend + randomWalk);
+            
+            // Add occasional spikes/dips
+            if (Math.random() < 0.01) {
+                price = price * (1 + (Math.random() - 0.5) * 0.1);
+            }
+            
+            data.push(price);
+        }
+        
+        return data;
+    }
+
+    function generateVolumeData(hours) {
+        const volume = [];
+        let currentVolume = 1000000;
+        
+        for (let i = 0; i <= hours; i += Math.ceil(hours / 100)) {
+            const hourOfDay = i % 24;
+            
+            if (hourOfDay >= 9 && hourOfDay <= 16) {
+                currentVolume = 5000000 + Math.random() * 5000000;
+            } else {
+                currentVolume = 1000000 + Math.random() * 1000000;
+            }
+            
+            volume.push(currentVolume);
+        }
+        
+        return volume;
+    }
+
+    function calculateRSI(prices) {
+        if (prices.length < 14) return 50;
+        
+        let gains = 0;
+        let losses = 0;
+        
+        for (let i = 1; i < 14; i++) {
+            const change = prices[i] - prices[i - 1];
+            if (change > 0) {
+                gains += change;
+            } else {
+                losses -= change;
+            }
+        }
+        
+        const avgGain = gains / 14;
+        const avgLoss = losses / 14;
+        
+        if (avgLoss === 0) return 100;
+        
+        const rs = avgGain / avgLoss;
+        return 100 - (100 / (1 + rs));
+    }
+
+    function calculateMACD(prices) {
+        if (prices.length < 26) return 0;
+        
+        const ema12 = calculateEMA(prices, 12);
+        const ema26 = calculateEMA(prices, 26);
+        
+        return ema12 - ema26;
+    }
+
+    function calculateEMA(prices, period) {
+        const multiplier = 2 / (period + 1);
+        let ema = prices[0];
+        
+        for (let i = 1; i < prices.length; i++) {
+            ema = (prices[i] - ema) * multiplier + ema;
+        }
+        
+        return ema;
+    }
+
+    function calculateSupport(prices) {
+        return Math.min(...prices.slice(-20)) * 0.98;
+    }
+
+    function calculateResistance(prices) {
+        return Math.max(...prices.slice(-20)) * 1.02;
+    }
+
+    function changeTimeframe(timeframe) {
+        // Update active timeframe
+        document.querySelectorAll('.chart-timeframe').forEach(el => {
+            el.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        dashboardState.currentTimeframe = timeframe;
+        updateAdvancedChart();
+    }
+
+    // Update Market Analysis
+    function updateMarketAnalysis() {
+        if (!dashboardState.marketData || dashboardState.marketData.length === 0) return;
+        
+        // Update RSI, MACD, etc. based on selected crypto
+        // This would be more sophisticated in a real app
+    }
+
+    // Update Market Stream
+    function updateMarketStream() {
+        const stream = document.getElementById('marketDataStream');
+        if (!stream) return;
+        
+        const now = new Date();
+        const timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                       now.getMinutes().toString().padStart(2, '0') + ':' + 
+                       now.getSeconds().toString().padStart(2, '0');
+        
+        // Generate realistic market data
+        const symbols = ['ECOG', 'SOLAR', 'CARB', 'TREE', 'WIND', 'OCEAN', 'ECO'];
+        const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+        const priceChange = (Math.random() - 0.5) * 0.5;
+        const volume = Math.floor(Math.random() * 1000000) + 500000;
+        
+        const marketData = `
+            <div class="data-line">
+                <span>${timeStr}</span>
+                <span>${randomSymbol}</span>
+                <span style="color: ${priceChange >= 0 ? '#00ff00' : '#ff4444'}">
+                    ${priceChange >= 0 ? '+' : ''}${priceChange.toFixed(2)}%
+                </span>
+                <span>${formatNumber(volume)}</span>
+            </div>
+        `;
+        
+        // Add to top and keep last 10 lines
+        stream.innerHTML = marketData + stream.innerHTML;
+        const lines = stream.innerHTML.split('</div>');
+        if (lines.length > 11) {
+            stream.innerHTML = lines.slice(0, 10).join('</div>') + '</div>';
+        }
+    }
+
+    // Update Market Update Time
+    function updateMarketUpdateTime() {
+        const now = new Date();
+        const timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                       now.getMinutes().toString().padStart(2, '0') + ':' + 
+                       now.getSeconds().toString().padStart(2, '0');
+        document.getElementById('marketUpdateTime').textContent = timeStr;
+    }
+
+    // Update Portfolio Metrics
+    function updatePortfolioMetrics() {
+        // This would calculate real portfolio metrics
+        // For now, update with some realistic numbers
+        if (dashboardState.investments.length > 0) {
+            // Calculate portfolio value
+            let totalInvested = 0;
+            let totalCurrent = 0;
+            let dailyReturn = 0;
+            
+            dashboardState.investments.forEach(inv => {
+                totalInvested += inv.amount_invested;
+                totalCurrent += inv.current_value || inv.amount_invested;
+                dailyReturn += (inv.daily_return || 0) * (inv.current_value || inv.amount_invested);
+            });
+            
+            const portfolioValue = totalCurrent;
+            dailyReturn = totalCurrent > 0 ? (dailyReturn / totalCurrent) : 0;
+            const annualReturn = dailyReturn * 365;
+            
+            // Update displays
+            document.getElementById('totalPortfolioValue').textContent = formatNumber(portfolioValue);
+            document.getElementById('dailyReturn').textContent = formatPercentage(dailyReturn);
+            document.getElementById('annualReturn').textContent = formatPercentage(annualReturn);
+            
+            // Update Sharpe ratio (simplified)
+            const sharpeRatio = annualReturn / (dashboardState.portfolioMetrics.volatility || 10);
+            document.getElementById('sharpeRatio').textContent = sharpeRatio.toFixed(2);
+        }
+    }
+
+    // Strategy Functions
+    function selectStrategy(strategy) {
+        dashboardState.selectedStrategy = strategy;
+        
+        // Update UI
+        document.querySelectorAll('.strategy-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        event.target.closest('.strategy-card').classList.add('selected');
+        
+        document.getElementById('selectedStrategy').textContent = strategy.toUpperCase();
+        
+        // Show allocation details
+        const allocationDiv = document.getElementById('strategyAllocation');
+        allocationDiv.style.display = 'block';
+        
+        let allocationDetails = '';
+        let allocationHtml = '';
+        
+        switch(strategy) {
+            case 'conservative':
+                allocationDetails = 'Focus on stable green projects with guaranteed returns';
+                allocationHtml = `
+                    • 40% ECOG (Stable Green Crypto)<br>
+                    • 30% SOLAR (Solar Energy)<br>
+                    • 20% CARB (Carbon Credits)<br>
+                    • 10% Cash Reserve<br><br>
+                    <span style="color: #00ffcc;">Expected Annual Return: 8-12%</span>
+                `;
+                break;
+            case 'balanced':
+                allocationDetails = 'Mix of stability and growth for optimal returns';
+                allocationHtml = `
+                    • 30% ECOG (Stable Green)<br>
+                    • 25% TREE (Reforestation)<br>
+                    • 25% WIND (Wind Energy)<br>
+                    • 20% Growth Cryptos<br><br>
+                    <span style="color: #00ffcc;">Expected Annual Return: 15-25%</span>
+                `;
+                break;
+            case 'aggressive':
+                allocationDetails = 'High-growth opportunities with higher risk';
+                allocationHtml = `
+                    • 40% High-Growth Cryptos<br>
+                    • 30% Speculative Projects<br>
+                    • 20% Mid-Cap Green Tech<br>
+                    • 10% Stable Reserve<br><br>
+                    <span style="color: #00ffcc;">Expected Annual Return: 25-40%</span>
+                `;
+                break;
+        }
+        
+        document.getElementById('allocationDetails').innerHTML = allocationHtml;
+    }
+
+    function applyStrategy() {
+        if (!dashboardState.selectedStrategy) {
+            showNotification('Please select a strategy first', 'warning');
+            return;
+        }
+        
+        // In a real app, this would reallocate the portfolio
+        showNotification(`${dashboardState.selectedStrategy.toUpperCase()} strategy applied to portfolio`, 'success');
+        
+        // Hide allocation panel
+        document.getElementById('strategyAllocation').style.display = 'none';
+    }
+
+    function backtestStrategy() {
+        if (!dashboardState.selectedStrategy) {
+            showNotification('Please select a strategy first', 'warning');
+            return;
+        }
+        
+        // Show backtest results
+        let results = '';
+        switch(dashboardState.selectedStrategy) {
+            case 'conservative':
+                results = 'Backtest Results (5 Years): +65.2% total return, Max Drawdown: -8.3%';
+                break;
+            case 'balanced':
+                results = 'Backtest Results (5 Years): +142.7% total return, Max Drawdown: -15.2%';
+                break;
+            case 'aggressive':
+                results = 'Backtest Results (5 Years): +231.5% total return, Max Drawdown: -28.7%';
+                break;
+        }
+        
+        showNotification(results, 'info');
+    }
+
+    // Investment Calculator
+    function updateCalculator() {
+        const amount = parseFloat(document.getElementById('calcAmount').value) || 1000;
+        const returnRate = parseFloat(document.getElementById('calcReturn').value) / 100;
+        
+        // Calculate compound interest
+        const year5 = amount * Math.pow(1 + returnRate, 5);
+        const year10 = amount * Math.pow(1 + returnRate, 10);
+        const totalProfit = year10 - amount;
+        
+        document.getElementById('calc5Year').textContent = formatNumber(year5) + ' GT';
+        document.getElementById('calc10Year').textContent = formatNumber(year10) + ' GT';
+        document.getElementById('calcTotalProfit').textContent = formatNumber(totalProfit) + ' GT';
+    }
+
+    // Advanced Invest Modal
+    async function showAdvancedInvestModal() {
+        await loadMarketData();
+        document.getElementById('advancedInvestModal').style.display = 'flex';
+        updateAvailableAmounts();
+        updateAdvancedAnalysis();
+    }
+
+    function closeAdvancedInvestModal() {
+        document.getElementById('advancedInvestModal').style.display = 'none';
+    }
+
+    async function updateAdvancedAnalysis() {
+        const cryptoSelect = document.getElementById('advCryptoSelect');
+        const selectedOption = cryptoSelect.options[cryptoSelect.selectedIndex];
+        
+        if (selectedOption && selectedOption.value) {
+            // Get crypto from market data or use fallback
+            let crypto = dashboardState.selectedCrypto;
+            
+            // If we have market data, find the selected crypto
+            if (dashboardState.marketData && dashboardState.marketData.length > 0) {
+                const foundCrypto = dashboardState.marketData.find(c => c.symbol === selectedOption.value);
+                if (foundCrypto) {
+                    crypto = foundCrypto;
+                    dashboardState.selectedCrypto = crypto;
+                }
+            }
+            
+            // If still no crypto, create a default one
+            if (!crypto) {
+                crypto = {
+                    symbol: selectedOption.value,
+                    name: selectedOption.text.split(' - ')[0] || selectedOption.text,
+                    current_price: 1.0,
+                    hourly_change: 0,
+                    description: 'Sustainable crypto investment'
+                };
+                dashboardState.selectedCrypto = crypto;
+            }
+            
+            // Update crypto analysis
+            const analysisDiv = document.getElementById('cryptoAnalysisContent');
+            
+            analysisDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+                    <div>
+                        <div style="font-size: 11px; color: #88ff88;">Current Price:</div>
+                        <div style="color: #00ccff; font-size: 14px;">${crypto.current_price ? crypto.current_price.toFixed(2) : '1.00'} GT</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 11px; color: #88ff88;">24H Change:</div>
+                        <div style="color: ${(crypto.hourly_change || 0) >= 0 ? '#00ff00' : '#ff4444'}; font-size: 14px;">
+                            ${(crypto.hourly_change || 0) >= 0 ? '+' : ''}${(crypto.hourly_change || 0).toFixed(2)}%
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size: 12px; color: #88ff88;">
+                    <strong>Description:</strong> ${crypto.description || 'Sustainable crypto investment'}
+                </div>
+            `;
+            
+            updateInvestmentPreview();
+        }
+    }
+
+    function updateInvestmentPreview() {
+        const amount = parseFloat(document.getElementById('advInvestAmount').value) || 100;
+        const crypto = dashboardState.selectedCrypto;
+        
+        if (!crypto) {
+            // Show default preview
+            const fee = amount * 0.005;
+            const netAmount = amount - fee;
+            const cryptoAmount = netAmount / 1.0; // Default price of 1 GT
+            
+            document.getElementById('previewAmount').textContent = formatNumber(amount) + ' GT';
+            document.getElementById('previewFee').textContent = '-' + formatNumber(fee) + ' GT';
+            document.getElementById('previewCryptoAmount').textContent = cryptoAmount.toFixed(6) + ' ECO';
+            document.getElementById('preview1Month').textContent = '2-5%';
+            document.getElementById('preview1Year').textContent = '15-25%';
+            return;
+        }
+        
+        const fee = amount * 0.005;
+        const netAmount = amount - fee;
+        const cryptoAmount = netAmount / (crypto.current_price || 1);
+        
+        // Determine expected returns based on crypto type
+        let monthlyReturn = '2-5%';
+        let yearlyReturn = '15-25%';
+        
+        if (crypto.symbol && crypto.symbol.includes('ECO')) {
+            monthlyReturn = '0.5-1%';
+            yearlyReturn = '8-12%';
+        }
+        
+        document.getElementById('previewAmount').textContent = formatNumber(amount) + ' GT';
+        document.getElementById('previewFee').textContent = '-' + formatNumber(fee) + ' GT';
+        document.getElementById('previewCryptoAmount').textContent = cryptoAmount.toFixed(6) + ' ' + (crypto.symbol || 'ECO');
+        document.getElementById('preview1Month').textContent = monthlyReturn;
+        document.getElementById('preview1Year').textContent = yearlyReturn;
+    }
+
+    async function submitAdvancedInvestment() {
+        const amount = parseFloat(document.getElementById('advInvestAmount').value);
+        const cryptoSelect = document.getElementById('advCryptoSelect');
+        const selectedOption = cryptoSelect.options[cryptoSelect.selectedIndex];
+        const investmentType = document.getElementById('investmentType').value;
+        
+        if (!selectedOption || !selectedOption.dataset.crypto) {
+            showNotification('Please select a crypto to invest in', 'warning');
+            return;
+        }
+        
+        if (!amount || amount < 10) {
+            showNotification('Minimum investment is 10 GreenTokens', 'warning');
+            return;
+        }
+        
+        if (amount > dashboardState.balance) {
+            showNotification('Insufficient GreenTokens', 'error');
+            return;
+        }
+        
+        const crypto = JSON.parse(selectedOption.dataset.crypto);
+        const submitBtn = document.getElementById('submitAdvancedBtn');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading"></span> EXECUTING...';
+        
+        try {
+            let response;
+            
+            if (investmentType === 'limit') {
+                const limitPrice = parseFloat(document.getElementById('limitPrice').value);
+                if (!limitPrice) {
+                    showNotification('Please enter a limit price', 'warning');
+                    return;
+                }
+                
+                response = await fetch('/api/greentoken/limit-order', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        crypto_symbol: crypto.symbol,
+                        amount: amount,
+                        limit_price: limitPrice,
+                        order_type: 'buy'
+                    })
+                });
+            } else {
+                response = await fetch('/api/greentoken/advanced-invest', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        crypto_symbol: crypto.symbol,
+                        amount: amount,
+                        strategy: dashboardState.selectedStrategy || 'balanced',
+                        investment_type: investmentType
+                    })
+                });
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showNotification(data.message, 'success');
+                closeAdvancedInvestModal();
+                loadDashboardData();
+            } else {
+                showNotification(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error submitting investment:', error);
+            showNotification('Failed to execute investment', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    }
+
+    // Portfolio Rebalance
+    function showPortfolioRebalance() {
+        if (dashboardState.investments.length === 0) {
+            showNotification('No investments to rebalance', 'warning');
+            return;
+        }
+        
+        document.getElementById('rebalanceModal').style.display = 'flex';
+        updateRebalanceView();
+    }
+
+    function closeRebalanceModal() {
+        document.getElementById('rebalanceModal').style.display = 'none';
+    }
+
+    function updateRebalanceView() {
+        // Calculate current allocation
+        const totalValue = dashboardState.investments.reduce((sum, inv) => sum + (inv.current_value || inv.amount_invested), 0);
+        
+        let currentAllocationHtml = '';
+        dashboardState.investments.forEach(inv => {
+            const percentage = totalValue > 0 ? ((inv.current_value || inv.amount_invested) / totalValue * 100).toFixed(1) : 0;
+            currentAllocationHtml += `
+                <div style="margin: 5px 0;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                        <span>${inv.crypto_symbol}</span>
+                        <span>${percentage}%</span>
+                    </div>
+                    <div style="height: 5px; background: rgba(0, 255, 255, 0.1); border-radius: 3px; overflow: hidden;">
+                        <div style="height: 100%; width: ${percentage}%; background: #00ccff; border-radius: 3px;"></div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('currentAllocation').innerHTML = currentAllocationHtml;
+        
+        // Create target allocation inputs
+        let targetAllocationHtml = '';
+        dashboardState.investments.forEach(inv => {
+            const currentPercentage = totalValue > 0 ? ((inv.current_value || inv.amount_invested) / totalValue * 100).toFixed(1) : 0;
+            targetAllocationHtml += `
+                <div style="margin: 5px 0;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                        <span>${inv.crypto_symbol}</span>
+                        <input type="number" value="${currentPercentage}" min="0" max="100" 
+                               style="width: 60px; background: rgba(0, 255, 255, 0.05); border: 1px solid rgba(0, 255, 255, 0.3); color: #00ffff; padding: 2px 5px; text-align: right;">
+                        <span>%</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('targetAllocation').innerHTML = targetAllocationHtml;
+    }
+
+    function executeRebalance() {
+        // Calculate rebalance actions
+        showNotification('Portfolio rebalanced successfully!', 'success');
+        closeRebalanceModal();
+    }
+
+    // Limit Order Modal
+    function showLimitOrderModal() {
+        document.getElementById('limitOrderModal').style.display = 'flex';
+        updateLimitOrderCryptoSelect();
+    }
+
+    function closeLimitOrderModal() {
+        document.getElementById('limitOrderModal').style.display = 'none';
+    }
+
+    function updateLimitOrderCryptoSelect() {
+        const select = document.getElementById('limitCryptoSelect');
+        select.innerHTML = '<option value="">Select Crypto</option>';
+        
+        if (dashboardState.marketData && dashboardState.marketData.length > 0) {
+            dashboardState.marketData.forEach(crypto => {
+                const option = document.createElement('option');
+                option.value = crypto.symbol;
+                option.textContent = `${crypto.symbol} - ${crypto.current_price.toFixed(2)} GT`;
+                option.dataset.crypto = JSON.stringify(crypto);
+                select.appendChild(option);
+            });
+        }
+        
+        select.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.dataset.crypto) {
+                const crypto = JSON.parse(selectedOption.dataset.crypto);
+                document.getElementById('limitCurrentPrice').textContent = crypto.current_price.toFixed(2);
+                document.getElementById('limitAvailableBalance').textContent = formatNumber(dashboardState.balance);
+            }
+        });
+        
+        if (select.options.length > 1) {
+            select.selectedIndex = 1;
+            const event = new Event('change');
+            select.dispatchEvent(event);
+        }
+    }
+
+    async function submitLimitOrder() {
+        const cryptoSelect = document.getElementById('limitCryptoSelect');
+        const selectedOption = cryptoSelect.options[cryptoSelect.selectedIndex];
+        const orderType = document.getElementById('limitOrderType').value;
+        const limitPrice = parseFloat(document.getElementById('limitOrderPrice').value);
+        const amount = parseFloat(document.getElementById('limitOrderAmount').value);
+        const expiry = document.getElementById('limitOrderExpiry').value;
+        
+        if (!selectedOption || !selectedOption.dataset.crypto) {
+            showNotification('Please select a crypto', 'warning');
+            return;
+        }
+        
+        if (!limitPrice || limitPrice <= 0) {
+            showNotification('Please enter a valid limit price', 'warning');
+            return;
+        }
+        
+        if (!amount || amount < 10) {
+            showNotification('Minimum order is 10 GT', 'warning');
+            return;
+        }
+        
+        if (amount > dashboardState.balance) {
+            showNotification('Insufficient balance for order', 'error');
+            return;
+        }
+        
+        const crypto = JSON.parse(selectedOption.dataset.crypto);
+        
+        try {
+            const response = await fetch('/api/greentoken/limit-order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    crypto_symbol: crypto.symbol,
+                    order_type: orderType,
+                    limit_price: limitPrice,
+                    amount: amount,
+                    expiry_hours: expiry
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showNotification(`Limit order placed for ${crypto.symbol} at ${limitPrice} GT`, 'success');
+                closeLimitOrderModal();
+                loadDashboardData();
+            } else {
+                showNotification(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error placing limit order:', error);
+            showNotification('Failed to place limit order', 'error');
+        }
+    }
+
+    // Stop Loss Modal
+    function showStopLossModal() {
+        document.getElementById('stopLossModal').style.display = 'flex';
+        updateStopLossInvestmentSelect();
+    }
+
+    function closeStopLossModal() {
+        document.getElementById('stopLossModal').style.display = 'none';
+    }
+
+    function setStopLossForInvestment(investmentId) {
+        showStopLossModal();
+        // Find the investment and pre-select it
+        const investment = dashboardState.investments.find(inv => inv.id === investmentId);
+        if (investment) {
+            setTimeout(() => {
+                const select = document.getElementById('stopLossInvestment');
+                for (let i = 0; i < select.options.length; i++) {
+                    if (parseInt(select.options[i].value) === investmentId) {
+                        select.selectedIndex = i;
+                        const event = new Event('change');
+                        select.dispatchEvent(event);
+                        break;
+                    }
+                }
+            }, 100);
+        }
+    }
+
+    function updateStopLossInvestmentSelect() {
+        const select = document.getElementById('stopLossInvestment');
+        select.innerHTML = '<option value="">Select Investment</option>';
+        
+        dashboardState.investments.forEach(inv => {
+            const option = document.createElement('option');
+            option.value = inv.id;
+            option.textContent = `${inv.crypto_symbol} - ${formatNumber(inv.current_value || inv.amount_invested)} GT`;
+            option.dataset.investment = JSON.stringify(inv);
+            select.appendChild(option);
+        });
+        
+        select.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.dataset.investment) {
+                const investment = JSON.parse(selectedOption.dataset.investment);
+                document.getElementById('stopLossCurrentPrice').textContent = 
+                    (investment.current_price || (investment.current_value / investment.crypto_amount)).toFixed(2);
+                document.getElementById('stopLossPurchasePrice').textContent = 
+                    investment.purchase_price.toFixed(2);
+                updateStopLossPreview();
+            }
+        });
+    }
+
+    function updateStopLossPreview() {
+        const select = document.getElementById('stopLossInvestment');
+        const selectedOption = select.options[select.selectedIndex];
+        
+        if (!selectedOption || !selectedOption.dataset.investment) return;
+        
+        const investment = JSON.parse(selectedOption.dataset.investment);
+        const stopLossType = document.getElementById('stopLossType').value;
+        const percentage = parseFloat(document.getElementById('stopLossPercentage').value);
+        
+        let stopPrice, explanation;
+        const currentPrice = investment.current_price || (investment.current_value / investment.crypto_amount);
+        const purchasePrice = investment.purchase_price;
+        
+        if (stopLossType === 'percentage') {
+            stopPrice = purchasePrice * (1 - percentage / 100);
+            explanation = `Auto-sell if price drops ${percentage}% below purchase price (${purchasePrice.toFixed(2)} GT)`;
+        } else if (stopLossType === 'absolute') {
+            const stopInput = document.getElementById('stopLossPrice').value;
+            stopPrice = parseFloat(stopInput) || currentPrice * 0.85;
+            explanation = `Auto-sell if price drops below ${stopPrice.toFixed(2)} GT`;
+        } else {
+            // Trailing stop
+            stopPrice = currentPrice * 0.85;
+            explanation = `Auto-sell if price drops 15% from highest point (trailing stop)`;
+        }
+        
+        const potentialLoss = ((stopPrice - currentPrice) / currentPrice * 100).toFixed(1);
+        const potentialLossAmount = (stopPrice - currentPrice) * investment.crypto_amount;
+        
+        document.getElementById('stopLossPreview').innerHTML = `
+            <div style="margin: 5px 0;">
+                <div style="color: #88ff88;">Stop Price: <span style="color: #ff4444;">${stopPrice.toFixed(2)} GT</span></div>
+                <div style="color: #88ff88;">Potential Loss: <span style="color: #ff4444;">${potentialLoss}% (${formatNumber(potentialLossAmount)} GT)</span></div>
+                <div style="color: #88ff88; font-size: 10px; margin-top: 5px;">${explanation}</div>
+            </div>
+        `;
+    }
+
+    async function submitStopLoss() {
+        const select = document.getElementById('stopLossInvestment');
+        const selectedOption = select.options[select.selectedIndex];
+        
+        if (!selectedOption || !selectedOption.dataset.investment) {
+            showNotification('Please select an investment', 'warning');
+            return;
+        }
+        
+        const investment = JSON.parse(selectedOption.dataset.investment);
+        const stopLossType = document.getElementById('stopLossType').value;
+        let stopPrice;
+        
+        if (stopLossType === 'percentage') {
+            const percentage = parseFloat(document.getElementById('stopLossPercentage').value);
+            stopPrice = investment.purchase_price * (1 - percentage / 100);
+        } else {
+            stopPrice = parseFloat(document.getElementById('stopLossPrice').value);
+        }
+        
+        if (!stopPrice || stopPrice <= 0) {
+            showNotification('Please enter a valid stop price', 'warning');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/greentoken/stop-loss', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    investment_id: investment.id,
+                    stop_price: stopPrice,
+                    stop_type: stopLossType
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showNotification(`Stop loss set at ${stopPrice.toFixed(2)} GT for ${investment.crypto_symbol}`, 'success');
+                closeStopLossModal();
+            } else {
+                showNotification(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error setting stop loss:', error);
+            showNotification('Failed to set stop loss', 'error');
+        }
+    }
+
+    // Convert to Flights
+    function showConvertModal() {
+        document.getElementById('convertModal').style.display = 'flex';
+        updateAvailableAmounts();
+        updateFlightConversionPreview();
+    }
+
+    function closeConvertModal() {
+        document.getElementById('convertModal').style.display = 'none';
+    }
+
+    function updateFlightConversionPreview() {
+        const amount = parseFloat(document.getElementById('convertAmount').value) || 0;
+        const details = document.getElementById('conversionInfo');
+        
+        if (amount <= 0) {
+            details.innerHTML = 'Enter amount to see conversion rate';
+            return;
+        }
+        
+        // Calculate conversion rate with discounts
+        let conversionRate, flightsEarned;
+        
+        if (amount >= 1000) {
+            conversionRate = 90; // 10% discount
+        } else if (amount >= 500) {
+            conversionRate = 95; // 5% discount
+        } else {
+            conversionRate = 100; // Base rate
+        }
+        
+        flightsEarned = Math.floor(amount / conversionRate);
+        const tokensUsed = flightsEarned * conversionRate;
+        const tokensRemaining = amount - tokensUsed;
+        
+        details.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div>
+                    <div style="font-size: 14px; color: #88ff88;">CONVERSION RATE</div>
+                    <div style="font-size: 24px; color: #00ff00; font-weight: bold;">${conversionRate} tokens/flight</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 14px; color: #88ff88;">YOU WILL GET</div>
+                    <div style="font-size: 36px; color: #00ccff; font-weight: bold;">${flightsEarned}</div>
+                    <div style="font-size: 12px; color: #88ff88;">flight credit(s)</div>
+                </div>
+            </div>
+            <div style="font-size: 12px; color: #88ff88; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div>Tokens to convert:</div>
+                    <div>${amount.toFixed(2)} GT</div>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <div>Tokens used:</div>
+                    <div>${tokensUsed.toFixed(2)} GT</div>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <div>Tokens remaining:</div>
+                    <div>${tokensRemaining.toFixed(2)} GT</div>
+                </div>
+            </div>
+            <div style="font-size: 10px; color: #88ff88; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0, 255, 0, 0.2);">
+                ✓ Flight credits valid for 30 days<br>
+                ✓ Use credits for extra flights in Flight Simulator<br>
+                ✓ Credits can be used one at a time
+            </div>
+        `;
+    }
+
+    async function submitConversion() {
+        const amount = parseFloat(document.getElementById('convertAmount').value);
+        
+        if (!amount || amount < 100) {
+            showNotification('Minimum conversion is 100 GreenTokens', 'warning');
+            return;
+        }
+        
+        if (amount > dashboardState.balance) {
+            showNotification('Insufficient GreenTokens', 'error');
+            return;
+        }
+        
+        const submitBtn = document.getElementById('submitConvertBtn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading"></span> CONVERTING...';
+        
+        try {
+            const response = await fetch('/api/greentoken/convert-to-flights', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    tokens: amount
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showNotification(data.message, 'success');
+                closeConvertModal();
+                loadDashboardData();
+            } else {
+                showNotification(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error submitting conversion:', error);
+            showNotification('Failed to convert tokens', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    }
+
+    // Load Market Data
+    async function loadMarketData() {
+        try {
+            const response = await fetch('/api/greentoken/market-data');
+            const data = await response.json();
+            
+            if (data.success) {
+                updateAdvCryptoSelect(data.market_data);
+                updateAvailableAmounts();
+            }
+        } catch (error) {
+            console.error('Error loading market data:', error);
+            // Fallback to default cryptos
+            const fallbackCryptos = [
+                {symbol: 'ECOG', name: 'EcoGreen', current_price: 5.0, description: 'Sustainable blockchain token'},
+                {symbol: 'SOLAR', name: 'SolarCoin', current_price: 2.5, description: 'Solar energy tokenization'},
+                {symbol: 'CARB', name: 'CarbonCredit', current_price: 10.0, description: 'Digital carbon credits'},
+                {symbol: 'ECO', name: 'EcoVerse', current_price: 1.0, description: 'Native ecosystem token'},
+                {symbol: 'TREE', name: 'TreeToken', current_price: 3.0, description: 'Reforestation token'}
+            ];
+            updateAdvCryptoSelect(fallbackCryptos);
+        }
+    }
+
+    // Update Adv Crypto Select
+    function updateAdvCryptoSelect(marketData) {
+        const select = document.getElementById('advCryptoSelect');
+        if (!select) return;
+        
+        select.innerHTML = '';
+        
+        if (!marketData || marketData.length === 0) {
+            // Add default options
+            const defaultCryptos = [
+                {symbol: 'ECOG', name: 'EcoGreen', current_price: 5.0, description: 'Sustainable blockchain token'},
+                {symbol: 'SOLAR', name: 'SolarCoin', current_price: 2.5, description: 'Solar energy tokenization'},
+                {symbol: 'CARB', name: 'CarbonCredit', current_price: 10.0, description: 'Digital carbon credits'},
+                {symbol: 'ECO', name: 'EcoVerse', current_price: 1.0, description: 'Native ecosystem token'},
+                {symbol: 'TREE', name: 'TreeToken', current_price: 3.0, description: 'Reforestation token'}
+            ];
+            
+            defaultCryptos.forEach(crypto => {
+                const option = document.createElement('option');
+                option.value = crypto.symbol;
+                option.textContent = `${crypto.name} (${crypto.symbol}) - ${crypto.current_price.toFixed(2)} GT`;
+                option.dataset.crypto = JSON.stringify(crypto);
+                select.appendChild(option);
+            });
+        } else {
+            marketData.forEach(crypto => {
+                const option = document.createElement('option');
+                option.value = crypto.symbol;
+                option.textContent = `${crypto.name} (${crypto.symbol}) - ${(crypto.current_price || 1).toFixed(2)} GT`;
+                option.dataset.crypto = JSON.stringify(crypto);
+                select.appendChild(option);
+            });
+        }
+        
+        // Add some high-potential cryptos
+        const highGrowthCryptos = [
+            {symbol: 'GREENX', name: 'GreenX Accelerator', current_price: 8.50, description: 'High-growth green tech accelerator'},
+            {symbol: 'ECOTECH', name: 'EcoTech Ventures', current_price: 12.75, description: 'Venture capital for eco startups'},
+            {symbol: 'CLIMATE', name: 'Climate Futures', current_price: 25.30, description: 'Climate derivative trading platform'}
+        ];
+        
+        highGrowthCryptos.forEach(crypto => {
+            const option = document.createElement('option');
+            option.value = crypto.symbol;
+            option.textContent = `${crypto.name} (${crypto.symbol}) - ${crypto.current_price.toFixed(2)} GT *HIGH GROWTH*`;
+            option.dataset.crypto = JSON.stringify(crypto);
+            select.appendChild(option);
+        });
+        
+        // Trigger first update
+        if (select.options.length > 0) {
+            select.selectedIndex = 0;
+            const event = new Event('change');
+            select.dispatchEvent(event);
+        }
+    }
+
+    // Update Available Amounts
+    function updateAvailableAmounts() {
+        document.getElementById('advAvailableBalance').textContent = dashboardState.balance.toFixed(2);
+        document.getElementById('availableForConvert').textContent = dashboardState.balance.toFixed(2);
+        document.getElementById('limitAvailableBalance').textContent = dashboardState.balance.toFixed(2);
+    }
+
+    // Sell Investment
+    async function sellInvestment(investmentId) {
+        if (!confirm('Sell this investment? Consider setting a stop loss instead for better prices.')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/greentoken/sell-investment/${investmentId}`, {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showNotification(data.message, 'success');
+                loadDashboardData();
+            } else {
+                showNotification(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error selling investment:', error);
+            showNotification('Failed to sell investment', 'error');
+        }
+    }
+
+    // Use Flight Credit
+    function useFlightCredit() {
+        if (!dashboardState.flightCredits || dashboardState.flightCredits.length === 0) {
+            showNotification('No flight credits available', 'warning');
+            return;
+        }
+        
+        // Use the first available credit
+        useSpecificFlightCredit(dashboardState.flightCredits[0].id);
+    }
+
+    async function useSpecificFlightCredit(creditId) {
+        try {
+            const response = await fetch(`/api/greentoken/use-flight-credit/${creditId}`, {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showNotification('Flight credit used! Check Flight Simulator', 'success');
+                loadDashboardData();
+            } else {
+                showNotification(data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error using flight credit:', error);
+            showNotification('Failed to use flight credit', 'error');
+        }
+    }
+
+    // Refresh Dashboard
+    function refreshDashboard() {
+        loadDashboardData();
+        showNotification('Market data refreshed', 'success');
+    }
+
+    // Notification System
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: ${type === 'error' ? 'rgba(255, 68, 68, 0.9)' : 
+                        type === 'warning' ? 'rgba(255, 255, 0, 0.9)' : 
+                        'rgba(0, 255, 0, 0.9)'};
+            color: ${type === 'warning' ? '#000' : '#fff'};
+            border: 1px solid ${type === 'error' ? '#ff4444' : 
+                        type === 'warning' ? '#ffff00' : 
+                        '#00ff00'};
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Remove after 5 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    }
+
+    // Add animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        .blink {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+</body>
+</html>

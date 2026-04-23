@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMMIGRATION CLEARANCE | EcoVerse Aviation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --primary-blue: #0a192f;
+            --secondary-blue: #112240;
+            --accent-cyan: #64ffda;
+            --accent-green: #00ff9d;
+            --warning-red: #ff4444;
+            --border-glow: rgba(100, 255, 218, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #0c0c2e 100%);
+            color: #e6f1ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* uiverse.io - Custom Animation Classes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        @keyframes breath {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @keyframes passportOpen {
+            0% { 
+                transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+                z-index: 10;
+            }
+            100% { 
+                transform: perspective(1000px) rotateY(-180deg) rotateX(5deg);
+                z-index: 10;
+            }
+        }
+        
+        @keyframes stampDrop {
+            0% {
+                opacity: 0;
+                transform: translateY(-100px) rotate(0deg) scale(0.5);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(10px) rotate(-5deg) scale(1.1);
+            }
+            80% {
+                transform: translateY(-5px) rotate(2deg) scale(1);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg) scale(1);
+            }
+        }
+        
+        @keyframes inkSpread {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+                filter: blur(0px);
+            }
+            20% {
+                opacity: 1;
+                transform: scale(0.5);
+                filter: blur(1px);
+            }
+            60% {
+                transform: scale(1.2);
+                filter: blur(3px);
+            }
+            100% {
+                opacity: 0.8;
+                transform: scale(1.5);
+                filter: blur(5px);
+            }
+        }
+        
+        @keyframes scanLine {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+        
+        @keyframes progressFill {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+        
+        @keyframes terminalTyping {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .animate-fade-in-left {
+            animation: fadeInLeft 0.6s ease-out forwards;
+        }
+        
+        .animate-fade-in-right {
+            animation: fadeInRight 0.6s ease-out forwards;
+        }
+        
+        .animate-pulse-custom {
+            animation: pulse 2s infinite ease-in-out;
+        }
+        
+        .animate-shimmer {
+            animation: shimmer 3s infinite linear;
+            background: linear-gradient(90deg, transparent, rgba(100, 255, 218, 0.1), transparent);
+            background-size: 1000px 100%;
+        }
+        
+        .animate-breath {
+            animation: breath 3s infinite ease-in-out;
+        }
+        
+        .animate-passport-open {
+            animation: passportOpen 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            transform-origin: left center;
+        }
+        
+        .animate-stamp-drop {
+            animation: stampDrop 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        .animate-ink-spread {
+            animation: inkSpread 1.5s ease-out forwards;
+            transform-origin: center;
+        }
+        
+        .animate-scan-line {
+            animation: scanLine 2s linear infinite;
+        }
+        
+        .animate-progress-fill {
+            animation: progressFill 2s ease-in-out forwards;
+        }
+        
+        .animate-terminal-typing {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: terminalTyping 3s steps(40, end);
+        }
+        
+        /* Custom Utility Classes */
+        .glass-panel {
+            background: rgba(17, 34, 64, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 
+                        0 0 20px rgba(100, 255, 218, 0.1);
+        }
+        
+        .border-glow {
+            box-shadow: 0 0 20px rgba(100, 255, 218, 0.3),
+                        inset 0 0 20px rgba(100, 255, 218, 0.1);
+        }
+        
+        .text-glow {
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.7),
+                         0 0 20px rgba(100, 255, 218, 0.5);
+        }
+        
+        .passport-chip {
+            position: absolute;
+            width: 24px;
+            height: 16px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            border-radius: 3px;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px currentColor;
+        }
+        
+        /* Terminal Screen Effect */
+        .terminal-screen {
+            background: #0a192f;
+            background-image: 
+                linear-gradient(rgba(10, 25, 47, 0.8) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(10, 25, 47, 0.8) 2px, transparent 2px);
+            background-size: 100px 100px, 100px 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .terminal-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(100, 255, 218, 0.05) 50%,
+                transparent 100%
+            );
+            pointer-events: none;
+        }
+        
+        .scan-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(100, 255, 218, 0.8) 50%, 
+                transparent 100%);
+            pointer-events: none;
+            z-index: 20;
+        }
+        
+        /* Passport 3D Effect */
+        .passport-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);
+        }
+        
+        .passport-page {
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+        
+        /* Visa Document Animation */
+        .visa-document {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            color: #1a202c;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .visa-stamp {
+            background: radial-gradient(circle at 30% 30%, #3a86ff, #1d3557);
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(58, 134, 255, 0.4);
+        }
+        
+        /* Security Scanner Animation */
+        .scanner-beam {
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(0, 255, 157, 0.2) 10%,
+                rgba(0, 255, 157, 0.6) 50%,
+                rgba(0, 255, 157, 0.2) 90%,
+                transparent 100%
+            );
+            height: 4px;
+            filter: blur(1px);
+        }
+        
+        /* Step Transitions */
+        .step-transition {
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .step-hidden {
+            opacity: 0;
+            transform: translateY(50px);
+            pointer-events: none;
+        }
+        
+        .step-visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+    </style>
+    
+    <!-- State Machine Script -->
+    <script>
+        // State Management
+        const ImmigrationState = {
+            PASSPORT_SELECTION: 'passport_selection',
+            PASSPORT_BOOKLET: 'passport_booklet',
+            IDENTITY_PAGE: 'identity_page',
+            IMMIGRATION_VISA: 'immigration_visa',
+            SECURITY_DECLARATION: 'security_declaration',
+            SECURITY_SCREENING: 'security_screening',
+            IMMIGRATION_STAMP: 'immigration_stamp',
+            COMPLETED: 'completed'
+        };
+        
+        // Global State Object
+        let state = {
+            current: ImmigrationState.PASSPORT_SELECTION,
+            passport: null,
+            visaRequired: null,
+            visaData: null,
+            securityAgreed: false,
+            screeningComplete: false,
+            timer: null,
+            animationQueue: [],
+            travelerData: {
+                name: "{{ name }}",
+                email: "{{ email }}",
+                username: "{{ username }}",
+                destinationNation: "{{ destination_country }}"
+            }
+        };
+        
+        // Passport Database
+        const passports = [
+            {
+                id: 'ind',
+                name: 'Republic of India',
+                nameNative: 'भारत गणराज्य',
+                color: 'bg-gradient-to-r from-orange-500 to-green-500',
+                textColor: 'text-amber-300',
+                chipColor: 'bg-gradient-to-br from-yellow-400 to-orange-600',
+                languages: ['English', 'हिन्दी'],
+                visaFree: ['Nepal', 'Bhutan', 'Maldives', 'Mauritius'],
+                visaRequired: ['United States', 'Japan', 'Hong Kong SAR, China', 'United Kingdom', 'Germany', 'France', 'Australia', 'Singapore', 'United Arab Emirates']
+            },
+            {
+                id: 'usa',
+                name: 'United States of America',
+                nameNative: 'United States of America',
+                color: 'bg-gradient-to-r from-blue-600 to-red-600',
+                textColor: 'text-white',
+                chipColor: 'bg-gradient-to-br from-blue-400 to-red-500',
+                languages: ['English'],
+                visaFree: ['United Kingdom', 'Germany', 'France', 'Japan', 'Australia', 'Singapore', 'United Arab Emirates'],
+                visaRequired: []
+            },
+            {
+                id: 'ger',
+                name: 'Federal Republic of Germany',
+                nameNative: 'Bundesrepublik Deutschland',
+                color: 'bg-gradient-to-r from-black via-red-500 to-yellow-500',
+                textColor: 'text-gray-100',
+                chipColor: 'bg-gradient-to-br from-yellow-400 to-red-500',
+                languages: ['German', 'English'],
+                visaFree: ['United States', 'United Kingdom', 'Japan', 'Australia', 'Singapore', 'France'],
+                visaRequired: []
+            },
+            {
+                id: 'jpn',
+                name: 'Japan',
+                nameNative: '日本国',
+                color: 'bg-gradient-to-r from-white to-red-600',
+                textColor: 'text-red-600',
+                chipColor: 'bg-gradient-to-br from-red-400 to-red-600',
+                languages: ['Japanese', 'English'],
+                visaFree: ['Singapore', 'United Kingdom', 'Germany', 'France', 'Australia'],
+                visaRequired: []
+            },
+            {
+                id: 'uae',
+                name: 'United Arab Emirates',
+                nameNative: 'دولة الإمارات العربية المتحدة',
+                color: 'bg-gradient-to-r from-green-500 via-white to-black',
+                textColor: 'text-green-400',
+                chipColor: 'bg-gradient-to-br from-green-400 to-yellow-400',
+                languages: ['Arabic', 'English'],
+                visaFree: ['Germany', 'France', 'Singapore'],
+                visaRequired: ['United States', 'United Kingdom', 'Japan', 'Australia']
+            },
+            {
+                id: 'sgp',
+                name: 'Republic of Singapore',
+                nameNative: 'Republic of Singapore',
+                color: 'bg-gradient-to-r from-red-600 via-white to-red-600',
+                textColor: 'text-white',
+                chipColor: 'bg-gradient-to-br from-red-400 to-red-600',
+                languages: ['English', 'Chinese', 'Malay', 'Tamil'],
+                visaFree: ['United States', 'United Kingdom', 'Germany', 'Japan', 'Australia', 'France', 'United Arab Emirates'],
+                visaRequired: []
+            }
+        ];
+        
+        // Visa Requirements Database
+        const visaRequirements = {
+            'Singapore': {
+                visaFree: ['United States', 'United Kingdom', 'Germany', 'Japan', 'Australia', 'France', 'United Arab Emirates'],
+                visaRequired: [],
+                etaRequired: []
+            },
+            'United States': {
+                visaFree: ['United Kingdom', 'Germany', 'France', 'Japan', 'Australia', 'Singapore', 'United Arab Emirates'],
+                visaRequired: [],
+                etaRequired: []
+            },
+            'Germany': {
+                visaFree: ['United States', 'United Kingdom', 'Japan', 'Australia', 'Singapore', 'France'],
+                visaRequired: [],
+                etaRequired: []
+            },
+            'Japan': {
+                visaFree: ['Singapore', 'United Kingdom', 'Germany', 'France', 'Australia'],
+                visaRequired: [],
+                etaRequired: []
+            },
+            'United Arab Emirates': {
+                visaFree: ['Germany', 'France', 'Singapore'],
+                visaRequired: ['United States', 'United Kingdom', 'Japan', 'Australia'],
+                etaRequired: []
+            },
+            'Hong Kong SAR, China': {
+                visaFree: ['Singapore', 'United Kingdom', 'Germany', 'Japan', 'Australia', 'France'],
+                visaRequired: ['India', 'United Arab Emirates'],
+                etaRequired: []
+            },
+            'United Kingdom': {
+                visaFree: ['United States', 'Germany', 'France', 'Japan', 'Australia', 'Singapore', 'United Arab Emirates'],
+                visaRequired: ['India'],
+                etaRequired: []
+            },
+            'Australia': {
+                visaFree: ['United States', 'United Kingdom', 'Germany', 'Japan', 'Singapore', 'France', 'United Arab Emirates'],
+                visaRequired: ['India'],
+                etaRequired: []
+            },
+            'France': {
+                visaFree: ['United States', 'United Kingdom', 'Germany', 'Japan', 'Australia', 'Singapore', 'United Arab Emirates'],
+                visaRequired: ['India'],
+                etaRequired: []
+            }
+        };
+        
+        // Security Screening Steps
+        const screeningSteps = [
+            {
+                id: 'document_verification',
+                title: 'Document Verification',
+                description: 'Verifying passport authenticity and validity',
+                duration: 2000,
+                status: 'pending'
+            },
+            {
+                id: 'identity_confirmation',
+                title: 'Identity Confirmation',
+                description: 'Cross-referencing with international databases',
+                duration: 2500,
+                status: 'pending'
+            },
+            {
+                id: 'metal_detector',
+                title: 'Metal Detector Scan',
+                description: 'Screening for prohibited metallic objects',
+                duration: 1800,
+                status: 'pending'
+            },
+            {
+                id: 'xray_scan',
+                title: 'X-Ray Luggage Scan',
+                description: 'Analyzing luggage contents',
+                duration: 3000,
+                status: 'pending'
+            },
+            {
+                id: 'biometric_verification',
+                title: 'Biometric Verification',
+                description: 'Facial recognition and fingerprint matching',
+                duration: 2200,
+                status: 'pending'
+            }
+        ];
+        
+        // Initialize Application
+        function initImmigrationFlow() {
+            console.log('🚀 Immigration Flow Initialized');
+            
+            // Check for required session data
+            if (!state.travelerData.name || state.travelerData.name === '{{ name }}') {
+                showSystemFailure('Session data missing. Please return to dashboard.');
+                return;
+            }
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Start with passport selection
+            showPassportSelection();
+            
+            // Add scanline effect
+            createScanlineEffect();
+        }
+        
+        // System Failure Screen
+        function showSystemFailure(message) {
+            const app = document.getElementById('immigration-app');
+            app.innerHTML = `
+                <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-900/20 to-red-950/40">
+                    <div class="glass-panel p-12 rounded-2xl border border-red-500/30 max-w-2xl mx-4 text-center">
+                        <div class="text-6xl mb-6 text-red-500">⚠️</div>
+                        <h1 class="text-3xl font-bold text-red-400 mb-4">SYSTEM FAILURE</h1>
+                        <div class="terminal-screen rounded-lg p-6 mb-6">
+                            <div class="font-mono text-red-300 text-left">
+                                <div class="mb-2">$ ERROR: SESSION_DATA_MISSING</div>
+                                <div class="mb-2">$ CODE: 0x7B3F2A</div>
+                                <div class="mb-2">$ TIME: ${new Date().toISOString()}</div>
+                                <div class="mb-2">$ USER: ${state.travelerData.username || 'UNKNOWN'}</div>
+                                <div class="text-green-400">$ MESSAGE: ${message}</div>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='/carbon-dashboard'" 
+                                class="px-8 py-3 bg-gradient-to-r from-red-600 to-red-800 text-white font-semibold rounded-lg hover:from-red-700 hover:to-red-900 transition-all duration-300 transform hover:scale-105">
+                            RETURN TO DASHBOARD
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Global keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && state.current !== ImmigrationState.COMPLETED) {
+                    if (confirm('Abort immigration process and return to dashboard?')) {
+                        window.location.href = '/carbon-dashboard';
+                    }
+                }
+            });
+            
+            // Prevent accidental navigation
+            window.addEventListener('beforeunload', (e) => {
+                if (state.current !== ImmigrationState.COMPLETED) {
+                    e.preventDefault();
+                    e.returnValue = 'You are in the middle of immigration clearance. Are you sure you want to leave?';
+                }
+            });
+        }
+        
+        // Create Scanline Effect
+        function createScanlineEffect() {
+            const scanline = document.createElement('div');
+            scanline.className = 'scan-line animate-scan-line';
+            scanline.style.position = 'fixed';
+            scanline.style.top = '0';
+            scanline.style.left = '0';
+            scanline.style.right = '0';
+            scanline.style.zIndex = '9999';
+            scanline.style.pointerEvents = 'none';
+            document.body.appendChild(scanline);
+        }
+        
+        // State Transition Function
+        function transitionTo(nextState) {
+            // Hide current state
+            const currentStep = document.querySelector(`[data-step="${state.current}"]`);
+            if (currentStep) {
+                currentStep.classList.remove('step-visible');
+                currentStep.classList.add('step-hidden');
+                
+                // Wait for animation before removing
+                setTimeout(() => {
+                    currentStep.style.display = 'none';
+                }, 800);
+            }
+            
+            // Update state
+            state.current = nextState;
+            
+            // Show next state
+            setTimeout(() => {
+                const nextStep = document.querySelector(`[data-step="${nextState}"]`);
+                if (nextStep) {
+                    nextStep.style.display = 'block';
+                    setTimeout(() => {
+                        nextStep.classList.remove('step-hidden');
+                        nextStep.classList.add('step-visible');
+                    }, 50);
+                }
+                
+                // Execute state-specific initialization
+                initializeState(nextState);
+            }, 800);
+        }
+        
+        // State Initialization
+        function initializeState(stateName) {
+            switch(stateName) {
+                case ImmigrationState.PASSPORT_SELECTION:
+                    showPassportSelection();
+                    break;
+                case ImmigrationState.PASSPORT_BOOKLET:
+                    showPassportBooklet();
+                    break;
+                case ImmigrationState.IDENTITY_PAGE:
+                    showIdentityPage();
+                    break;
+                case ImmigrationState.IMMIGRATION_VISA:
+                    showImmigrationVisa();
+                    break;
+                case ImmigrationState.SECURITY_DECLARATION:
+                    showSecurityDeclaration();
+                    break;
+                case ImmigrationState.SECURITY_SCREENING:
+                    showSecurityScreening();
+                    break;
+                case ImmigrationState.IMMIGRATION_STAMP:
+                    showImmigrationStamp();
+                    break;
+            }
+        }
+        
+        // STEP 1: Passport Selection
+        function showPassportSelection() {
+            const container = document.getElementById('passport-selection-container');
+            
+            let passportsHTML = passports.map(passport => `
+                <div class="passport-card cursor-pointer transform transition-all duration-500 hover:scale-105 hover:-translate-y-2"
+                     onclick="selectPassport('${passport.id}')">
+                    <div class="glass-panel rounded-xl p-6 h-full border-2 border-transparent hover:border-cyan-500/50 transition-all duration-300">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="${passport.color} w-12 h-8 rounded-lg flex items-center justify-center">
+                                <div class="passport-chip"></div>
+                            </div>
+                            <div class="status-light bg-yellow-500 animate-pulse"></div>
+                        </div>
+                        <h3 class="text-xl font-bold ${passport.textColor} mb-2">${passport.name}</h3>
+                        <div class="text-sm text-gray-300 mb-3">${passport.nameNative}</div>
+                        <div class="flex flex-wrap gap-1 mb-4">
+                            ${passport.languages.map(lang => `
+                                <span class="px-2 py-1 bg-cyan-900/30 text-cyan-300 text-xs rounded">${lang}</span>
+                            `).join('')}
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            ${passport.visaFree.length} visa-free destinations
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = passportsHTML;
+            
+            // Animate cards in sequence
+            const cards = container.querySelectorAll('.passport-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        }
+        
+        function selectPassport(passportId) {
+            const selectedPassport = passports.find(p => p.id === passportId);
+            if (!selectedPassport) return;
+            
+            state.passport = selectedPassport;
+            
+            // Animate selection
+            const cards = document.querySelectorAll('.passport-card');
+            cards.forEach(card => {
+                card.style.pointerEvents = 'none';
+                if (!card.querySelector(`[onclick*="${passportId}"]`)) {
+                    card.style.opacity = '0.3';
+                    card.style.transform = 'scale(0.95)';
+                } else {
+                    card.querySelector('.status-light').classList.remove('bg-yellow-500');
+                    card.querySelector('.status-light').classList.add('bg-green-500');
+                    card.style.borderColor = 'rgba(0, 255, 157, 0.5)';
+                    card.style.boxShadow = '0 0 30px rgba(0, 255, 157, 0.3)';
+                }
+            });
+            
+            // Check visa requirements
+            const destination = state.travelerData.destinationNation;
+            state.visaRequired = false;
+            
+            if (destination && selectedPassport.visaRequired.includes(destination)) {
+                state.visaRequired = true;
+            } else if (destination && visaRequirements[destination]) {
+                state.visaRequired = visaRequirements[destination].visaRequired.includes(selectedPassport.name);
+            }
+            
+            // Proceed after animation
+            setTimeout(() => {
+                transitionTo(ImmigrationState.PASSPORT_BOOKLET);
+            }, 1500);
+        }
+        
+        // STEP 2: Passport Booklet
+        function showPassportBooklet() {
+            const passport = state.passport;
+            
+            // Update passport cover
+            document.getElementById('passport-country').textContent = passport.name;
+            document.getElementById('passport-country-native').textContent = passport.nameNative;
+            document.getElementById('passport-cover').className = `passport-3d ${passport.color} rounded-xl p-8 relative overflow-hidden animate-breath`;
+            
+            // Start opening animation after delay
+            setTimeout(() => {
+                const passportElement = document.getElementById('passport-cover');
+                passportElement.classList.remove('animate-breath');
+                passportElement.classList.add('animate-passport-open');
+                
+                // After passport opens, show identity page
+                setTimeout(() => {
+                    passportElement.style.opacity = '0';
+                    transitionTo(ImmigrationState.IDENTITY_PAGE);
+                }, 1800);
+            }, 2000);
+        }
+        
+        // STEP 3: Identity Page
+        function showIdentityPage() {
+            const passport = state.passport;
+            const traveler = state.travelerData;
+            
+            // Generate passport number from username
+            const passportNumber = 'P' + btoa(traveler.username).substring(0, 9).toUpperCase();
+            
+            // Update identity fields
+            document.getElementById('traveler-name').textContent = traveler.name;
+            document.getElementById('traveler-username').textContent = traveler.username;
+            document.getElementById('traveler-email').textContent = traveler.email;
+            document.getElementById('passport-number').textContent = passportNumber;
+            document.getElementById('nationality').textContent = passport.name;
+            document.getElementById('issuing-authority').textContent = passport.name + ' Immigration Authority';
+            
+            // Set dates
+            const today = new Date();
+            const issueDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+            const expiryDate = new Date(today.getFullYear() + 9, today.getMonth(), today.getDate());
+            
+            document.getElementById('issue-date').textContent = issueDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            document.getElementById('expiry-date').textContent = expiryDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Animate fields appearance
+            const fields = document.querySelectorAll('#identity-page .animate-fade-in-up');
+            fields.forEach((field, index) => {
+                field.style.animationDelay = `${0.1 * index}s`;
+                field.classList.add('animate-fade-in-up');
+            });
+            
+            // Animate passport page opening
+            setTimeout(() => {
+                document.getElementById('passport-page').classList.add('opacity-100', 'translate-x-0');
+            }, 500);
+        }
+        
+        function proceedToImmigration() {
+            // Animate button click
+            const button = document.querySelector('#identity-page button');
+            button.classList.add('scale-95');
+            setTimeout(() => button.classList.remove('scale-95'), 150);
+            
+            // Fade out and transition
+            setTimeout(() => {
+                transitionTo(ImmigrationState.IMMIGRATION_VISA);
+            }, 800);
+        }
+        
+        // STEP 4: Immigration & Visa Logic
+        function showImmigrationVisa() {
+            const destination = state.travelerData.destinationNation;
+            const passport = state.passport;
+            
+            if (!state.visaRequired) {
+                // Visa-free entry
+                showVisaFreeApproval();
+            } else {
+                // Visa required
+                showVisaApplication();
+            }
+        }
+        
+        function showVisaFreeApproval() {
+            const container = document.getElementById('visa-container');
+            const destination = state.travelerData.destinationNation;
+            
+            container.innerHTML = `
+                <div class="text-center animate-fade-in-up">
+                    <div class="text-6xl mb-6 text-green-400">✅</div>
+                    <h2 class="text-3xl font-bold text-green-300 mb-4">VISA-FREE ENTRY APPROVED</h2>
+                    <div class="glass-panel rounded-xl p-6 max-w-md mx-auto mb-6">
+                        <div class="text-xl font-semibold text-green-200 mb-2">Entry Conditions</div>
+                        <div class="text-gray-300 text-left space-y-2">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                                <span>Maximum stay: 90 days</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                                <span>Tourism/business purposes</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                                <span>No employment permitted</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                                <span>Return/onward ticket required</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="animate-pulse-custom text-lg text-cyan-300 mb-8">
+                        <div class="font-mono">STATUS: ENTRY_CLEARED</div>
+                    </div>
+                    <button onclick="proceedToSecurity()" 
+                            class="px-8 py-4 bg-gradient-to-r from-green-600 to-cyan-600 text-white font-bold rounded-xl hover:from-green-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-green-500/30">
+                        PROCEED TO SECURITY CHECK
+                    </button>
+                </div>
+            `;
+            
+            // Animate seal
+            setTimeout(() => {
+                const seal = document.createElement('div');
+                seal.className = 'absolute inset-0 flex items-center justify-center pointer-events-none';
+                seal.innerHTML = `
+                    <div class="visa-stamp w-48 h-48 opacity-0 transform scale-0">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-2xl font-bold">APPROVED</div>
+                                <div class="text-sm">VISA-FREE</div>
+                                <div class="text-xs mt-2">${destination}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(seal);
+                
+                const stamp = seal.querySelector('.visa-stamp');
+                setTimeout(() => {
+                    stamp.classList.add('animate-stamp-drop');
+                    stamp.style.opacity = '1';
+                }, 500);
+                
+                // Add ink spread
+                setTimeout(() => {
+                    const ink = document.createElement('div');
+                    ink.className = 'absolute inset-0 flex items-center justify-center pointer-events-none';
+                    ink.innerHTML = `<div class="visa-stamp w-64 h-64 opacity-0 bg-blue-500/30"></div>`;
+                    container.appendChild(ink);
+                    
+                    const inkSpread = ink.querySelector('div');
+                    inkSpread.classList.add('animate-ink-spread');
+                }, 1000);
+            }, 1000);
+        }
+        
+        function showVisaApplication() {
+            const container = document.getElementById('visa-container');
+            const destination = state.travelerData.destinationNation;
+            
+            container.innerHTML = `
+                <div class="max-w-2xl mx-auto animate-fade-in-up">
+                    <h2 class="text-3xl font-bold text-yellow-300 mb-2">VISA APPLICATION REQUIRED</h2>
+                    <div class="text-gray-300 mb-8">Complete the form for entry into ${destination}</div>
+                    
+                    <div class="visa-document rounded-xl p-8 mb-8 transform transition-all duration-500">
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Purpose of Visit</label>
+                                <select id="purpose" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="tourism">Tourism</option>
+                                    <option value="business">Business Meeting</option>
+                                    <option value="conference">Conference</option>
+                                    <option value="transit">Transit</option>
+                                    <option value="medical">Medical Treatment</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Duration of Stay (Days)</label>
+                                <input type="number" id="duration" min="1" max="180" value="14" 
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Occupation</label>
+                                    <input type="text" id="occupation" value="Software Engineer"
+                                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Accommodation Address</label>
+                                <input type="text" id="accommodation" value="Hotel Booking Confirmed"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            
+                            <div class="flex items-center space-x-2">
+                                <input type="checkbox" id="declaration" class="w-5 h-5 text-blue-600">
+                                <label for="declaration" class="text-gray-700">I declare all information is true and complete</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="text-yellow-500 animate-pulse-custom">
+                            <div class="font-mono">⚠️ VISA_REQUIRED_FOR_${destination.toUpperCase().replace(/\s+/g, '_')}</div>
+                        </div>
+                        <button onclick="submitVisaApplication()" 
+                                class="px-8 py-4 bg-gradient-to-r from-yellow-600 to-orange-600 text-white font-bold rounded-xl hover:from-yellow-700 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-yellow-500/30">
+                            SUBMIT VISA APPLICATION
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Animate form appearance
+            const formElements = container.querySelectorAll('input, select, label, button');
+            formElements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        }
+        
+        function submitVisaApplication() {
+            const purpose = document.getElementById('purpose').value;
+            const duration = document.getElementById('duration').value;
+            const declaration = document.getElementById('declaration').checked;
+            
+            if (!declaration) {
+                showNotification('Please accept the declaration to proceed', 'error');
+                return;
+            }
+            
+            // Simulate visa processing
+            const container = document.getElementById('visa-container');
+            container.innerHTML = `
+                <div class="text-center animate-fade-in-up">
+                    <div class="inline-block relative mb-8">
+                        <div class="w-32 h-32 border-4 border-blue-500/30 rounded-full"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-4xl text-blue-400">⌛</div>
+                        </div>
+                        <div class="absolute inset-0 border-4 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-blue-300 mb-4">PROCESSING VISA APPLICATION</h2>
+                    
+                    <div class="glass-panel rounded-xl p-6 max-w-md mx-auto mb-6">
+                        <div class="space-y-4 text-left">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">Document Verification</span>
+                                <span class="text-green-400 font-mono">✓</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">Background Check</span>
+                                <span class="text-green-400 font-mono">✓</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">Purpose Validation</span>
+                                <span id="purpose-check" class="text-yellow-400 font-mono">⌛</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">Final Approval</span>
+                                <span id="final-approval" class="text-yellow-400 font-mono">⌛</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 relative">
+                            <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div id="progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full" style="width: 40%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Simulate processing steps
+            setTimeout(() => {
+                document.getElementById('purpose-check').textContent = '✓';
+                document.getElementById('purpose-check').classList.remove('text-yellow-400');
+                document.getElementById('purpose-check').classList.add('text-green-400');
+                document.getElementById('progress-bar').style.width = '70%';
+            }, 1500);
+            
+            setTimeout(() => {
+                document.getElementById('final-approval').textContent = '✓';
+                document.getElementById('final-approval').classList.remove('text-yellow-400');
+                document.getElementById('final-approval').classList.add('text-green-400');
+                document.getElementById('progress-bar').style.width = '100%';
+                
+                // Show approval after delay
+                setTimeout(() => {
+                    showVisaApproval();
+                }, 800);
+            }, 3000);
+        }
+        
+        function showVisaApproval() {
+            const container = document.getElementById('visa-container');
+            const destination = state.travelerData.destinationNation;
+            
+            container.innerHTML = `
+                <div class="text-center animate-fade-in-up">
+                    <div class="text-6xl mb-6 text-green-400 animate-bounce">✅</div>
+                    <h2 class="text-3xl font-bold text-green-300 mb-4">VISA APPROVED</h2>
+                    
+                    <div class="visa-document rounded-xl p-8 max-w-md mx-auto mb-8 transform transition-all duration-500 hover:scale-105">
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-blue-800 mb-2">${destination.toUpperCase()} ENTRY VISA</div>
+                            <div class="h-px bg-gray-300 my-4"></div>
+                            
+                            <div class="text-left space-y-3">
+                                <div>
+                                    <div class="text-sm text-gray-500">Holder Name</div>
+                                    <div class="font-semibold">${state.travelerData.name}</div>
+                                </div>
+                                
+                                <div>
+                                    <div class="text-sm text-gray-500">Passport Number</div>
+                                    <div class="font-mono">P${btoa(state.travelerData.username).substring(0, 9).toUpperCase()}</div>
+                                </div>
+                                
+                                <div>
+                                    <div class="text-sm text-gray-500">Validity</div>
+                                    <div>${new Date().toLocaleDateString()} - ${new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toLocaleDateString()}</div>
+                                </div>
+                                
+                                <div>
+                                    <div class="text-sm text-gray-500">Remarks</div>
+                                    <div class="text-green-600 font-medium">MULTIPLE ENTRY • TOURISM</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 relative">
+                                <div class="visa-stamp w-24 h-24 mx-auto opacity-0">
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="text-white text-center">
+                                            <div class="text-lg font-bold">APPROVED</div>
+                                            <div class="text-xs">${destination.substring(0, 3).toUpperCase()}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="animate-pulse-custom text-lg text-cyan-300 mb-8">
+                        <div class="font-mono">STATUS: VISA_APPROVED</div>
+                    </div>
+                    
+                    <button onclick="proceedToSecurity()" 
+                            class="px-8 py-4 bg-gradient-to-r from-green-600 to-cyan-600 text-white font-bold rounded-xl hover:from-green-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-green-500/30">
+                        PROCEED TO SECURITY CHECK
+                    </button>
+                </div>
+            `;
+            
+            // Animate visa stamp
+            setTimeout(() => {
+                const stamp = container.querySelector('.visa-stamp');
+                stamp.classList.add('animate-stamp-drop');
+                stamp.style.opacity = '1';
+                
+                // Add ink spread effect
+                setTimeout(() => {
+                    const ink = document.createElement('div');
+                    ink.className = 'absolute inset-0 flex items-center justify-center pointer-events-none';
+                    ink.innerHTML = `<div class="visa-stamp w-32 h-32 opacity-0 bg-green-500/20"></div>`;
+                    container.querySelector('.visa-document').appendChild(ink);
+                    
+                    ink.querySelector('div').classList.add('animate-ink-spread');
+                }, 500);
+            }, 1000);
+        }
+        
+        function proceedToSecurity() {
+            // Animate transition
+            const container = document.getElementById('visa-container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(-50px)';
+            container.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            setTimeout(() => {
+                transitionTo(ImmigrationState.SECURITY_DECLARATION);
+            }, 800);
+        }
+        
+        // STEP 5: Security Declaration
+        function showSecurityDeclaration() {
+            const container = document.getElementById('security-container');
+            const destination = state.travelerData.destinationNation;
+            
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto animate-fade-in-up">
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <h2 class="text-3xl font-bold text-cyan-300">SECURITY DECLARATION</h2>
+                            <div class="text-gray-300">${destination} Border Security Protocol</div>
+                        </div>
+                        <div class="text-4xl">🛂</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="glass-panel rounded-xl p-6 border border-cyan-500/30">
+                            <div class="text-xl font-semibold text-cyan-200 mb-4">Prohibited Items</div>
+                            <ul class="space-y-3 text-gray-300">
+                                <li class="flex items-center">
+                                    <div class="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                                    Weapons & firearms
+                                </li>
+                                <li class="flex items-center">
+                                    <div class="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                                    Explosives & flammable materials
+                                </li>
+                                <li class="flex items-center">
+                                    <div class="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                                    Illegal substances
+                                </li>
+                                <li class="flex items-center">
+                                    <div class="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                                    Certain agricultural products
+                                </li>
+                                <li class="flex items-center">
+                                    <div class="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                                    Large quantities of cash (> $10,000)
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="glass-panel rounded-xl p-6 border border-green-500/30">
+                            <div class="text-xl font-semibold text-green-200 mb-4">Duty-Free Allowances</div>
+                            <ul class="space-y-3 text-gray-300">
+                                <li class="flex items-center">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                                    200 cigarettes or equivalent
+                                </li>
+                                <li class="flex items-center">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                                    1 liter of spirits
+                                </li>
+                                <li class="flex items-center">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                                    Personal effects (reasonable)
+                                </li>
+                                <li class="flex items-center">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                                    Gifts up to $400 value
+                                </li>
+                                <li class="flex items-center">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                                    Prescribed medication (with proof)
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel rounded-xl p-6 mb-8 border border-yellow-500/30">
+                        <div class="text-xl font-semibold text-yellow-200 mb-4">Declaration Statement</div>
+                        <div class="space-y-4">
+                            <p class="text-gray-300">
+                                I, <span class="font-bold text-cyan-300">${state.travelerData.name}</span>, declare that:
+                            </p>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-start space-x-3">
+                                    <input type="checkbox" id="declare1" class="w-5 h-5 mt-1 text-blue-600">
+                                    <label for="declare1" class="text-gray-300">I am not carrying any prohibited items listed above</label>
+                                </div>
+                                
+                                <div class="flex items-start space-x-3">
+                                    <input type="checkbox" id="declare2" class="w-5 h-5 mt-1 text-blue-600">
+                                    <label for="declare2" class="text-gray-300">All information provided is true and complete</label>
+                                </div>
+                                
+                                <div class="flex items-start space-x-3">
+                                    <input type="checkbox" id="declare3" class="w-5 h-5 mt-1 text-blue-600">
+                                    <label for="declare3" class="text-gray-300">I understand that false declaration may lead to penalties</label>
+                                </div>
+                                
+                                <div class="flex items-start space-x-3">
+                                    <input type="checkbox" id="declare4" class="w-5 h-5 mt-1 text-blue-600">
+                                    <label for="declare4" class="text-gray-300">I consent to security screening procedures</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-400">
+                            <div class="font-mono">SECURITY_PROTOCOL v4.2 • ${new Date().toISOString().split('T')[0]}</div>
+                        </div>
+                        <button onclick="submitSecurityDeclaration()" 
+                                class="px-8 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-xl hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cyan-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                                id="declaration-submit"
+                                disabled>
+                            CONFIRM & PROCEED TO SCREENING
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Setup checkbox validation
+            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+            const submitBtn = document.getElementById('declaration-submit');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                    submitBtn.disabled = !allChecked;
+                    
+                    if (allChecked) {
+                        submitBtn.classList.remove('disabled:opacity-50');
+                        submitBtn.classList.add('shadow-lg', 'shadow-cyan-500/30');
+                    }
+                });
+            });
+            
+            // Animate items appearance
+            const items = container.querySelectorAll('.glass-panel, button, h2, .text-4xl');
+            items.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    item.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        }
+        
+        function submitSecurityDeclaration() {
+            state.securityAgreed = true;
+            
+            // Animate button click
+            const button = document.getElementById('declaration-submit');
+            button.classList.add('scale-95');
+            
+            // Show confirmation animation
+            const container = document.getElementById('security-container');
+            const confirmation = document.createElement('div');
+            confirmation.className = 'fixed inset-0 flex items-center justify-center pointer-events-none z-50';
+            confirmation.innerHTML = `
+                <div class="text-center">
+                    <div class="text-8xl text-green-400 mb-4 animate-bounce">✓</div>
+                    <div class="text-2xl font-bold text-green-300 bg-black/70 backdrop-blur-sm px-8 py-4 rounded-2xl">
+                        DECLARATION CONFIRMED
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmation);
+            
+            // Remove confirmation and transition
+            setTimeout(() => {
+                confirmation.remove();
+                button.classList.remove('scale-95');
+                
+                container.style.opacity = '0';
+                container.style.transform = 'scale(0.95)';
+                container.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                
+                setTimeout(() => {
+                    transitionTo(ImmigrationState.SECURITY_SCREENING);
+                }, 600);
+            }, 1500);
+        }
+        
+        // STEP 6: Security Screening
+        function showSecurityScreening() {
+            const container = document.getElementById('screening-container');
+            const traveler = state.travelerData;
+            
+            container.innerHTML = `
+                <div class="max-w-6xl mx-auto animate-fade-in-up">
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <h2 class="text-3xl font-bold text-green-300">SECURITY SCREENING</h2>
+                            <div class="text-gray-300">Advanced Biometric & Security Check</div>
+                        </div>
+                        <div class="text-4xl animate-pulse-custom">🚨</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                        <!-- Scanner Visualization -->
+                        <div class="lg:col-span-2">
+                            <div class="glass-panel rounded-xl p-6 h-full border border-green-500/30">
+                                <div class="text-xl font-semibold text-green-200 mb-4">Live Screening Process</div>
+                                
+                                <div class="relative h-64 rounded-lg overflow-hidden bg-gradient-to-b from-gray-900 to-black mb-6">
+                                    <!-- Scanner Frame -->
+                                    <div class="absolute inset-4 border-2 border-green-500/50 rounded-lg"></div>
+                                    
+                                    <!-- Human Silhouette -->
+                                    <div class="absolute inset-x-8 bottom-4 top-12 flex justify-center">
+                                        <div class="w-32 h-48 bg-gradient-to-b from-cyan-900/30 to-transparent rounded-full relative">
+                                            <!-- Head -->
+                                            <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-cyan-900/40 rounded-full"></div>
+                                            <!-- Body -->
+                                            <div class="absolute top-8 left-1/2 transform -translate-x-1/2 w-16 h-32 bg-cyan-900/30 rounded-lg"></div>
+                                            <!-- Arms -->
+                                            <div class="absolute top-10 left-4 w-24 h-4 bg-cyan-900/30 rounded-full"></div>
+                                            <div class="absolute top-10 right-4 w-24 h-4 bg-cyan-900/30 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Scanner Beam -->
+                                    <div id="scanner-beam" class="scanner-beam absolute top-0 left-0 right-0 transform -translate-y-full"></div>
+                                    
+                                    <!-- Detection Points -->
+                                    <div id="detection-points" class="absolute inset-0">
+                                        <!-- Will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <div class="text-sm text-gray-400 mb-2">PASSENGER: ${traveler.name.toUpperCase()}</div>
+                                    <div class="font-mono text-green-400 animate-pulse-custom" id="scanner-status">
+                                        INITIALIZING SCANNER...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Screening Steps -->
+                        <div class="glass-panel rounded-xl p-6 border border-blue-500/30">
+                            <div class="text-xl font-semibold text-blue-200 mb-4">Screening Checklist</div>
+                            <div class="space-y-4" id="screening-steps">
+                                ${screeningSteps.map(step => `
+                                    <div class="screening-step" data-step="${step.id}">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-gray-300">${step.title}</span>
+                                            <span class="status-indicator text-yellow-400 font-mono">⌛</span>
+                                        </div>
+                                        <div class="text-sm text-gray-400 mb-2">${step.description}</div>
+                                        <div class="h-1 bg-gray-800 rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-500 rounded-full progress-bar" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Details -->
+                    <div class="glass-panel rounded-xl p-6 border border-yellow-500/30">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <div class="text-lg font-semibold text-yellow-200 mb-3">Biometric Data</div>
+                                <div class="space-y-2 text-gray-300">
+                                    <div class="flex justify-between">
+                                        <span>Facial Match</span>
+                                        <span id="face-match" class="font-mono text-yellow-400">PENDING</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Iris Scan</span>
+                                        <span id="iris-scan" class="font-mono text-yellow-400">PENDING</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Fingerprints</span>
+                                        <span id="fingerprints" class="font-mono text-yellow-400">PENDING</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-lg font-semibold text-green-200 mb-3">Luggage Scan</div>
+                                <div class="space-y-2 text-gray-300">
+                                    <div class="flex justify-between">
+                                        <span>Metallic Objects</span>
+                                        <span id="metal-detection" class="font-mono text-yellow-400">SCANNING</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Organic Material</span>
+                                        <span id="organic-scan" class="font-mono text-yellow-400">SCANNING</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Liquids</span>
+                                        <span id="liquid-detection" class="font-mono text-yellow-400">SCANNING</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-lg font-semibold text-cyan-200 mb-3">Database Checks</div>
+                                <div class="space-y-2 text-gray-300">
+                                    <div class="flex justify-between">
+                                        <span>INTERPOL</span>
+                                        <span id="interpol-check" class="font-mono text-yellow-400">QUERYING</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>No-Fly List</span>
+                                        <span id="no-fly-check" class="font-mono text-yellow-400">QUERYING</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Travel History</span>
+                                        <span id="travel-history" class="font-mono text-yellow-400">ANALYZING</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Start screening process
+            startSecurityScreening();
+        }
+        
+        function startSecurityScreening() {
+            const steps = screeningSteps;
+            let currentStepIndex = 0;
+            
+            function processNextStep() {
+                if (currentStepIndex >= steps.length) {
+                    completeScreening();
+                    return;
+                }
+                
+                const step = steps[currentStepIndex];
+                const stepElement = document.querySelector(`[data-step="${step.id}"]`);
+                const statusIndicator = stepElement.querySelector('.status-indicator');
+                const progressBar = stepElement.querySelector('.progress-bar');
+                const scannerStatus = document.getElementById('scanner-status');
+                
+                // Update scanner status
+                scannerStatus.textContent = step.title.toUpperCase() + '...';
+                scannerStatus.classList.remove('text-green-400');
+                scannerStatus.classList.add('text-yellow-400');
+                
+                // Animate scanner beam
+                const scannerBeam = document.getElementById('scanner-beam');
+                scannerBeam.style.transition = 'transform 0.1s linear';
+                scannerBeam.style.transform = 'translateY(0%)';
+                
+                // Create detection points
+                createDetectionPoints();
+                
+                // Animate progress bar
+                progressBar.style.transition = `width ${step.duration}ms linear`;
+                progressBar.style.width = '100%';
+                
+                // Simulate processing
+                setTimeout(() => {
+                    // Complete step
+                    statusIndicator.textContent = '✓';
+                    statusIndicator.classList.remove('text-yellow-400');
+                    statusIndicator.classList.add('text-green-400');
+                    
+                    // Update scanner status
+                    scannerStatus.textContent = step.title.toUpperCase() + ' COMPLETE';
+                    scannerStatus.classList.remove('text-yellow-400');
+                    scannerStatus.classList.add('text-green-400');
+                    
+                    // Reset scanner beam
+                    scannerBeam.style.transform = 'translateY(-100%)';
+                    
+                    // Update other status indicators based on step
+                    updateDetailedStatus(step.id);
+                    
+                    // Process next step
+                    currentStepIndex++;
+                    setTimeout(processNextStep, 800);
+                }, step.duration);
+            }
+            
+            // Start processing
+            setTimeout(processNextStep, 1000);
+        }
+        
+        function createDetectionPoints() {
+            const container = document.getElementById('detection-points');
+            container.innerHTML = '';
+            
+            // Create random detection points
+            for (let i = 0; i < 5; i++) {
+                const point = document.createElement('div');
+                point.className = 'absolute w-4 h-4 rounded-full bg-gradient-to-br from-green-400 to-cyan-400';
+                point.style.left = `${20 + Math.random() * 60}%`;
+                point.style.top = `${30 + Math.random() * 60}%`;
+                point.style.boxShadow = '0 0 20px rgba(0, 255, 157, 0.7)';
+                point.style.opacity = '0';
+                
+                container.appendChild(point);
+                
+                // Animate point appearance
+                setTimeout(() => {
+                    point.style.transition = 'all 0.3s ease-out';
+                    point.style.opacity = '1';
+                    point.style.transform = 'scale(1.5)';
+                    
+                    setTimeout(() => {
+                        point.style.opacity = '0';
+                        point.style.transform = 'scale(0.5)';
+                    }, 500);
+                }, i * 200);
+            }
+        }
+        
+        function updateDetailedStatus(stepId) {
+            // Update detailed status indicators based on completed step
+            switch(stepId) {
+                case 'document_verification':
+                    document.getElementById('interpol-check').textContent = 'CLEAR';
+                    document.getElementById('interpol-check').classList.remove('text-yellow-400');
+                    document.getElementById('interpol-check').classList.add('text-green-400');
+                    break;
+                    
+                case 'identity_confirmation':
+                    document.getElementById('no-fly-check').textContent = 'CLEAR';
+                    document.getElementById('no-fly-check').classList.remove('text-yellow-400');
+                    document.getElementById('no-fly-check').classList.add('text-green-400');
+                    document.getElementById('travel-history').textContent = 'VERIFIED';
+                    document.getElementById('travel-history').classList.remove('text-yellow-400');
+                    document.getElementById('travel-history').classList.add('text-green-400');
+                    break;
+                    
+                case 'metal_detector':
+                    document.getElementById('metal-detection').textContent = 'CLEAR';
+                    document.getElementById('metal-detection').classList.remove('text-yellow-400');
+                    document.getElementById('metal-detection').classList.add('text-green-400');
+                    break;
+                    
+                case 'xray_scan':
+                    document.getElementById('organic-scan').textContent = 'CLEAR';
+                    document.getElementById('organic-scan').classList.remove('text-yellow-400');
+                    document.getElementById('organic-scan').classList.add('text-green-400');
+                    document.getElementById('liquid-detection').textContent = 'CLEAR';
+                    document.getElementById('liquid-detection').classList.remove('text-yellow-400');
+                    document.getElementById('liquid-detection').classList.add('text-green-400');
+                    break;
+                    
+                case 'biometric_verification':
+                    document.getElementById('face-match').textContent = 'MATCHED';
+                    document.getElementById('face-match').classList.remove('text-yellow-400');
+                    document.getElementById('face-match').classList.add('text-green-400');
+                    document.getElementById('iris-scan').textContent = 'VERIFIED';
+                    document.getElementById('iris-scan').classList.remove('text-yellow-400');
+                    document.getElementById('iris-scan').classList.add('text-green-400');
+                    document.getElementById('fingerprints').textContent = 'CONFIRMED';
+                    document.getElementById('fingerprints').classList.remove('text-yellow-400');
+                    document.getElementById('fingerprints').classList.add('text-green-400');
+                    break;
+            }
+        }
+        
+        function completeScreening() {
+            state.screeningComplete = true;
+            
+            const container = document.getElementById('screening-container');
+            const scannerStatus = document.getElementById('scanner-status');
+            
+            // Show completion animation
+            scannerStatus.textContent = 'SECURITY SCREENING COMPLETE';
+            scannerStatus.classList.remove('text-yellow-400', 'animate-pulse-custom');
+            scannerStatus.classList.add('text-green-400', 'animate-pulse');
+            
+            // Create success overlay
+            const successOverlay = document.createElement('div');
+            successOverlay.className = 'fixed inset-0 flex items-center justify-center pointer-events-none z-50';
+            successOverlay.innerHTML = `
+                <div class="text-center animate-fade-in-up">
+                    <div class="text-8xl text-green-400 mb-6 animate-bounce">🛡️</div>
+                    <div class="text-3xl font-bold text-green-300 mb-2 bg-black/80 backdrop-blur-lg px-12 py-6 rounded-2xl">
+                        SECURITY CLEARANCE GRANTED
+                    </div>
+                    <div class="text-xl text-gray-300 mt-4 bg-black/60 backdrop-blur-sm px-8 py-4 rounded-xl">
+                        All checks passed • Proceeding to immigration stamp
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(successOverlay);
+            
+            // Animate scanner visualization completion
+            const scannerBeam = document.getElementById('scanner-beam');
+            scannerBeam.style.background = 'linear-gradient(90deg, transparent 0%, rgba(0, 255, 157, 0.6) 50%, transparent 100%)';
+            scannerBeam.style.animation = 'none';
+            scannerBeam.style.transform = 'translateY(0%)';
+            
+            // Create final detection points burst
+            const detectionPoints = document.getElementById('detection-points');
+            detectionPoints.innerHTML = '';
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const point = document.createElement('div');
+                    point.className = 'absolute w-3 h-3 rounded-full bg-gradient-to-br from-green-400 to-cyan-400';
+                    point.style.left = `${Math.random() * 100}%`;
+                    point.style.top = `${Math.random() * 100}%`;
+                    point.style.boxShadow = '0 0 15px rgba(0, 255, 157, 0.8)';
+                    point.style.opacity = '0';
+                    
+                    detectionPoints.appendChild(point);
+                    
+                    // Animate burst
+                    setTimeout(() => {
+                        point.style.transition = 'all 0.5s ease-out';
+                        point.style.opacity = '1';
+                        point.style.transform = 'scale(2)';
+                        
+                        setTimeout(() => {
+                            point.style.opacity = '0';
+                            point.style.transform = 'scale(0)';
+                        }, 300);
+                    }, 10);
+                }, i * 50);
+            }
+            
+            // Transition to stamp after delay
+            setTimeout(() => {
+                successOverlay.remove();
+                transitionTo(ImmigrationState.IMMIGRATION_STAMP);
+            }, 3000);
+        }
+        
+        // STEP 7: Immigration Stamp
+        function showImmigrationStamp() {
+            const container = document.getElementById('stamp-container');
+            const traveler = state.travelerData;
+            const destination = state.travelerData.destinationNation;
+            const passport = state.passport;
+            
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto text-center animate-fade-in-up">
+                    <div class="text-6xl mb-6">🛃</div>
+                    <h2 class="text-3xl font-bold text-yellow-300 mb-2">FINAL IMMIGRATION CLEARANCE</h2>
+                    <div class="text-xl text-gray-300 mb-8">Welcome to ${destination}</div>
+                    
+                    <!-- Passport Display -->
+                    <div class="relative inline-block mb-12">
+                        <div class="passport-3d ${passport.color} rounded-xl p-8 w-80 h-48 mx-auto relative overflow-hidden">
+                            <div class="absolute top-4 left-4 text-xs opacity-80">${passport.name}</div>
+                            <div class="absolute top-4 right-4">
+                                <div class="passport-chip"></div>
+                            </div>
+                            
+                            <!-- Passport Data -->
+                            <div class="absolute inset-0 flex flex-col justify-center p-6 text-left">
+                                <div class="mb-2">
+                                    <div class="text-xs text-gray-300">HOLDER</div>
+                                    <div class="text-lg font-bold">${traveler.name}</div>
+                                </div>
+                                <div class="mb-2">
+                                    <div class="text-xs text-gray-300">PASSPORT NO</div>
+                                    <div class="text-lg font-mono">P${btoa(traveler.username).substring(0, 9).toUpperCase()}</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-gray-300">DESTINATION</div>
+                                    <div class="text-lg">${destination}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Stamp Area -->
+                            <div id="stamp-area" class="absolute right-6 bottom-6 w-24 h-16 border-2 border-dashed border-gray-400/50 rounded-lg flex items-center justify-center">
+                                <div class="text-xs text-gray-400">STAMP AREA</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Status Display -->
+                    <div class="glass-panel rounded-xl p-6 max-w-md mx-auto mb-8 border border-yellow-500/30">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">Passport Status</span>
+                                <span class="text-green-400 font-mono">✓ VALID</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">Visa Status</span>
+                                <span class="text-green-400 font-mono">✓ ${state.visaRequired ? 'APPROVED' : 'NOT REQUIRED'}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">Security Clearance</span>
+                                <span class="text-green-400 font-mono">✓ GRANTED</span>
+                            </div>
+                            <div class="h-px bg-gray-700 my-2"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">Final Authorization</span>
+                                <span id="final-auth-status" class="text-yellow-400 font-mono animate-pulse-custom">PENDING...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="animate-pulse-custom text-lg text-cyan-300 mb-8">
+                        <div class="font-mono">AWAITING OFFICIAL STAMP FOR ENTRY INTO ${destination.toUpperCase().replace(/\s+/g, '_')}</div>
+                    </div>
+                    
+                    <button onclick="applyImmigrationStamp()" 
+                            id="stamp-button"
+                            class="px-12 py-6 bg-gradient-to-r from-yellow-600 to-orange-600 text-white font-bold text-xl rounded-2xl hover:from-yellow-700 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 shadow-2xl shadow-yellow-500/40 animate-bounce">
+                        <div class="flex items-center justify-center space-x-3">
+                            <span class="text-2xl">🛃</span>
+                            <span>APPLY OFFICIAL IMMIGRATION STAMP</span>
+                        </div>
+                    </button>
+                    
+                    <div class="mt-8 text-sm text-gray-400">
+                        <div class="font-mono">LAST STEP • IMMIGRATION_CONTROL • ${new Date().toLocaleDateString().toUpperCase()}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Animate elements
+            const elements = container.querySelectorAll('h2, div, button, .glass-panel');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        }
+        
+        function applyImmigrationStamp() {
+            const button = document.getElementById('stamp-button');
+            const status = document.getElementById('final-auth-status');
+            const stampArea = document.getElementById('stamp-area');
+            
+            // Disable button and update status
+            button.disabled = true;
+            button.classList.remove('animate-bounce', 'hover:scale-105');
+            button.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            status.textContent = 'PROCESSING...';
+            status.classList.remove('text-yellow-400');
+            status.classList.add('text-orange-400');
+            
+            // Create stamp element
+            const stamp = document.createElement('div');
+            stamp.className = 'absolute w-20 h-14 rounded-lg border-4 border-blue-800 bg-gradient-to-br from-blue-600 to-blue-900 flex items-center justify-center transform scale-0 opacity-0';
+            stamp.innerHTML = `
+                <div class="text-center text-white p-1">
+                    <div class="text-xs font-bold">${state.travelerData.destinationNation.substring(0, 3).toUpperCase()}</div>
+                    <div class="text-[8px]">IMMIGRATION</div>
+                    <div class="text-[8px] mt-1">${new Date().getDate()}/${new Date().getMonth() + 1}/${new Date().getFullYear().toString().substr(-2)}</div>
+                    <div class="text-[6px] mt-1">OFFICIAL</div>
+                </div>
+            `;
+            
+            stampArea.innerHTML = '';
+            stampArea.appendChild(stamp);
+            stampArea.classList.remove('border-dashed', 'border-gray-400/50');
+            stampArea.classList.add('border-solid', 'border-transparent');
+            
+            // Animate stamp drop
+            setTimeout(() => {
+                stamp.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                stamp.style.opacity = '1';
+                stamp.style.transform = 'scale(1) rotate(-5deg)';
+                
+                // Add impact effect
+                setTimeout(() => {
+                    stamp.style.transform = 'scale(1.05) rotate(0deg)';
+                    
+                    // Create ink spread
+                    const ink = document.createElement('div');
+                    ink.className = 'absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/10 rounded-lg opacity-0';
+                    stampArea.appendChild(ink);
+                    
+                    ink.style.transition = 'all 1s ease-out';
+                    ink.style.opacity = '0.3';
+                    ink.style.transform = 'scale(1.5)';
+                    
+                    // Add sound effect notification
+                    const soundNotification = document.createElement('div');
+                    soundNotification.className = 'absolute -top-4 -right-4 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center animate-ping';
+                    soundNotification.innerHTML = '<div class="text-xs">🔊</div>';
+                    stampArea.appendChild(soundNotification);
+                    
+                    // Update status
+                    setTimeout(() => {
+                        status.textContent = '✓ APPROVED';
+                        status.classList.remove('text-orange-400');
+                        status.classList.add('text-green-400');
+                        
+                        button.innerHTML = `
+                            <div class="flex items-center justify-center space-x-3">
+                                <span class="text-2xl">🎉</span>
+                                <span>ENTRY GRANTED • RETURNING TO DASHBOARD</span>
+                            </div>
+                        `;
+                        button.classList.remove('from-yellow-600', 'to-orange-600');
+                        button.classList.add('from-green-600', 'to-cyan-600', 'animate-pulse');
+                        
+                        // Complete the process
+                        setTimeout(() => {
+                            completeImmigrationProcess();
+                        }, 2000);
+                    }, 1000);
+                }, 300);
+            }, 500);
+        }
+        
+        function completeImmigrationProcess() {
+            state.current = ImmigrationState.COMPLETED;
+            
+            // Show completion animation
+            const container = document.getElementById('stamp-container');
+            container.style.opacity = '0';
+            container.style.transform = 'scale(0.95)';
+            container.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            // Create final celebration overlay
+            const celebration = document.createElement('div');
+            celebration.className = 'fixed inset-0 flex items-center justify-center z-50';
+            celebration.innerHTML = `
+                <div class="text-center animate-fade-in-up">
+                    <div class="text-8xl mb-6 animate-bounce">✨</div>
+                    <h1 class="text-4xl font-bold text-green-300 mb-4 bg-black/80 backdrop-blur-xl px-12 py-8 rounded-3xl">
+                        IMMIGRATION CLEARANCE COMPLETE
+                    </h1>
+                    <div class="text-2xl text-gray-300 mb-6 bg-black/60 backdrop-blur-lg px-8 py-6 rounded-2xl">
+                        Welcome to ${state.travelerData.destinationNation}
+                    </div>
+                    <div class="text-lg text-cyan-300 animate-pulse-custom">
+                        <div class="font-mono">RETURNING TO CARBON DASHBOARD...</div>
+                    </div>
+                    
+                    <!-- Progress indicator -->
+                    <div class="mt-8 max-w-md mx-auto">
+                        <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+                            <div id="redirect-progress" class="h-full bg-gradient-to-r from-green-500 to-cyan-500 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(celebration);
+            
+            // Animate progress bar
+            const progressBar = document.getElementById('redirect-progress');
+            progressBar.style.transition = 'width 2s ease-in-out';
+            progressBar.style.width = '100%';
+            
+            // Add confetti effect
+            createConfetti();
+            
+            // Redirect to dashboard
+            setTimeout(() => {
+                celebration.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-6xl mb-6 animate-spin">✈️</div>
+                        <div class="text-2xl text-cyan-300 font-bold">
+                            RESUMING FLIGHT SIMULATION...
+                        </div>
+                    </div>
+                `;
+                
+                // Make the redirect call
+                setTimeout(() => {
+                    window.location.href = "/carbon-dashboard?immigration=cleared";
+                }, 1000);
+            }, 2500);
+        }
+        
+        function createConfetti() {
+            const colors = ['#64ffda', '#00ff9d', '#3a86ff', '#ff006e', '#fb5607'];
+            const confettiContainer = document.createElement('div');
+            confettiContainer.className = 'fixed inset-0 pointer-events-none z-40';
+            document.body.appendChild(confettiContainer);
+            
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    const size = Math.random() * 10 + 5;
+                    const startX = Math.random() * 100;
+                    
+                    confetti.style.position = 'absolute';
+                    confetti.style.width = `${size}px`;
+                    confetti.style.height = `${size}px`;
+                    confetti.style.background = color;
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.left = `${startX}vw`;
+                    confetti.style.top = '-20px';
+                    confetti.style.opacity = '0.9';
+                    confetti.style.boxShadow = `0 0 10px ${color}`;
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    
+                    confettiContainer.appendChild(confetti);
+                    
+                    // Animate falling
+                    const animation = confetti.animate([
+                        { 
+                            transform: `translate(0, 0) rotate(0deg)`,
+                            opacity: 1 
+                        },
+                        { 
+                            transform: `translate(${(Math.random() - 0.5) * 100}px, 100vh) rotate(${360 * 3}deg)`,
+                            opacity: 0 
+                        }
+                    ], {
+                        duration: 3000 + Math.random() * 2000,
+                        easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+                    });
+                    
+                    animation.onfinish = () => confetti.remove();
+                }, i * 30);
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-4 rounded-xl shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ${
+                type === 'error' ? 'bg-gradient-to-r from-red-600/90 to-red-800/90' :
+                type === 'success' ? 'bg-gradient-to-r from-green-600/90 to-green-800/90' :
+                'bg-gradient-to-r from-blue-600/90 to-blue-800/90'
+            }`;
+            
+            notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <span class="text-xl">${type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️'}</span>
+                    <span class="font-medium">${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            // Remove after delay
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initImmigrationFlow);
+    </script>
+</head>
+<body class="min-h-screen overflow-x-hidden">
+    <!-- Main Application Container -->
+    <div id="immigration-app" class="min-h-screen">
+        <!-- Header -->
+        <header class="glass-panel border-b border-cyan-500/20 py-4 px-6 sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="text-3xl">✈️</div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-glow">IMMIGRATION CLEARANCE</h1>
+                        <div class="text-sm text-gray-400 font-mono">EcoVerse Aviation • Border Control System</div>
+                    </div>
+                </div>
+                
+                <div class="text-right">
+                    <div class="text-sm text-gray-300">Traveler: <span class="font-bold text-cyan-300">{{ name }}</span></div>
+                    <div class="text-xs text-gray-400">Destination: <span class="font-medium">{{ destination_country }}</span></div>
+                    <div id="system-timer" class="text-xs text-gray-500 mt-1 font-mono">00:00:00</div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content Area - Step Transitions -->
+        <main class="py-8 px-4 max-w-7xl mx-auto">
+            <!-- Step 1: Passport Selection -->
+            <section id="passport-selection" data-step="passport_selection" class="step-transition step-visible">
+                <div class="text-center mb-12 animate-fade-in-up">
+                    <div class="text-6xl mb-4">🛂</div>
+                    <h2 class="text-4xl font-bold text-cyan-300 mb-4">SELECT YOUR PASSPORT</h2>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                        Choose your travel document from the available e-passports. Your selection will determine visa requirements and clearance procedures.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="passport-selection-container">
+                    <!-- Passport cards will be injected here by JavaScript -->
+                </div>
+                
+                <div class="text-center text-gray-400 animate-pulse-custom">
+                    <div class="font-mono">SELECTION_REQUIRED • AWAITING_INPUT</div>
+                </div>
+            </section>
+            
+            <!-- Step 2: Passport Booklet -->
+            <section id="passport-booklet" data-step="passport_booklet" class="step-transition step-hidden" style="display: none;">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-cyan-300 mb-4">PASSPORT VERIFICATION</h2>
+                    <p class="text-gray-300">Processing biometric e-passport...</p>
+                </div>
+                
+                <div class="flex justify-center items-center min-h-[400px]">
+                    <div id="passport-cover" class="passport-3d w-80 h-56 rounded-xl p-8 relative overflow-hidden shadow-2xl">
+                        <div class="absolute top-6 left-6 text-2xl font-bold text-white" id="passport-country"></div>
+                        <div class="absolute top-12 left-6 text-sm text-white/80" id="passport-country-native"></div>
+                        <div class="absolute bottom-6 right-6">
+                            <div class="passport-chip"></div>
+                        </div>
+                        <div class="absolute bottom-6 left-6 text-white text-xs">
+                            <div class="font-mono">e-PASSPORT</div>
+                            <div>BIOMETRIC • CHIP ENABLED</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-12">
+                    <div class="inline-block p-4 bg-cyan-900/30 rounded-xl animate-pulse-custom">
+                        <div class="font-mono text-cyan-300">SCANNING_RFID_CHIP • VERIFYING_DIGITAL_SIGNATURE</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Step 3: Identity Page -->
+            <section id="identity-page" data-step="identity_page" class="step-transition step-hidden" style="display: none;">
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-cyan-300 mb-2">IDENTITY CONFIRMATION</h2>
+                        <p class="text-gray-300">Please verify your details match the passport information</p>
+                    </div>
+                    
+                    <!-- Passport Page Simulation -->
+                    <div class="visa-document rounded-xl p-8 mx-auto transform transition-all duration-1000 opacity-0 translate-x-10" id="passport-page">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Left Column -->
+                            <div>
+                                <div class="mb-6">
+                                    <div class="text-sm text-gray-500 mb-1">Family Name / Given Name</div>
+                                    <div class="text-2xl font-bold text-gray-800 border-b pb-2" id="traveler-name"></div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <div class="text-sm text-gray-500 mb-1">Username / Handle</div>
+                                    <div class="text-xl font-mono text-gray-700 border-b pb-2" id="traveler-username"></div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <div class="text-sm text-gray-500 mb-1">Contact Email</div>
+                                    <div class="text-lg text-gray-700 border-b pb-2" id="traveler-email"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Column -->
+                            <div>
+                                <div class="mb-6">
+                                    <div class="text-sm text-gray-500 mb-1">Passport Number</div>
+                                    <div class="text-2xl font-mono font-bold text-gray-800 border-b pb-2" id="passport-number"></div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <div class="text-sm text-gray-500 mb-1">Nationality</div>
+                                        <div class="text-lg text-gray-700" id="nationality"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm text-gray-500 mb-1">Issuing Authority</div>
+                                        <div class="text-lg text-gray-700" id="issuing-authority"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <div class="text-sm text-gray-500 mb-1">Date of Issue</div>
+                                        <div class="text-lg text-gray-700" id="issue-date"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm text-gray-500 mb-1">Date of Expiry</div>
+                                        <div class="text-lg text-gray-700" id="expiry-date"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Machine Readable Zone Simulation -->
+                        <div class="mt-8 p-4 bg-gray-900 rounded-lg">
+                            <div class="font-mono text-green-400 text-sm tracking-widest">
+                                P{{ username | upper }}&lt;{{ name | replace(' ', '&lt;') }}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+                            </div>
+                            <div class="font-mono text-green-400 text-sm tracking-widest mt-1">
+                                {{ destination_country | upper }}&lt;IMMIGRATION&lt;AUTHORIZED&lt;{{ 'now' | date('ymd') }}&lt;{{ 'now' | date('His') }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-12 animate-fade-in-up">
+                        <button onclick="proceedToImmigration()" 
+                                class="px-10 py-5 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold text-xl rounded-xl hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-xl shadow-cyan-500/30">
+                            <div class="flex items-center justify-center space-x-3">
+                                <span class="text-2xl">✅</span>
+                                <span>CONFIRM IDENTITY & PROCEED TO IMMIGRATION</span>
+                            </div>
+                        </button>
+                        <div class="mt-4 text-sm text-gray-400">
+                            <div class="font-mono">BIOMETRIC_DATA_MATCHED • IDENTITY_VERIFIED</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Step 4: Immigration & Visa -->
+            <section id="immigration-visa" data-step="immigration_visa" class="step-transition step-hidden" style="display: none;">
+                <div class="max-w-6xl mx-auto">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-cyan-300 mb-2">IMMIGRATION & VISA PROCESSING</h2>
+                        <p class="text-gray-300">Border control verification for entry into {{ destination_country }}</p>
+                    </div>
+                    
+                    <div class="relative">
+                        <div id="visa-container" class="min-h-[500px] flex items-center justify-center">
+                            <!-- Visa content will be injected here -->
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-8 text-sm text-gray-400">
+                        <div class="font-mono">IMMIGRATION_CONTROL • {{ destination_country | upper }}_BORDER_SECURITY</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Step 5: Security Declaration -->
+            <section id="security-declaration" data-step="security_declaration" class="step-transition step-hidden" style="display: none;">
+                <div id="security-container" class="min-h-[600px]">
+                    <!-- Security declaration content will be injected here -->
+                </div>
+            </section>
+            
+            <!-- Step 6: Security Screening -->
+            <section id="security-screening" data-step="security_screening" class="step-transition step-hidden" style="display: none;">
+                <div id="screening-container" class="min-h-[700px]">
+                    <!-- Security screening content will be injected here -->
+                </div>
+            </section>
+            
+            <!-- Step 7: Immigration Stamp -->
+            <section id="immigration-stamp" data-step="immigration_stamp" class="step-transition step-hidden" style="display: none;">
+                <div id="stamp-container" class="min-h-[600px]">
+                    <!-- Immigration stamp content will be injected here -->
+                </div>
+            </section>
+        </main>
+        
+        <!-- System Footer -->
+        <footer class="glass-panel border-t border-cyan-500/20 py-4 px-6 mt-12">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <div class="text-sm font-semibold text-cyan-300 mb-2">EcoVerse Aviation</div>
+                        <div class="text-xs text-gray-400">Advanced Immigration Clearance System v4.2</div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="flex items-center justify-center space-x-4">
+                            <div class="flex items-center space-x-2">
+                                <div class="status-light bg-green-500"></div>
+                                <span class="text-xs text-gray-300">System Online</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="status-light bg-cyan-500 animate-pulse"></div>
+                                <span class="text-xs text-gray-300">Processing</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <div class="text-xs text-gray-400">
+                            Session: <span class="font-mono">{{ username }}</span> |
+                            Destination: <span class="font-mono">{{ destination_country }}</span>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">
+                            Protocol: ICAO 9303 • Biometric: ISO/IEC 19794
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Timer Script -->
+    <script>
+        // System timer
+        let startTime = Date.now();
+        const timerElement = document.getElementById('system-timer');
+        
+        function updateTimer() {
+            const elapsed = Date.now() - startTime;
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            
+            timerElement.textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        setInterval(updateTimer, 1000);
+        updateTimer();
+    </script>
+    
+    <!-- Terminal Typing Effect for Status Messages -->
+    <script>
+        // Add typing effect to status messages
+        function typeWriter(element, text, speed = 50) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            
+            type();
+        }
+        
+        // Initialize typing effects on relevant elements
+        document.addEventListener('DOMContentLoaded', () => {
+            const typingElements = document.querySelectorAll('.typing-effect');
+            typingElements.forEach(el => {
+                const text = el.textContent;
+                el.classList.add('animate-terminal-typing');
+            });
+        });
+    </script>
+</body>
+</html>

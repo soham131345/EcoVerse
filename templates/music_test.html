@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Music Test - EcoVerse</title>
+    <style>
+        body {
+            background: #0a1929;
+            color: white;
+            font-family: Arial;
+            padding: 20px;
+        }
+        .music-player {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px;
+            display: inline-block;
+        }
+        button {
+            background: #2ecc71;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 Music Player Test</h1>
+    
+    <div class="music-player">
+        <h2>Heroic Music</h2>
+        <button onclick="playMusic('h1')">Play h1.mp3</button>
+        <button onclick="playMusic('h2')">Play h2.mp3</button>
+        <button onclick="playMusic('h3')">Play h3.mp3</button>
+    </div>
+    
+    <div class="music-player">
+        <h2>Unaccomplished Music</h2>
+        <button onclick="playMusic('u1')">Play u1.mp3</button>
+        <button onclick="playMusic('u2')">Play u2.mp3</button>
+        <button onclick="playMusic('u3')">Play u3.mp3</button>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <button onclick="stopMusic()">⏹️ Stop Music</button>
+        <input type="range" id="volumeSlider" min="0" max="100" value="30" onchange="changeVolume(this.value)">
+        <span id="volumeLabel">Volume: 30%</span>
+    </div>
+    
+    <script>
+        let currentAudio = null;
+        
+        function playMusic(track) {
+            // Stop current music
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+            
+            // Play new track
+            currentAudio = new Audio(`${track}.mp3`);
+            currentAudio.volume = document.getElementById('volumeSlider').value / 100;
+            currentAudio.play();
+            
+            console.log(`Playing: ${track}.mp3`);
+        }
+        
+        function stopMusic() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+        }
+        
+        function changeVolume(value) {
+            if (currentAudio) {
+                currentAudio.volume = value / 100;
+            }
+            document.getElementById('volumeLabel').textContent = `Volume: ${value}%`;
+        }
+    </script>
+</body>
+</html>

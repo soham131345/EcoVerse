@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Immigration Stamping | Carbon Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #4FC3F7;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            color: #B3E5FC;
+            font-size: 1.1rem;
+        }
+
+        /* Passport Page */
+        .passport-page {
+            width: 400px;
+            height: 280px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 40px auto;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .passport-content {
+            padding: 30px;
+            color: #333;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .passport-header {
+            text-align: center;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .passport-title {
+            font-size: 24px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .passport-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .holder-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-field {
+            text-align: left;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        /* Stamp Area */
+        .stamp-area {
+            position: absolute;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+            z-index: 1;
+        }
+
+        /* Stamp Animation */
+        .stamp {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, #FF0000 0%, #CC0000 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 10px 40px rgba(255, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(-200px) scale(0.5);
+            z-index: 2;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .stamp.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .stamp::before {
+            content: '';
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border: 3px solid white;
+            border-radius: 50%;
+        }
+
+        .stamp-text {
+            transform: rotate(-15deg);
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* Ink Spread Effect */
+        .stamp::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 50%, rgba(255, 0, 0, 0.3) 70%);
+            border-radius: 50%;
+            animation: inkSpread 1s ease-out 0.8s forwards;
+            opacity: 0;
+        }
+
+        @keyframes inkSpread {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Immigration Desk Background */
+        .desk-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            z-index: -1;
+        }
+
+        .desk-items {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: #8B4513;
+            z-index: -1;
+        }
+
+        .desk-items::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to bottom, transparent, #8B4513);
+        }
+
+        /* Status Message */
+        .status-message {
+            margin-top: 40px;
+            font-size: 1.2rem;
+            color: #B3E5FC;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #4FC3F7;
+            border-radius: 50%;
+            margin: 0 10px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* Completion Animation */
+        .completion-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .completion-content {
+            text-align: center;
+            animation: zoomIn 0.8s ease-out;
+        }
+
+        .completion-icon {
+            font-size: 80px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            animation: bounce 1s ease-in-out;
+        }
+
+        .completion-title {
+            font-size: 3rem;
+            color: #4FC3F7;
+            margin-bottom: 10px;
+        }
+
+        .completion-subtitle {
+            font-size: 1.5rem;
+            color: #B3E5FC;
+            margin-bottom: 40px;
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Hidden redirect element */
+        #redirectLink {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="desk-background"></div>
+    <div class="desk-items"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>IMMIGRATION STAMPING</h1>
+            <p>Final clearance before boarding</p>
+        </div>
+
+        <div class="passport-page">
+            <div class="passport-content">
+                <div class="passport-header">
+                    <div class="passport-title">PASSPORT</div>
+                    <div class="passport-subtitle">Republic of {{ session.get('passport_country', 'India') }}</div>
+                </div>
+
+                <div class="holder-info">
+                    <div class="info-field">
+                        <div class="info-label">Name</div>
+                        <div class="info-value">{{ user.username }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">Passport No.</div>
+                        <div class="info-value">P{{ "%06d" % user.id }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">Nationality</div>
+                        <div class="info-value">{{ session.get('passport_country', 'India') }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">Destination</div>
+                        <div class="info-value">{{ session.get('destination_country', 'Singapore') }}</div>
+                    </div>
+                </div>
+
+                <div class="stamp-area">
+                    <div id="stampPlaceholder">STAMP AREA</div>
+                    <div class="stamp" id="immigrationStamp">
+                        <div class="stamp-text">
+                            ENTRY<br>APPROVED<br>{{ datetime.now().strftime('%d-%m-%Y') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-message" id="statusMessage">
+            <span class="status-dot"></span>
+            Preparing immigration stamp...
+            <span class="status-dot"></span>
+        </div>
+    </div>
+
+    <!-- Completion Animation -->
+    <div class="completion-animation" id="completionAnimation">
+        <div class="completion-content">
+            <div class="completion-icon">✅</div>
+            <div class="completion-title">IMMIGRATION CLEARED</div>
+            <div class="completion-subtitle">Proceed to boarding gate</div>
+        </div>
+    </div>
+
+    <!-- Hidden redirect link -->
+    <a id="redirectLink" href="/complete-immigration"></a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            startStampAnimation();
+        });
+
+        function startStampAnimation() {
+            const stamp = document.getElementById('immigrationStamp');
+            const statusMessage = document.getElementById('statusMessage');
+            const completionAnimation = document.getElementById('completionAnimation');
+            const redirectLink = document.getElementById('redirectLink');
+
+            // Sequence of events
+            setTimeout(() => {
+                statusMessage.innerHTML = '<span class="status-dot"></span> Processing immigration check... <span class="status-dot"></span>';
+            }, 1000);
+
+            setTimeout(() => {
+                statusMessage.innerHTML = '<span class="status-dot"></span> Verifying documents... <span class="status-dot"></span>';
+            }, 2000);
+
+            setTimeout(() => {
+                statusMessage.innerHTML = '<span class="status-dot"></span> Applying entry stamp... <span class="status-dot"></span>';
+                
+                // Activate stamp animation
+                stamp.classList.add('active');
+                
+                // Optional: Add stamp sound effect
+                try {
+                    const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQQ=');
+                    audio.volume = 0.3;
+                    audio.play().catch(e => console.log('Audio play failed:', e));
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            }, 3000);
+
+            setTimeout(() => {
+                statusMessage.innerHTML = '<span class="status-dot"></span> Stamp applied successfully! <span class="status-dot"></span>';
+            }, 4000);
+
+            setTimeout(() => {
+                // Show completion animation
+                completionAnimation.style.display = 'flex';
+                
+                // Update stamp text if visa was required
+                {% if session.get('requires_visa') %}
+                stamp.querySelector('.stamp-text').innerHTML = 'VISA<br>GRANTED<br>{{ datetime.now().strftime("%d-%m-%Y") }}';
+                {% endif %}
+            }, 5000);
+            
+            setTimeout(() => {
+                // Clear immigration session
+                fetch('/api/clear-immigration-session', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'include'
+                })
+                .then(() => {
+                    window.location.href = '/carbon-dashboard?immigration_cleared=true';
+                });
+            }, 7000);
+        }
+    </script>
+</body>
+</html>

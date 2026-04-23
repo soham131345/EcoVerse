@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ story.title }} - EcoVerse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .story-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a1929, #1a3a5f);
+            z-index: 1;
+        }
+
+        #storyCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .story-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 15px 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            z-index: 100;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 10px;
+            border-radius: 50%;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #3498db);
+            border-radius: 3px;
+            width: 0%;
+        }
+
+        .time-display {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .story-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .narration-box {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            border-left: 5px solid #2ecc71;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .narration-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .narration-character {
+            font-size: 14px;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        .export-panel {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            z-index: 100;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 200px;
+        }
+
+        .export-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .export-btn:hover {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: #2ecc71;
+            transform: translateY(-2px);
+        }
+
+        .export-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .export-btn.exporting {
+            background: rgba(52, 152, 219, 0.2);
+            border-color: #3498db;
+        }
+
+        .audio-controls {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 10px 20px;
+            z-index: 100;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .music-info {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-slider {
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #2ecc71;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #2ecc71;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 100;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .control-btn {
+                font-size: 20px;
+                padding: 8px;
+            }
+            
+            .progress-bar {
+                width: 200px;
+            }
+            
+            .narration-box {
+                bottom: 120px;
+                padding: 15px 20px;
+            }
+            
+            .narration-text {
+                font-size: 16px;
+            }
+            
+            .export-panel {
+                top: 15px;
+                right: 15px;
+                padding: 15px;
+            }
+            
+            .audio-controls {
+                top: 80px;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3 style="margin-bottom: 10px;">Loading Story...</h3>
+            <p id="loadingMessage">Prepparing you're personalized eco-story</p>
+        </div>
+    </div>
+
+    <div class="story-canvas">
+        <canvas id="storyCanvas"></canvas>
+    </div>
+
+    <div class="story-overlay">
+        <div class="narration-box" id="narrationBox">
+            <div class="narration-text" id="narrationText">Story begins...</div>
+            <div class="narration-character" id="narrationCharacter">NARRATOR</div>
+        </div>
+    </div>
+
+    <div class="audio-controls" id="audioControls">
+        <div class="music-info">
+            <span id="musicIcon">🎵</span>
+            <span id="musicStatus">Loading music...</span>
+        </div>
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30">
+        <button class="control-btn" onclick="toggleMusicMute()" id="musicMuteBtn">🔊</button>
+    </div>
+
+    <button class="back-btn" onclick="goBack()">
+        ← Back to Stories
+    </button>
+
+    <div class="export-panel">
+        <button class="export-btn" onclick="exportAsVideo()" id="videoExportBtn">
+            🎥 Export as Video
+        </button>
+        
+        <button class="export-btn" onclick="shareStory()">
+            📤 Share Story
+        </button>
+    </div>
+
+    <div class="story-controls">
+        <button class="control-btn" onclick="skipBack()">⏪</button>
+        <button class="control-btn" onclick="togglePlay()" id="playBtn">▶️</button>
+        <button class="control-btn" onclick="skipForward()">⏩</button>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+        
+        <button class="control-btn" onclick="toggleFullscreen()">⛶</button>
+    </div>
+
+    <audio id="backgroundMusic" loop preload="auto"></audio>
+    
+    <script>
+        const storyData = {
+            title: "{{ story.title }}",
+            script: `{{ story.script }}`,
+            visuals: JSON.parse(`{{ visuals|safe }}`),
+            duration: {{ story.duration }},
+            username: "{{ user.username }}",
+            avatarLevel: {{ user.avatar_level }},
+            cityName: "{{ save.city_name if save else 'EcoCity' }}",
+            ecoScore: {{ user.eco_score }},
+            userLevel: {{ user.level }}
+        };
+
+        const MUSIC_FILES = {
+            heroic: ['h1.mp3', 'h2.mp3', 'h3.mp3'],
+            unaccomplished: ['u1.mp3', 'u2.mp3', 'u3.mp3']
+        };
+
+        let canvas, ctx;
+        let isPlaying = false;
+        let currentTime = 0;
+        let totalTime = storyData.duration;
+        let animationFrame;
+        let particles = [];
+        
+        let backgroundMusic = document.getElementById('backgroundMusic');
+        let isMusicMuted = false;
+        let currentMusicTrack = '';
+        let storyMood = 'heroic';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            canvas = document.getElementById('storyCanvas');
+            ctx = canvas.getContext('2d');
+            
+            resizeCanvas();
+            parseScript();
+            setupAudio();
+            renderScene();
+            
+            window.addEventListener('resize', resizeCanvas);
+            
+            setTimeout(() => {
+                if (!isPlaying) {
+                    togglePlay();
+                }
+            }, 1500);
+        });
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            renderScene();
+        }
+
+        function parseScript() {
+            const lines = storyData.script.split('\n');
+            let scenes = [];
+            let currentScene = null;
+            
+            lines.forEach(line => {
+                line = line.trim();
+                if (line.startsWith('[SCENE')) {
+                    if (currentScene) scenes.push(currentScene);
+                    currentScene = {
+                        title: line,
+                        narration: '',
+                        character: '',
+                        duration: 15
+                    };
+                } else if (line.startsWith('NARRATOR:')) {
+                    currentScene.narration = line.replace('NARRATOR:', '').trim();
+                    currentScene.character = 'NARRATOR';
+                } else if (line && currentScene) {
+                    if (!currentScene.narration) {
+                        currentScene.narration = line;
+                    }
+                }
+            });
+            
+            if (currentScene) scenes.push(currentScene);
+            window.storyScenes = scenes;
+        }
+
+        function setupAudio() {
+            storyMood = detectStoryMood();
+            document.getElementById('musicStatus').textContent = `${storyMood} mood`;
+            
+            loadBackgroundMusic();
+            
+            const volumeSlider = document.getElementById('volumeSlider');
+            volumeSlider.addEventListener('input', function() {
+                const volume = this.value / 100;
+                backgroundMusic.volume = volume;
+                document.getElementById('musicStatus').textContent = 
+                    `${storyMood} (${Math.round(volume * 100)}%)`;
+            });
+            
+            backgroundMusic.addEventListener('loadeddata', function() {
+                console.log('Music loaded:', currentMusicTrack);
+                document.getElementById('musicStatus').textContent = 
+                    `${storyMood}: ${currentMusicTrack}`;
+            });
+            
+            backgroundMusic.addEventListener('error', function(e) {
+                console.error('Music error:', e);
+                document.getElementById('musicStatus').textContent = 'Music error';
+                document.getElementById('musicIcon').textContent = '❌';
+            });
+            
+            backgroundMusic.addEventListener('play', function() {
+                document.getElementById('musicIcon').textContent = '🎵';
+            });
+            
+            backgroundMusic.addEventListener('pause', function() {
+                document.getElementById('musicIcon').textContent = '⏸️';
+            });
+        }
+
+        function detectStoryMood() {
+            const script = storyData.script.toLowerCase();
+            
+            const positiveWords = ['amazing', 'success', 'achieved', 'saved', 'hero', 
+                                  'inspiring', 'celebrate', 'victory', 'wonderful',
+                                  'great', 'excellent', 'fantastic', 'incredible'];
+            const negativeWords = ['failed', 'struggle', 'difficult', 'challenge', 
+                                  'unfortunately', 'problem', 'issue', 'hard',
+                                  'difficulty', 'challenges', 'struggles'];
+            
+            let positiveScore = 0;
+            let negativeScore = 0;
+            
+            positiveWords.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                const matches = script.match(regex);
+                if (matches) positiveScore += matches.length;
+            });
+            
+            negativeWords.forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                const matches = script.match(regex);
+                if (matches) negativeScore += matches.length;
+            });
+            
+            const co2Match = script.match(/(\d+)\s*kg\s*of\s*co₂/i) || script.match(/co2.*?(\d+)/i);
+            const treesMatch = script.match(/(\d+)\s*trees/i);
+            
+            if (co2Match) {
+                const co2Saved = parseInt(co2Match[1]);
+                if (co2Saved > 50) positiveScore += 3;
+                else if (co2Saved > 20) positiveScore += 2;
+                else positiveScore += 1;
+            }
+            
+            if (treesMatch) {
+                const treesPlanted = parseInt(treesMatch[1]);
+                if (treesPlanted > 10) positiveScore += 3;
+                else if (treesPlanted > 5) positiveScore += 2;
+                else positiveScore += 1;
+            }
+            
+            if (storyData.ecoScore > 150) positiveScore += 2;
+            if (storyData.userLevel > 3) positiveScore += 1;
+            
+            console.log(`Mood detection: Positive=${positiveScore}, Negative=${negativeScore}`);
+            
+            return positiveScore >= negativeScore ? 'heroic' : 'unaccomplished';
+        }
+
+        function loadBackgroundMusic() {
+            const tracks = MUSIC_FILES[storyMood];
+            const selectedTrack = tracks[Math.floor(Math.random() * tracks.length)];
+            currentMusicTrack = selectedTrack;
+            
+            backgroundMusic.src = `/static/${selectedTrack}`;
+            backgroundMusic.volume = 0.3;
+            
+            backgroundMusic.load();
+            
+            console.log(`Loading ${storyMood} music: ${selectedTrack}`);
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            const playBtn = document.getElementById('playBtn');
+            playBtn.textContent = isPlaying ? '⏸️' : '▶️';
+            
+            if (isPlaying) {
+                if (!isMusicMuted && backgroundMusic.paused) {
+                    backgroundMusic.play().catch(e => {
+                        console.log('Music autoplay prevented, user interaction required:', e);
+                    });
+                }
+                
+                animationFrame = requestAnimationFrame(updateAnimation);
+                console.log('Story started');
+            } else {
+                backgroundMusic.pause();
+                
+                cancelAnimationFrame(animationFrame);
+                console.log('Story paused');
+            }
+        }
+
+        function toggleMusicMute() {
+            isMusicMuted = !isMusicMuted;
+            const muteBtn = document.getElementById('musicMuteBtn');
+            
+            if (isMusicMuted) {
+                muteBtn.textContent = '🔇';
+                backgroundMusic.volume = 0;
+                document.getElementById('musicStatus').textContent = `${storyMood} (muted)`;
+            } else {
+                muteBtn.textContent = '🔊';
+                const volume = document.getElementById('volumeSlider').value / 100;
+                backgroundMusic.volume = volume;
+                document.getElementById('musicStatus').textContent = 
+                    `${storyMood} (${Math.round(volume * 100)}%)`;
+                
+                if (isPlaying && backgroundMusic.paused) {
+                    backgroundMusic.play().catch(e => {
+                        console.log('Music play failed:', e);
+                    });
+                }
+            }
+        }
+
+        function skipBack() {
+            currentTime = Math.max(0, currentTime - 5);
+            renderScene();
+        }
+
+        function skipForward() {
+            currentTime = Math.min(totalTime, currentTime + 5);
+            renderScene();
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function goBack() {
+            backgroundMusic.pause();
+            backgroundMusic.currentTime = 0;
+            
+            window.location.href = '/ai-stories';
+        }
+
+        function updateAnimation() {
+            if (!isPlaying) return;
+            
+            currentTime += 0.016;
+            
+            const progress = (currentTime / totalTime) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            
+            const currentMinutes = Math.floor(currentTime / 60);
+            const currentSeconds = Math.floor(currentTime % 60);
+            const totalMinutes = Math.floor(totalTime / 60);
+            const totalSeconds = Math.floor(totalTime % 60);
+            
+            document.getElementById('timeDisplay').textContent = 
+                `${currentMinutes.toString().padStart(2, '0')}:${currentSeconds.toString().padStart(2, '0')} / ` +
+                `${totalMinutes.toString().padStart(2, '0')}:${totalSeconds.toString().padStart(2, '0')}`;
+            
+            if (currentTime >= totalTime) {
+                currentTime = 0;
+                isPlaying = false;
+                document.getElementById('playBtn').textContent = '▶️';
+                
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+                
+                setTimeout(() => {
+                    if (!isPlaying) {
+                        togglePlay();
+                    }
+                }, 2000);
+            }
+            
+            renderScene();
+            
+            if (isPlaying) {
+                animationFrame = requestAnimationFrame(updateAnimation);
+            }
+        }
+
+        function renderScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawBackground();
+            
+            drawSceneElements();
+            
+            drawParticles();
+            
+            updateNarration();
+        }
+
+        function drawBackground() {
+            const sceneIndex = Math.floor(currentTime / 15);
+            
+            let gradient;
+            if (sceneIndex === 0) {
+                gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#0a1929');
+                gradient.addColorStop(1, '#1a3a5f');
+            } else if (sceneIndex === 1) {
+                gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#1a3a5f');
+                gradient.addColorStop(1, '#2980b9');
+            } else if (sceneIndex === 2) {
+                gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#27ae60');
+                gradient.addColorStop(1, '#2ecc71');
+            } else {
+                gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#1a5276');
+                gradient.addColorStop(1, '#3498db');
+            }
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawSceneElements() {
+            const sceneIndex = Math.floor(currentTime / 15);
+            
+            if (sceneIndex === 0) drawIntroScene();
+            else if (sceneIndex === 1) drawJourneyScene();
+            else if (sceneIndex === 2) drawImpactScene();
+            else if (sceneIndex === 3) drawInspirationScene();
+        }
+
+        function drawIntroScene() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            drawAvatar(centerX, centerY);
+            
+            ctx.font = 'bold 48px Arial';
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(storyData.username, centerX, centerY - 150);
+            
+            ctx.font = '24px Arial';
+            ctx.fillStyle = '#2ecc71';
+            ctx.fillText('The Eco-Guardian', centerX, centerY - 100);
+            
+            ctx.font = '16px Arial';
+            ctx.fillStyle = storyMood === 'heroic' ? '#f1c40f' : '#95a5a6';
+            ctx.fillText(`${storyMood.toUpperCase()} STORY`, centerX, centerY + 150);
+        }
+
+        function drawAvatar(x, y) {
+            const avatarSize = 120;
+            
+            ctx.fillStyle = '#3498db';
+            ctx.beginPath();
+            ctx.arc(x, y, avatarSize / 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#2ecc71';
+            ctx.fillRect(x - 40, y - 20, 80, 40);
+            
+            ctx.fillStyle = '#f39c12';
+            ctx.beginPath();
+            ctx.arc(x, y - 80, 20, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(storyData.avatarLevel, x, y - 80);
+        }
+
+        function drawJourneyScene() {
+            const buildings = [
+                {x: canvas.width * 0.2, y: canvas.height * 0.6, icon: '🏠'},
+                {x: canvas.width * 0.35, y: canvas.height * 0.7, icon: '🌳'},
+                {x: canvas.width * 0.5, y: canvas.height * 0.6, icon: '🏢'},
+                {x: canvas.width * 0.65, y: canvas.height * 0.7, icon: '♻️'},
+                {x: canvas.width * 0.8, y: canvas.height * 0.6, icon: '🌞'}
+            ];
+            
+            buildings.forEach(building => {
+                ctx.font = '40px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(building.icon, building.x, building.y);
+            });
+            
+            ctx.font = 'bold 32px Arial';
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.fillText(storyData.cityName, canvas.width / 2, 100);
+        }
+
+        function drawImpactScene() {
+            for (let i = 0; i < 10; i++) {
+                const x = (i % 5) * (canvas.width / 5) + canvas.width / 10;
+                const y = canvas.height * 0.6 + Math.sin(currentTime + i) * 10;
+                ctx.font = '40px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('🌳', x, y);
+            }
+            
+            ctx.font = 'bold 36px Arial';
+            ctx.fillStyle = '#2ecc71';
+            ctx.textAlign = 'center';
+            ctx.fillText('CO₂ Captured: 150kg', canvas.width / 2, canvas.height * 0.3);
+            ctx.fillText('Trees Planted: 12', canvas.width / 2, canvas.height * 0.4);
+            
+            ctx.font = '24px Arial';
+            ctx.fillStyle = '#f39c12';
+            ctx.fillText(`Eco-Score: ${storyData.ecoScore}`, canvas.width / 2, canvas.height * 0.5);
+        }
+
+        function drawInspirationScene() {
+            for (let i = 0; i < 10; i++) {
+                const height = 100 + Math.sin(i * 0.5) * 50;
+                const x = i * (canvas.width / 10) + 50;
+                const y = canvas.height - height;
+                
+                ctx.fillStyle = '#3498db';
+                ctx.fillRect(x, y, 40, height);
+                
+                ctx.fillStyle = '#f1c40f';
+                for (let j = 0; j < 4; j++) {
+                    for (let k = 0; k < 2; k++) {
+                        ctx.fillRect(x + 5 + k * 15, y + 20 + j * 20, 10, 10);
+                    }
+                }
+            }
+            
+            ctx.fillStyle = '#f39c12';
+            ctx.beginPath();
+            ctx.arc(canvas.width - 100, 100, 60, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.font = 'bold 32px Arial';
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.fillText('Every Action Counts', canvas.width / 2, 200);
+            
+            ctx.font = '24px Arial';
+            ctx.fillStyle = '#2ecc71';
+            ctx.fillText('Your journey inspires others!', canvas.width / 2, 250);
+        }
+
+        function createParticles() {
+            if (Math.random() < 0.1) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 3 + 1,
+                    speedX: (Math.random() - 0.5) * 2,
+                    speedY: (Math.random() - 0.5) * 2,
+                    color: Math.random() > 0.5 ? '#2ecc71' : '#3498db',
+                    life: 50
+                });
+            }
+        }
+
+        function drawParticles() {
+            particles.forEach((particle, index) => {
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                ctx.fillStyle = particle.color;
+                ctx.fill();
+                
+                particle.x += particle.speedX;
+                particle.y += particle.speedY;
+                particle.life--;
+                
+                if (particle.life <= 0) {
+                    particles.splice(index, 1);
+                }
+            });
+        }
+
+        function updateNarration() {
+            const sceneIndex = Math.floor(currentTime / 15);
+            const scene = window.storyScenes?.[sceneIndex];
+            
+            if (scene) {
+                document.getElementById('narrationText').textContent = scene.narration;
+                document.getElementById('narrationCharacter').textContent = scene.character;
+                
+                const box = document.getElementById('narrationBox');
+                if (scene.narration) {
+                    box.style.display = 'block';
+                } else {
+                    box.style.display = 'none';
+                }
+            }
+        }
+
+        async function exportAsVideo() {
+            const exportBtn = document.getElementById('videoExportBtn');
+            exportBtn.disabled = true;
+            exportBtn.textContent = '⏳ Exporting...';
+            
+            try {
+                const videoBlob = await captureCanvasAnimation();
+                
+                const url = URL.createObjectURL(videoBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `eco-story-${Date.now()}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert('Video exported successfully!');
+                
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Export failed: ' + error.message);
+            } finally {
+                exportBtn.disabled = false;
+                exportBtn.textContent = '🎥 Export as Video';
+            }
+        }
+
+        async function captureCanvasAnimation() {
+            return new Promise((resolve) => {
+                const frames = [];
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                
+                const originalTime = currentTime;
+                const frameCount = 30;
+                
+                for (let i = 0; i < frameCount; i++) {
+                    currentTime = (i / frameCount) * totalTime;
+                    renderScene();
+                    
+                    tempCtx.drawImage(canvas, 0, 0);
+                    frames.push(tempCanvas.toDataURL('image/jpeg', 0.8));
+                }
+                
+                currentTime = originalTime;
+                renderScene();
+                
+                resolve(new Blob([JSON.stringify({frames})], {type: 'application/json'}));
+            });
+        }
+
+        function shareStory() {
+            const storyData = {
+                title: storyData.title,
+                username: storyData.username,
+                mood: storyMood,
+                timestamp: new Date().toISOString()
+            };
+            
+            const shareText = `Check out my ${storyMood} eco-story "${storyData.title}" on EcoVerse!`;
+            const shareUrl = window.location.href;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: storyData.title,
+                    text: shareText,
+                    url: shareUrl
+                });
+            } else {
+                navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`)
+                    .then(() => alert('Story link copied to clipboard!'))
+                    .catch(() => alert('Please copy the URL manually: ' + shareUrl));
+            }
+        }
+    </script>
+</body>
+</html>

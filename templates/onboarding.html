@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to EcoVerse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .onboarding-container {
+            width: 90%;
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .tutorial-content {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .tutorial-step {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid #2ecc71;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .tutorial-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #2ecc71;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .step-title {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .step-description {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #2ecc71;
+        }
+
+        .progress-container {
+            padding: 0 40px 40px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #3498db);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #7f8c8d;
+        }
+
+        .btn-secondary:hover {
+            background: #bdc3c7;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(46, 204, 113, 0.4);
+        }
+
+        .btn-skip {
+            background: transparent;
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+            padding: 12px 30px;
+        }
+
+        .btn-skip:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .feature-tag {
+            display: inline-block;
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .demo-video {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 18px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <div class="header">
+            <h1>🌱 Welcome to EcoVerse!</h1>
+            <p>Your journey to sustainable living starts here</p>
+        </div>
+
+        <div class="tutorial-content">
+            <!-- Step 1 -->
+            <div class="tutorial-step">
+                <div class="step-number">1</div>
+                <div class="feature-icon">🎮</div>
+                <div class="step-title">EcoWorld Simulator</div>
+                <div class="step-description">
+                    Build sustainable cities, plant forests, and manage resources in our flagship simulation game. Every decision affects your virtual environment.
+                </div>
+                <div class="feature-tag">City Builder + Forest Architect</div>
+                <div class="demo-video">🏙️ Build Your Sustainable City</div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="tutorial-step">
+                <div class="step-number">2</div>
+                <div class="feature-icon">🤖</div>
+                <div class="step-title">AI-Powered Dashboard</div>
+                <div class="step-description">
+                    Track your carbon footprint, get personalized suggestions, and watch your EcoTwin avatar evolve based on your real-world actions.
+                </div>
+                <div class="feature-tag">EcoTwin + Carbon Coach + Habit Visualizer</div>
+                <div class="demo-video">📊 Your Environmental Impact</div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="tutorial-step">
+                <div class="step-number">3</div>
+                <div class="feature-icon">💰</div>
+                <div class="step-title">GreenToken Economy</div>
+                <div class="step-description">
+                    Earn tokens for eco-actions, trade with friends, and use them to unlock premium features in EcoWorld and customize your avatar.
+                </div>
+                <div class="feature-tag">Blockchain Simulated + P2P Trading</div>
+                <div class="demo-video">💎 Earn & Trade Tokens</div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="tutorial-step">
+                <div class="step-number">4</div>
+                <div class="feature-icon">🏛️</div>
+                <div class="step-title">Community & Education</div>
+                <div class="step-description">
+                    Join groups, participate in challenges, earn certifications, and learn through interactive stories and games.
+                </div>
+                <div class="feature-tag">Forum + Certifications + AI Stories</div>
+                <div class="demo-video">👥 Community Challenges</div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="tutorial-step">
+                <div class="step-number">5</div>
+                <div class="feature-icon">🎯</div>
+                <div class="step-title">Gamified Learning</div>
+                <div class="step-description">
+                    Play educational mini-games, complete recycling guides, and participate in water conservation challenges to earn rewards.
+                </div>
+                <div class="feature-tag">GreenSkill Arcade + Recycling Guide</div>
+                <div class="demo-video">🎮 Educational Games</div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="tutorial-step">
+                <div class="step-number">6</div>
+                <div class="feature-icon">📱</div>
+                <div class="step-title">Interactive Tools</div>
+                <div class="step-description">
+                    Use the Carbon Domino Simulator, Climate Time Machine, and personalized AI stories to understand complex environmental concepts.
+                </div>
+                <div class="feature-tag">Visualization + Simulation + Storytelling</div>
+                <div class="demo-video">⏳ See Your Impact Over Time</div>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="navigation">
+                <button class="btn btn-skip" onclick="skipTutorial()">Skip Tutorial</button>
+                <div>
+                    <button class="btn btn-secondary" onclick="previousStep()" id="prevBtn" style="display:none">← Previous</button>
+                    <button class="btn btn-primary" onclick="nextStep()" id="nextBtn">Next Step →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 6;
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            
+            if (currentStep === 1) {
+                document.getElementById('prevBtn').style.display = 'none';
+            } else {
+                document.getElementById('prevBtn').style.display = 'inline-block';
+            }
+            
+            if (currentStep === totalSteps) {
+                document.getElementById('nextBtn').textContent = 'Get Started →';
+            } else {
+                document.getElementById('nextBtn').textContent = 'Next Step →';
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateProgress();
+                
+                // Scroll to top of steps
+                document.querySelector('.tutorial-content').scrollTop = 0;
+                
+                // Highlight current step (visual feedback)
+                const steps = document.querySelectorAll('.tutorial-step');
+                steps.forEach((step, index) => {
+                    if (index === currentStep - 1) {
+                        step.style.borderLeftColor = '#3498db';
+                        step.style.transform = 'translateY(-5px)';
+                    } else {
+                        step.style.borderLeftColor = '#2ecc71';
+                        step.style.transform = 'none';
+                    }
+                });
+            } else {
+                completeTutorial();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateProgress();
+                
+                // Scroll to top of steps
+                document.querySelector('.tutorial-content').scrollTop = 0;
+            }
+        }
+
+        function completeTutorial() {
+            fetch('/complete-onboarding', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/dashboard';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.location.href = '/dashboard';
+            });
+        }
+
+        function skipTutorial() {
+            if (confirm('Skip the tutorial and go straight to the dashboard?')) {
+                completeTutorial();
+            }
+        }
+
+        // Initialize
+        updateProgress();
+        
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextStep();
+            } else if (e.key === 'ArrowLeft') {
+                previousStep();
+            } else if (e.key === 'Escape') {
+                skipTutorial();
+            }
+        });
+    </script>
+</body>
+</html>

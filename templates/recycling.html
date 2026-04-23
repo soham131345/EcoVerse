@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Recycling Guide - EcoVerse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #001219 100%);
+            color: #e0f7fa;
+            font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+        }
+        
+        .sci-fi-card {
+            background: linear-gradient(135deg, #001a23 0%, #003543 100%);
+            border: 1px solid #00e5ff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sci-fi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .sci-fi-card:hover::before {
+            left: 100%;
+        }
+        
+        .sci-fi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 229, 255, 0.2);
+            border-color: #00ffff;
+        }
+        
+        .sci-fi-header {
+            background: linear-gradient(90deg, #001a23 0%, #003543 100%);
+            border-bottom: 2px solid #00e5ff;
+        }
+        
+        .sci-fi-button {
+            background: linear-gradient(135deg, #00bcd4 0%, #006064 100%);
+            color: #e0f7fa;
+            border: 1px solid #00e5ff;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .sci-fi-button:hover {
+            background: linear-gradient(135deg, #00e5ff 0%, #007c91 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.3);
+        }
+        
+        .sci-fi-input {
+            background: rgba(0, 42, 50, 0.7);
+            border: 1px solid #00bcd4;
+            color: #e0f7fa;
+            border-radius: 8px;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .sci-fi-input:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff;
+            color: #00ffff;
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+        
+        .tutorial-step {
+            transition: all 0.3s ease;
+        }
+        .tutorial-step.active {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 229, 255, 0.2);
+        }
+        .quiz-option {
+            transition: all 0.2s ease;
+        }
+        .quiz-option:hover {
+            transform: translateY(-2px);
+        }
+        .quiz-option.correct {
+            background: linear-gradient(135deg, #00c853 0%, #00701a 100%) !important;
+            color: white;
+            border-color: #00ff00;
+        }
+        .quiz-option.incorrect {
+            background: linear-gradient(135deg, #f44336 0%, #ba000d 100%) !important;
+            color: white;
+            border-color: #ff5252;
+        }
+        .category-card {
+            transition: all 0.3s ease;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+        .progress-ring {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .drop-zone {
+            border: 2px dashed #00bcd4;
+            background: rgba(0, 42, 50, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone.drag-over {
+            border-color: #00ffff;
+            background: rgba(0, 229, 255, 0.1);
+        }
+        
+        .bin-icon {
+            color: #00e5ff;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+        
+        .tutorial-number {
+            background: linear-gradient(135deg, #00bcd4 0%, #006064 100%);
+            color: #e0f7fa;
+            border: 1px solid #00e5ff;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="sci-fi-header shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <a href="/dashboard" class="text-cyan-400 hover:text-cyan-300">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </a>
+                <h1 class="text-2xl font-bold neon-text">
+                    <i class="fas fa-recycle mr-2"></i>Smart Recycling Guide
+                </h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="sci-fi-card px-4 py-2">
+                    <i class="fas fa-coins text-yellow-400 mr-2"></i>
+                    <span id="token-balance" class="font-bold">1000</span>
+                </div>
+                <div class="text-sm text-cyan-300">
+                    Level <span id="user-level" class="font-bold">1</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Progress Section -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-xl font-semibold text-cyan-300">Your Recycling Progress</h2>
+                <span class="neon-text font-bold" id="progress-percent">0%</span>
+            </div>
+            <div class="sci-fi-card p-4">
+                <div class="w-full bg-gray-800 rounded-full h-4">
+                    <div id="progress-bar" class="bg-gradient-to-r from-cyan-500 to-teal-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between mt-2 text-sm text-cyan-200">
+                    <span>0 Points</span>
+                    <span>500 Points for next level</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Waste Categorization -->
+        <section class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold neon-text">
+                    <i class="fas fa-trash-alt mr-2"></i>Waste Categorization
+                </h2>
+                <button id="reset-categories" class="sci-fi-button">
+                    <i class="fas fa-redo mr-2"></i>Reset
+                </button>
+            </div>
+            
+            <div class="sci-fi-card p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-4 text-cyan-300">Drag items to correct bins</h3>
+                
+                <!-- Waste Items -->
+                <div id="waste-items" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <!-- Items will be dynamically generated -->
+                </div>
+                
+                <!-- Recycling Bins -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Plastic Bin -->
+                    <div class="category-card sci-fi-card p-4 text-center" data-category="plastic">
+                        <div class="mb-3">
+                            <i class="fas fa-water-bottle bin-icon text-4xl"></i>
+                        </div>
+                        <h4 class="font-bold text-cyan-300 mb-2">Plastic</h4>
+                        <div class="h-40 drop-zone rounded-lg flex items-center justify-center mb-3" id="plastic-bin">
+                            <p class="text-cyan-400 text-sm">Drag plastic items here</p>
+                        </div>
+                        <p class="text-xs text-cyan-300">Bottles, containers, packaging</p>
+                    </div>
+                    
+                    <!-- Paper Bin -->
+                    <div class="category-card sci-fi-card p-4 text-center" data-category="paper">
+                        <div class="mb-3">
+                            <i class="fas fa-newspaper bin-icon text-4xl"></i>
+                        </div>
+                        <h4 class="font-bold text-cyan-300 mb-2">Paper</h4>
+                        <div class="h-40 drop-zone rounded-lg flex items-center justify-center mb-3" id="paper-bin">
+                            <p class="text-cyan-400 text-sm">Drag paper items here</p>
+                        </div>
+                        <p class="text-xs text-cyan-300">Newspaper, cardboard, office paper</p>
+                    </div>
+                    
+                    <!-- Glass Bin -->
+                    <div class="category-card sci-fi-card p-4 text-center" data-category="glass">
+                        <div class="mb-3">
+                            <i class="fas fa-wine-glass-alt bin-icon text-4xl"></i>
+                        </div>
+                        <h4 class="font-bold text-cyan-300 mb-2">Glass</h4>
+                        <div class="h-40 drop-zone rounded-lg flex items-center justify-center mb-3" id="glass-bin">
+                            <p class="text-cyan-400 text-sm">Drag glass items here</p>
+                        </div>
+                        <p class="text-xs text-cyan-300">Bottles, jars, glass containers</p>
+                    </div>
+                    
+                    <!-- Organic Bin -->
+                    <div class="category-card sci-fi-card p-4 text-center" data-category="organic">
+                        <div class="mb-3">
+                            <i class="fas fa-apple-alt bin-icon text-4xl"></i>
+                        </div>
+                        <h4 class="font-bold text-cyan-300 mb-2">Organic</h4>
+                        <div class="h-40 drop-zone rounded-lg flex items-center justify-center mb-3" id="organic-bin">
+                            <p class="text-cyan-400 text-sm">Drag organic items here</p>
+                        </div>
+                        <p class="text-xs text-cyan-300">Food waste, plants, compostable</p>
+                    </div>
+                </div>
+                
+                <!-- Feedback -->
+                <div id="categorization-feedback" class="mt-6 p-4 rounded-lg hidden sci-fi-card">
+                    <p class="text-center font-semibold"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Animated Recycling Tutorials -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold neon-text mb-6">
+                <i class="fas fa-graduation-cap mr-2"></i>Recycling Tutorials
+            </h2>
+            
+            <div class="sci-fi-card p-6">
+                <div class="flex flex-col md:flex-row items-center">
+                    <!-- Animation Area -->
+                    <div class="md:w-1/2 mb-6 md:mb-0 md:pr-6">
+                        <div class="sci-fi-card rounded-lg p-4 h-64 flex items-center justify-center">
+                            <div id="tutorial-animation">
+                                <!-- Lottie animation will be inserted here -->
+                                <lottie-player
+                                    id="recycle-animation"
+                                    src="https://assets5.lottiefiles.com/packages/lf20_yy4tqskb.json"
+                                    background="transparent"
+                                    speed="1"
+                                    style="width: 300px; height: 300px;"
+                                    loop
+                                    autoplay>
+                                </lottie-player>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tutorial Steps -->
+                    <div class="md:w-1/2">
+                        <div class="mb-4">
+                            <h3 class="text-xl font-bold text-cyan-400 mb-2">How to Recycle Properly</h3>
+                            <p class="text-cyan-300">Follow these steps to become a recycling expert</p>
+                        </div>
+                        
+                        <div class="space-y-4" id="tutorial-steps">
+                            <!-- Tutorial steps will be dynamically generated -->
+                        </div>
+                        
+                        <div class="mt-6 flex justify-between">
+                            <button id="prev-step" class="sci-fi-button">
+                                <i class="fas fa-chevron-left mr-2"></i>Previous
+                            </button>
+                            <button id="next-step" class="sci-fi-button">
+                                Next<i class="fas fa-chevron-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Knowledge Verification Quizzes -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold neon-text mb-6">
+                <i class="fas fa-question-circle mr-2"></i>Recycling Knowledge Quiz
+            </h2>
+            
+            <div class="sci-fi-card p-6">
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 id="quiz-title" class="text-lg font-semibold text-cyan-300">Question 1 of 5</h3>
+                        <span class="sci-fi-card px-3 py-1 text-sm font-semibold text-cyan-300">
+                            Score: <span id="quiz-score">0</span>/5
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-800 rounded-full h-2">
+                        <div id="quiz-progress" class="bg-gradient-to-r from-cyan-500 to-teal-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div id="quiz-container">
+                    <!-- Quiz will be dynamically loaded here -->
+                </div>
+                
+                <div class="mt-6 text-center">
+                    <button id="start-quiz" class="sci-fi-button px-8 py-3">
+                        <i class="fas fa-play mr-2"></i>Start Quiz
+                    </button>
+                    <button id="next-question" class="sci-fi-button px-8 py-3 hidden">
+                        Next Question<i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recycling Tips & Best Practices -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold neon-text mb-6">
+                <i class="fas fa-lightbulb mr-2"></i>Recycling Tips & Best Practices
+            </h2>
+            
+            <div class="sci-fi-card p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="sci-fi-card p-4 bg-gradient-to-br from-cyan-900 to-teal-900">
+                        <div class="flex items-start mb-3">
+                            <i class="fas fa-check-circle text-green-400 text-xl mr-3 mt-1"></i>
+                            <div>
+                                <h3 class="font-bold text-cyan-300 mb-1">Do Recycle</h3>
+                                <ul class="text-cyan-200 text-sm space-y-1">
+                                    <li>✓ Clean plastic bottles & containers</li>
+                                    <li>✓ Paper & cardboard (dry)</li>
+                                    <li>✓ Glass bottles & jars</li>
+                                    <li>✓ Aluminum & steel cans</li>
+                                    <li>✓ Clean food containers</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sci-fi-card p-4 bg-gradient-to-br from-red-900 to-pink-900">
+                        <div class="flex items-start mb-3">
+                            <i class="fas fa-times-circle text-red-400 text-xl mr-3 mt-1"></i>
+                            <div>
+                                <h3 class="font-bold text-cyan-300 mb-1">Don't Recycle</h3>
+                                <ul class="text-cyan-200 text-sm space-y-1">
+                                    <li>✗ Plastic bags (take to store)</li>
+                                    <li>✗ Pizza boxes with grease</li>
+                                    <li>✗ Broken glass or mirrors</li>
+                                    <li>✗ Styrofoam containers</li>
+                                    <li>✗ Batteries & electronics</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 sci-fi-card p-4">
+                    <h3 class="font-bold text-cyan-300 mb-2">Pro Tips</h3>
+                    <ul class="text-cyan-200 text-sm space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-shower text-cyan-400 mr-2 mt-1"></i>
+                            <span>Rinse containers to remove food residue before recycling</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-compress-alt text-cyan-400 mr-2 mt-1"></i>
+                            <span>Flatten cardboard boxes to save space in recycling bins</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-layer-group text-cyan-400 mr-2 mt-1"></i>
+                            <span>Keep plastic caps ON bottles - they're recyclable too!</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt text-cyan-400 mr-2 mt-1"></i>
+                            <span>Check local recycling guidelines - rules vary by location</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Recycling Assistant -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold neon-text mb-6">
+                <i class="fas fa-robot mr-2"></i>AI Recycling Assistant
+            </h2>
+            
+            <div class="sci-fi-card p-6">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="md:w-1/3 mb-6 md:mb-0 md:pr-6">
+                        <div class="bg-gradient-to-br from-cyan-600 to-teal-800 rounded-lg p-6 text-center glow-effect">
+                            <i class="fas fa-robot text-5xl mb-4 neon-text"></i>
+                            <h3 class="text-xl font-bold mb-2">RecycleBot AI</h3>
+                            <p class="text-cyan-200">Your AI-powered recycling guide</p>
+                        </div>
+                    </div>
+                    
+                    <div class="md:w-2/3">
+                        <div class="mb-4">
+                            <p class="text-cyan-300">Ask about any item and I'll tell you how to recycle it properly!</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="sci-fi-card p-4">
+                                <p class="text-cyan-200">Try asking: "How do I recycle pizza boxes?" or "What bin does a broken mirror go in?"</p>
+                            </div>
+                            
+                            <div class="flex">
+                                <input type="text" id="ai-question" placeholder="Ask me about recycling..." class="sci-fi-input flex-grow rounded-l-lg p-3">
+                                <button id="ask-ai" class="sci-fi-button rounded-r-lg px-6">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            
+                            <div id="sample-questions" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <p class="text-cyan-300 text-sm mb-2 col-span-full">Try asking:</p>
+                                <!-- Sample questions will be added dynamically -->
+                            </div>
+                            
+                            <div id="ai-response" class="sci-fi-card p-4 hidden">
+                                <div class="flex">
+                                    <div class="mr-3 text-cyan-400">
+                                        <i class="fas fa-robot text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p id="ai-response-text" class="text-cyan-200"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Confetti Container -->
+    <div id="confetti-container" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></div>
+
+    <script>
+        // User data
+       ` let userTokens = 1000;
+               let userLevel = 1;
+               let userProgress = 0;
+               let earnedTokens = 0;
+               
+               // Waste items data
+               const wasteItems = [
+                   { id: 1, name: "Plastic Bottle", category: "plastic", icon: "fas fa-wine-bottle", color: "cyan" },
+                   { id: 2, name: "Newspaper", category: "paper", icon: "fas fa-newspaper", color: "cyan" },
+                   { id: 3, name: "Glass Jar", category: "glass", icon: "fas fa-jar", color: "cyan" },
+                   { id: 4, name: "Banana Peel", category: "organic", icon: "fas fa-apple-alt", color: "cyan" },
+                   { id: 5, name: "Plastic Bag", category: "plastic", icon: "fas fa-shopping-bag", color: "cyan" },
+                   { id: 6, name: "Cardboard Box", category: "paper", icon: "fas fa-box", color: "cyan" },
+                   { id: 7, name: "Wine Bottle", category: "glass", icon: "fas fa-wine-bottle-alt", color: "cyan" },
+                   { id: 8, name: "Eggshells", category: "organic", icon: "fas fa-egg", color: "cyan" }
+               ];
+               
+               // Quiz data
+               const quizQuestions = [
+                   {
+                       question: "Which of these items should NOT go in the recycling bin?",
+                       options: [
+                           "Clean plastic bottles",
+                           "Pizza boxes with grease stains",
+                           "Aluminum cans",
+                           "Cardboard boxes"
+                       ],
+                       correct: 1,
+                       explanation: "Pizza boxes with grease stains should go in compost or trash, not recycling."
+                   },
+                   {
+                       question: "What should you do with plastic bottle caps before recycling?",
+                       options: [
+                           "Throw them away separately",
+                           "Leave them on the bottle",
+                           "Collect them for crafts",
+                           "Wash and recycle separately"
+                       ],
+                       correct: 1,
+                       explanation: "Most recycling facilities prefer caps left on bottles to prevent them from getting lost."
+                   },
+                   {
+                       question: "Which type of glass cannot be recycled with regular glass bottles?",
+                       options: [
+                           "Wine bottles",
+                           "Jam jars",
+                           "Drinking glasses",
+                           "Beer bottles"
+                       ],
+                       correct: 2,
+                       explanation: "Drinking glasses have different melting points and should not be mixed with container glass."
+                   },
+                   {
+                       question: "What is the main benefit of recycling aluminum cans?",
+                       options: [
+                           "Saves 95% of energy compared to new production",
+                           "Makes them stronger",
+                           "Changes their color",
+                           "Makes them lighter"
+                       ],
+                       correct: 0,
+                       explanation: "Recycling aluminum saves 95% of the energy needed to make new cans from raw materials."
+                   },
+                   {
+                       question: "How should you prepare cardboard boxes for recycling?",
+                       options: [
+                           "Flatten them",
+                           "Leave them assembled",
+                           "Shred them into small pieces",
+                           "Wet them first"
+                       ],
+                       correct: 0,
+                       explanation: "Flattening cardboard boxes saves space in recycling trucks and facilities."
+                   }
+               ];
+               
+               // Tutorial steps
+               const tutorialSteps = [
+                   {
+                       title: "Step 1: Know Your Materials",
+                       description: "Learn what materials can be recycled in your area. Common recyclables include paper, plastic, glass, and metal.",
+                       animation: "https://assets5.lottiefiles.com/packages/lf20_yy4tqskb.json"
+                   },
+                   {
+                       title: "Step 2: Clean Before Recycling",
+                       description: "Rinse containers to remove food residue. This prevents contamination and keeps recycling facilities clean.",
+                       animation: "https://assets2.lottiefiles.com/packages/lf20_4kx2q32h.json"
+                   },
+                   {
+                       title: "Step 3: Sort Properly",
+                       description: "Separate materials by type. Some areas require single-stream recycling, while others need separated materials.",
+                       animation: "https://assets10.lottiefiles.com/packages/lf20_uzvc8n7h.json"
+                   },
+                   {
+                       title: "Step 4: Avoid Wishcycling",
+                       description: "Don't put questionable items in the bin hoping they'll be recycled. When in doubt, throw it out or check local guidelines.",
+                       animation: "https://assets9.lottiefiles.com/packages/lf20_svy4ivvy.json"
+                   },
+                   {
+                       title: "Step 5: Reduce and Reuse First",
+                       description: "Remember: Reduce and Reuse come before Recycle. Try to minimize waste before relying on recycling.",
+                       animation: "https://assets2.lottiefiles.com/packages/lf20_isyujjsx.json"
+                   }
+               ];
+               
+               // Game state
+               let sortedItems = [];
+               let currentTutorialStep = 0;
+               let currentQuizQuestion = 0;
+               let quizScore = 0;
+               let quizStarted = false;
+               
+               // DOM Elements
+               const tokenBalanceEl = document.getElementById('token-balance');
+               const userLevelEl = document.getElementById('user-level');
+               const progressPercentEl = document.getElementById('progress-percent');
+               const progressBarEl = document.getElementById('progress-bar');
+               
+               // Initialize the page
+               document.addEventListener('DOMContentLoaded', function() {
+                   updateUserInfo();
+                   initializeWasteCategorization();
+                   initializeTutorial();
+                   initializeQuiz();
+                   initializeAI();
+               });
+               
+               // Update user info display
+               function updateUserInfo() {
+                   tokenBalanceEl.textContent = userTokens;
+                   userLevelEl.textContent = userLevel;
+                   
+                   // Calculate progress percentage
+                   const progressPercent = Math.min(100, (userProgress / 500) * 100);
+                   progressPercentEl.textContent = `${Math.round(progressPercent)}%`;
+                   progressBarEl.style.width = `${progressPercent}%`;
+               }
+               
+               // Initialize waste categorization game
+               function initializeWasteCategorization() {
+                   const wasteItemsContainer = document.getElementById('waste-items');
+                   wasteItemsContainer.innerHTML = '';
+                   
+                   // Shuffle waste items
+                   const shuffledItems = [...wasteItems]`.sort(() => Math.random() - 0.5);
+            
+            // Create waste item elements
+            shuffledItems.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = `sci-fi-card p-4 text-center cursor-pointer transition-all duration-300 waste-item glow-effect`;
+                itemEl.dataset.id = item.id;
+                itemEl.dataset.category = item.category;
+                itemEl.innerHTML = `
+                    <div class="mb-2">
+                        <i class="${item.icon} text-cyan-400 text-3xl"></i>
+                    </div>
+                    <p class="text-sm font-semibold text-cyan-300">${item.name}</p>
+                `;
+                
+                // Make item draggable
+                itemEl.draggable = true;
+                itemEl.addEventListener('dragstart', handleDragStart);
+                
+                wasteItemsContainer.appendChild(itemEl);
+            });
+            
+            // Setup drop zones
+            const bins = ['plastic-bin', 'paper-bin', 'glass-bin', 'organic-bin'];
+            bins.forEach(binId => {
+                const bin = document.getElementById(binId);
+                bin.addEventListener('dragover', handleDragOver);
+                bin.addEventListener('drop', handleDrop);
+            });
+            
+            // Reset button
+            document.getElementById('reset-categories').addEventListener('click', function() {
+                sortedItems = [];
+                initializeWasteCategorization();
+                document.getElementById('categorization-feedback').classList.add('hidden');
+            });
+        }
+        
+        // Drag and drop handlers
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            const itemId = e.dataTransfer.getData('text/plain');
+            const item = wasteItems.find(i => i.id == itemId);
+            const binCategory = e.target.closest('.category-card').dataset.category;
+            
+            // Check if correct
+            const isCorrect = item.category === binCategory;
+            
+            // Add to sorted items if not already sorted
+            if (!sortedItems.some(i => i.id == itemId)) {
+                sortedItems.push({...item, correct: isCorrect});
+                
+                // Remove item from waste items area
+                const itemEl = document.querySelector(`.waste-item[data-id="${itemId}"]`);
+                if (itemEl) {
+                    itemEl.style.opacity = '0.5';
+                    itemEl.style.transform = 'scale(0.9)';
+                    itemEl.draggable = false;
+                }
+                
+                // Add visual feedback to bin
+                const bin = e.target.closest('.category-card').querySelector('[id$="-bin"]');
+                if (isCorrect) {
+                    bin.classList.add('bg-gradient-to-br', 'from-green-900', 'to-emerald-900');
+                    bin.classList.remove('drop-zone');
+                } else {
+                    bin.classList.add('bg-gradient-to-br', 'from-red-900', 'to-pink-900');
+                    bin.classList.remove('drop-zone');
+                }
+                
+                // Show feedback message
+                const feedbackEl = document.getElementById('categorization-feedback');
+                const feedbackText = feedbackEl.querySelector('p');
+                
+                if (isCorrect) {
+                    feedbackEl.className = 'mt-6 p-4 rounded-lg sci-fi-card bg-gradient-to-r from-green-900 to-emerald-900';
+                    feedbackText.textContent = `✓ Correct! ${item.name} goes in the ${item.category} bin.`;
+                    feedbackText.className = 'text-center font-semibold text-green-300';
+                } else {
+                    feedbackEl.className = 'mt-6 p-4 rounded-lg sci-fi-card bg-gradient-to-r from-red-900 to-pink-900';
+                    feedbackText.textContent = `✗ Incorrect! ${item.name} should go in the ${item.category} bin, not ${binCategory}.`;
+                    feedbackText.className = 'text-center font-semibold text-red-300';
+                }
+                
+                feedbackEl.classList.remove('hidden');
+                
+                // Check if all items are sorted
+                if (sortedItems.length === wasteItems.length) {
+                    setTimeout(() => {
+                        const correctCount = sortedItems.filter(item => item.correct).length;
+                        const score = Math.round((correctCount / wasteItems.length) * 100);
+                        
+                        let message = '';
+                        let tokensEarned = 0;
+                        if (score === 100) {
+                            message = `Perfect! You sorted all ${wasteItems.length} items correctly!`;
+                            tokensEarned = 100;
+                            createConfetti();
+                        } else if (score >= 80) {
+                            message = `Great job! You sorted ${correctCount} out of ${wasteItems.length} items correctly.`;
+                            tokensEarned = 75;
+                        } else if (score >= 60) {
+                            message = `Good effort! You sorted ${correctCount} out of ${wasteItems.length} items correctly.`;
+                            tokensEarned = 50;
+                        } else {
+                            message = `You sorted ${correctCount} out of ${wasteItems.length} items correctly. Keep practicing!`;
+                            tokensEarned = 25;
+                        }
+                        
+                        awardTokens(tokensEarned);
+                        feedbackText.textContent = `${message} +${tokensEarned} tokens!`;
+                        feedbackEl.className = 'mt-6 p-4 rounded-lg sci-fi-card bg-gradient-to-r from-cyan-900 to-blue-900';
+                        feedbackText.className = 'text-center font-semibold text-cyan-300';
+                        
+                        // Send score to server
+                        fetch('/api/recycling/complete-categorization', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                score: score
+                            })
+                        }).catch(error => console.error('Error saving score:', error));
+                    }, 1000);
+                }
+            }
+        }
+        
+        // Initialize tutorial
+        function initializeTutorial() {
+            const tutorialStepsContainer = document.getElementById('tutorial-steps');
+            tutorialStepsContainer.innerHTML = '';
+            
+            tutorialSteps.forEach((step, index) => {
+                const stepEl = document.createElement('div');
+                stepEl.className = `tutorial-step sci-fi-card p-4 ${index === 0 ? 'active' : ''}`;
+                stepEl.dataset.index = index;
+                stepEl.innerHTML = `
+                    <div class="flex items-start">
+                        <div class="tutorial-number rounded-full w-8 h-8 flex items-center justify-center mr-3">
+                            ${index + 1}
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-cyan-300 mb-1">${step.title}</h4>
+                            <p class="text-cyan-200 text-sm">${step.description}</p>
+                        </div>
+                    </div>
+                `;
+                
+                tutorialStepsContainer.appendChild(stepEl);
+            });
+            
+            // Update animation for first step
+            updateTutorialAnimation(0);
+            
+            // Navigation buttons
+            document.getElementById('prev-step').addEventListener('click', () => {
+                if (currentTutorialStep > 0) {
+                    currentTutorialStep--;
+                    updateTutorialStep();
+                }
+            });
+            
+            document.getElementById('next-step').addEventListener('click', () => {
+                if (currentTutorialStep < tutorialSteps.length - 1) {
+                    currentTutorialStep++;
+                    updateTutorialStep();
+                } else {
+                    // Tutorial completed
+                    awardTokens(30);
+                    showNotification('Tutorial completed! +30 tokens earned.', 'success');
+                    
+                    // Notify server
+                    fetch('/api/recycling/complete-tutorial', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }).catch(error => console.error('Error saving tutorial completion:', error));
+                }
+            });
+        }
+        
+        function updateTutorialStep() {
+            // Update active step styling
+            document.querySelectorAll('.tutorial-step').forEach((step, index) => {
+                if (index === currentTutorialStep) {
+                    step.classList.add('active');
+                    step.classList.add('glow-effect');
+                } else {
+                    step.classList.remove('active');
+                    step.classList.remove('glow-effect');
+                }
+            });
+            
+            // Update animation
+            updateTutorialAnimation(currentTutorialStep);
+            
+            // Update button states
+            document.getElementById('prev-step').disabled = currentTutorialStep === 0;
+            document.getElementById('next-step').textContent = 
+                currentTutorialStep === tutorialSteps.length - 1 ? 'Complete' : 'Next';
+        }
+        
+        function updateTutorialAnimation(stepIndex) {
+            const animationContainer = document.getElementById('tutorial-animation');
+            animationContainer.innerHTML = `
+                <lottie-player
+                    id="recycle-animation"
+                    src="${tutorialSteps[stepIndex].animation}"
+                    background="transparent"
+                    speed="1"
+                    style="width: 300px; height: 300px;"
+                    loop
+                    autoplay>
+                </lottie-player>
+            `;
+        }
+        
+        // Initialize quiz
+        function initializeQuiz() {
+            document.getElementById('start-quiz').addEventListener('click', startQuiz);
+            document.getElementById('next-question').addEventListener('click', nextQuestion);
+        }
+        
+        function startQuiz() {
+            quizStarted = true;
+            currentQuizQuestion = 0;
+            quizScore = 0;
+            
+            document.getElementById('start-quiz').classList.add('hidden');
+            document.getElementById('next-question').classList.remove('hidden');
+            
+            loadQuestion(currentQuizQuestion);
+        }
+        
+        function loadQuestion(questionIndex) {
+            const question = quizQuestions[questionIndex];
+            const quizContainer = document.getElementById('quiz-container');
+            const quizTitle = document.getElementById('quiz-title');
+            const quizProgress = document.getElementById('quiz-progress');
+            
+            // Update title and progress
+            quizTitle.textContent = `Question ${questionIndex + 1} of ${quizQuestions.length}`;
+            quizProgress.style.width = `${((questionIndex) / quizQuestions.length) * 100}%`;
+            
+            // Create question HTML
+            quizContainer.innerHTML = `
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-cyan-300 mb-4">${question.question}</h3>
+                    <div class="space-y-3" id="quiz-options">
+                        ${question.options.map((option, index) => `
+                            <div class="quiz-option sci-fi-card p-4 cursor-pointer hover:transform hover:scale-[1.02] transition-transform" data-index="${index}">
+                                <div class="flex items-center">
+                                    <div class="sci-fi-card border border-cyan-500 rounded-full w-6 h-6 flex items-center justify-center mr-3">
+                                        <span class="text-sm font-semibold text-cyan-300">${String.fromCharCode(65 + index)}</span>
+                                    </div>
+                                    <span class="text-cyan-200">${option}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div id="quiz-explanation" class="hidden mt-4 p-4 sci-fi-card">
+                    <p class="text-cyan-300 font-semibold" id="explanation-text"></p>
+                </div>
+            `;
+            
+            // Add click handlers to options
+            document.querySelectorAll('.quiz-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    if (this.classList.contains('selected')) return;
+                    
+                    const selectedIndex = parseInt(this.dataset.index);
+                    const isCorrect = selectedIndex === question.correct;
+                    
+                    // Mark all options
+                    document.querySelectorAll('.quiz-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                        if (parseInt(opt.dataset.index) === question.correct) {
+                            opt.classList.add('correct');
+                        } else if (parseInt(opt.dataset.index) === selectedIndex && !isCorrect) {
+                            opt.classList.add('incorrect');
+                        }
+                        opt.style.pointerEvents = 'none';
+                    });
+                    
+                    // Mark selected option
+                    this.classList.add('selected');
+                    if (isCorrect) {
+                        quizScore++;
+                        document.getElementById('quiz-score').textContent = quizScore;
+                    }
+                    
+                    // Show explanation
+                    const explanationEl = document.getElementById('quiz-explanation');
+                    document.getElementById('explanation-text').textContent = question.explanation;
+                    explanationEl.classList.remove('hidden');
+                    
+                    // Update next button text
+                    document.getElementById('next-question').textContent = 
+                        questionIndex === quizQuestions.length - 1 ? 'Finish Quiz' : 'Next Question';
+                });
+            });
+        }
+        
+        function nextQuestion() {
+            if (currentQuizQuestion < quizQuestions.length - 1) {
+                currentQuizQuestion++;
+                loadQuestion(currentQuizQuestion);
+            } else {
+                finishQuiz();
+            }
+        }
+        
+        function finishQuiz() {
+            const scorePercent = (quizScore / quizQuestions.length) * 100;
+            let message = '';
+            let tokensEarned = 0;
+            
+            if (scorePercent === 100) {
+                message = 'Perfect score! You\'re a recycling expert!';
+                tokensEarned = 100;
+                createConfetti();
+            } else if (scorePercent >= 80) {
+                message = 'Great job! You know your recycling facts well.';
+                tokensEarned = 75;
+            } else if (scorePercent >= 60) {
+                message = 'Good effort! Keep learning about recycling.';
+                tokensEarned = 50;
+            } else {
+                message = 'Keep practicing! Recycling knowledge comes with time.';
+                tokensEarned = 25;
+            }
+            
+            awardTokens(tokensEarned);
+            
+            document.getElementById('quiz-container').innerHTML = `
+                <div class="text-center py-8">
+                    <div class="text-6xl mb-4">${scorePercent === 100 ? '🎉' : scorePercent >= 80 ? '👍' : '📚'}</div>
+                    <h3 class="text-xl font-bold text-cyan-300 mb-2">Quiz Complete!</h3>
+                    <p class="text-cyan-200 mb-2">Your score: ${quizScore}/${quizQuestions.length} (${Math.round(scorePercent)}%)</p>
+                    <p class="text-cyan-300 mb-4">${message}</p>
+                    <p class="text-yellow-400 font-bold">+${tokensEarned} tokens earned!</p>
+                </div>
+            `;
+            
+            document.getElementById('next-question').classList.add('hidden');
+            document.getElementById('start-quiz').classList.remove('hidden');
+            document.getElementById('start-quiz').textContent = 'Restart Quiz';
+            
+            quizStarted = false;
+            
+            // Send score to server
+            fetch('/api/recycling/complete-quiz', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    score: scorePercent
+                })
+            }).catch(error => console.error('Error saving quiz score:', error));
+        }
+        
+        // Initialize AI assistant
+        function initializeAI() {
+            const askButton = document.getElementById('ask-ai');
+            const questionInput = document.getElementById('ai-question');
+            const responseEl = document.getElementById('ai-response');
+            const responseText = document.getElementById('ai-response-text');
+            const sampleContainer = document.getElementById('sample-questions');
+            
+            // Sample recycling Q&A for fallback
+            const recyclingQA = {
+                'pizza box': 'Pizza boxes with grease stains should go in compost or trash, not recycling. If the box is clean, tear off the clean parts for recycling.',
+                'plastic bag': 'Most plastic bags should be returned to grocery store drop-off bins, not regular recycling. They tangle recycling machinery.',
+                'broken mirror': 'Broken mirrors go in trash, not recycling. The coating makes them unsuitable for glass recycling.',
+                'battery': 'Batteries should be taken to special collection points. Never put them in regular trash or recycling due to fire risk.',
+                'light bulb': 'LED and CFL bulbs contain hazardous materials. Check with local waste facility or hardware stores for proper disposal.',
+                'styrofoam': 'Most Styrofoam is not recyclable in regular bins. Some cities have special drop-off locations.',
+                'electronic': 'Electronics should be recycled at e-waste facilities. They contain valuable materials and hazardous substances.',
+                'glass': 'Yes, glass is recyclable! Rinse bottles and jars before recycling. Remove caps unless local guidelines say otherwise.',
+                'plastic': 'Check the recycling symbol. #1 (PET) and #2 (HDPE) are widely accepted. Always rinse containers.',
+                'paper': 'Most paper is recyclable. Keep it dry and clean. Shredded paper may need special handling.',
+                'can': 'Aluminum and steel cans are highly recyclable. Rinse them clean before recycling.',
+                'default': 'For specific recycling questions, check your local municipality\'s guidelines. When in doubt, look it up online!'
+            };
+            
+            // Add sample questions
+            const sampleQuestions = [
+                "How do I recycle pizza boxes?",
+                "Can I recycle plastic bags?",
+                "What to do with broken glass?",
+                "Where to dispose of batteries?"
+            ];
+            
+            sampleQuestions.forEach(q => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'sci-fi-button text-xs py-2 px-3';
+                button.textContent = q;
+                button.addEventListener('click', () => {
+                    questionInput.value = q;
+                    askButton.click();
+                });
+                sampleContainer.appendChild(button);
+            });
+            
+            askButton.addEventListener('click', async function() {
+                const question = questionInput.value.toLowerCase().trim();
+                
+                if (!question) {
+                    showNotification('Please ask a question about recycling.', 'error');
+                    return;
+                }
+                
+                // Show loading state
+                responseText.textContent = 'Thinking...';
+                responseEl.classList.remove('hidden');
+                askButton.disabled = true;
+                
+                try {
+                    // Send to server for AI response
+                    const response = await fetch('/api/recycling/ask-ai', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            question: question
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        responseText.textContent = result.answer;
+                        awardTokens(5); // Small reward for using AI
+                    } else {
+                        // Fallback to predefined responses
+                        let answer = recyclingQA.default;
+                        for (const [keyword, response] of Object.entries(recyclingQA)) {
+                            if (question.includes(keyword)) {
+                                answer = response;
+                                break;
+                            }
+                        }
+                        responseText.textContent = answer;
+                        awardTokens(2);
+                    }
+                } catch (error) {
+                    console.error('Error getting AI response:', error);
+                    // Fallback to local Q&A
+                    let answer = recyclingQA.default;
+                    for (const [keyword, response] of Object.entries(recyclingQA)) {
+                        if (question.includes(keyword)) {
+                            answer = response;
+                            break;
+                        }
+                    }
+                    responseText.textContent = answer;
+                    awardTokens(2);
+                }
+                
+                // Clear input and re-enable button
+                questionInput.value = '';
+                askButton.disabled = false;
+                questionInput.focus();
+            });
+            
+            // Allow Enter key
+            questionInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    askButton.click();
+                }
+            });
+        }
+        
+        // Award tokens to user
+        function awardTokens(amount) {
+            userTokens += amount;
+            userProgress += amount;
+            
+            // Check for level up
+            if (userProgress >= 500) {
+                userLevel++;
+                userProgress = userProgress % 500;
+                showNotification(`🎉 Level Up! You're now Level ${userLevel}!`, 'success', 5000);
+                createConfetti();
+            }
+            
+            updateUserInfo();
+            showNotification(`+${amount} tokens!`, 'success');
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#00e5ff', '#00bcd4', '#006064', '#00ff9d', '#00ff00'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-10px';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                
+                container.appendChild(confetti);
+                
+                // Animate
+                const animation = confetti.animate([
+                    { top: '-10px', opacity: 1, transform: `rotate(${Math.random() * 360}deg)` },
+                    { top: '100vh', opacity: 0, transform: `rotate(${Math.random() * 720}deg)` }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'info', duration = 3000) {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Create notification
+            const notification = document.createElement('div');
+            const bgColor = type === 'error' ? 'bg-gradient-to-r from-red-900 to-pink-900' : 
+                         type === 'success' ? 'bg-gradient-to-r from-green-900 to-emerald-900' :
+                         'bg-gradient-to-r from-cyan-900 to-blue-900';
+            
+            notification.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 fade-in sci-fi-card ${bgColor}`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'} mr-2 text-cyan-300"></i>
+                    <span class="text-cyan-200">${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after duration
+            setTimeout(() => {
+                notification.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
+        }
+    </script>
+</body>
+</html> 

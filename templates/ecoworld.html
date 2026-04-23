@@ -1,0 +1,2393 @@
+<!DOCTYPE html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoSim City Builder - Realistic Urban Planning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 320px;
+            gap: 16px;
+            padding: 16px;
+            height: 100vh;
+        }
+
+        .panel {
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #334155;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(12px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-left {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .panel-right {
+            border-left: 4px solid #10b981;
+        }
+
+        .panel-center {
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .header {
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #475569;
+        }
+
+        .city-name-display {
+            font-size: 24px;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 8px;
+        }
+
+        .city-name-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .city-name-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 3px solid;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 4px 0;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        .meter-container {
+            margin: 16px 0;
+        }
+
+        .meter-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .meter-bar {
+            height: 8px;
+            background: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 16px;
+            position: sticky;
+            top: 0;
+            background: rgba(30, 41, 59, 0.95);
+            padding: 8px 0;
+            z-index: 10;
+        }
+
+        .tab {
+            padding: 6px 12px;
+            background: #475569;
+            border: none;
+            border-radius: 6px;
+            color: #cbd5e1;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 60px;
+        }
+
+        .tab.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .tab:hover:not(.active) {
+            background: #64748b;
+        }
+
+        .buildings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .building-card {
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .building-card:hover {
+            border-color: #60a5fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .building-card.selected {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .building-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .building-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .building-name {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #e2e8f0;
+        }
+
+        .building-cost {
+            font-size: 11px;
+            color: #fbbf24;
+            margin-bottom: 6px;
+        }
+
+        .building-stats {
+            font-size: 10px;
+            color: #94a3b8;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .game-area {
+            position: relative;
+            background: linear-gradient(135deg, #1e40af, #1e3a8a);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #cityCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: crosshair;
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        .mode-selector {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            gap: 8px;
+            border: 1px solid #475569;
+            z-index: 100;
+        }
+
+        .mode-btn {
+            padding: 6px 12px;
+            background: #475569;
+            border: none;
+            border-radius: 6px;
+            color: #cbd5e1;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .game-controls {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            padding: 8px 16px;
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: #475569;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.primary {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .control-btn.warning {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+        }
+
+        .resource-update {
+            position: absolute;
+            font-size: 12px;
+            font-weight: 700;
+            pointer-events: none;
+            z-index: 1000;
+            animation: floatUp 1s ease-out forwards;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+        }
+
+        .time-display {
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .current-time {
+            font-size: 20px;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+
+        .game-date {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.95);
+            border-left: 4px solid;
+            border-radius: 8px;
+            padding: 16px;
+            max-width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.info { border-left-color: #3b82f6; }
+        .notification.success { border-left-color: #10b981; }
+        .notification.warning { border-left-color: #f59e0b; }
+        .notification.error { border-left-color: #ef4444; }
+
+        .city-log {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            font-size: 11px;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: #cbd5e1;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-timestamp {
+            color: #94a3b8;
+            margin-right: 8px;
+        }
+
+        .city-info-box {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 8px;
+            padding: 12px;
+            max-width: 250px;
+            border: 1px solid #475569;
+            z-index: 100;
+        }
+
+        .info-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #60a5fa;
+        }
+
+        .info-stats {
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        .delete-confirm {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .delete-box {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            border: 1px solid #475569;
+        }
+
+        .delete-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .delete-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .delete-btn.cancel {
+            background: #475569;
+            color: #e2e8f0;
+        }
+
+        .delete-btn.confirm {
+            background: #ef4444;
+            color: white;
+        }
+
+        .scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollbar::-webkit-scrollbar-track {
+            background: rgba(51, 65, 85, 0.3);
+            border-radius: 3px;
+        }
+
+        .scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+
+        .scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #e2e8f0;
+            z-index: 1000;
+            pointer-events: none;
+            max-width: 200px;
+        }
+
+        .tax-rate-display {
+            margin: 12px 0;
+            padding: 12px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .tax-rate-label {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .tax-rate-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+
+        .budget-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .budget-item {
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 6px;
+            padding: 8px;
+        }
+
+        .budget-label {
+            font-size: 10px;
+            color: #94a3b8;
+        }
+
+        .budget-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .budget-value.positive {
+            color: #10b981;
+        }
+
+        .budget-value.negative {
+            color: #ef4444;
+        }
+
+        .emergency-alert {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .alert-message {
+            font-size: 11px;
+            color: #fca5a5;
+            font-weight: 600;
+        }
+
+        .zone-indicator {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        .zone-value {
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1400px) {
+            .game-container {
+                grid-template-columns: 280px 1fr 280px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .game-container {
+                grid-template-columns: 250px 1fr 250px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .game-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .panel {
+                min-height: 400px;
+            }
+        }
+
+        #cityCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: crosshair;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        .game-area {
+            position: relative;
+            background: linear-gradient(135deg, #1e40af, #1e3a8a);
+            border-radius: 12px;
+            overflow: hidden;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+
+        .canvas-loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="panel panel-left scrollbar">
+            <div class="header">
+                <a href="/dashboard" class="nav-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <div class="city-name-display" id="cityNameDisplay">New EcoCity</div>
+                <input type="text" class="city-name-input" id="cityNameInput" 
+                       placeholder="Enter city name..." maxlength="32">
+                <h5><strong>Note:</strong> This Webpage can lag based on your computer's memory.</h5>
+                
+                <div class="zone-indicator">
+                    Grid: <span class="zone-value" id="zoneIndicator">0/0</span>
+                    Population Density: <span class="zone-value" id="densityIndicator">Low</span>
+                </div>
+            </div>
+
+            <div class="budget-display">
+                <div class="budget-item">
+                    <div class="budget-label">Monthly Income</div>
+                    <div class="budget-value positive" id="monthlyIncome">$0</div>
+                </div>
+                <div class="budget-item">
+                    <div class="budget-label">Monthly Expenses</div>
+                    <div class="budget-value negative" id="monthlyExpenses">$0</div>
+                </div>
+                <div class="budget-item">
+                    <div class="budget-label">City Treasury</div>
+                    <div class="budget-value" id="cityTreasury">$50,000</div>
+                </div>
+                <div class="budget-item">
+                    <div class="budget-label">Tax Revenue</div>
+                    <div class="budget-value" id="taxRevenue">$0</div>
+                </div>
+            </div>
+
+            <div class="tax-rate-display">
+                <div class="tax-rate-label">Property Tax Rate</div>
+                <div class="tax-rate-value" id="taxRateValue">9%</div>
+                <input type="range" id="taxRateSlider" min="1" max="20" value="9" 
+                       style="width: 100%; margin-top: 8px;">
+                <div style="font-size: 10px; color: #94a3b8; margin-top: 4px;">
+                    Higher taxes reduce happiness but increase revenue
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box" style="border-left-color: #3b82f6;">
+                    <div class="stat-label">Population</div>
+                    <div class="stat-value" id="populationValue">1,000</div>
+                </div>
+                <div class="stat-box" style="border-left-color: #10b981;">
+                    <div class="stat-label">Employment</div>
+                    <div class="stat-value" id="employmentValue">45%</div>
+                </div>
+                <div class="stat-box" style="border-left-color: #f59e0b;">
+                    <div class="stat-label">Monthly Growth</div>
+                    <div class="stat-value" id="growthValue">+2.1%</div>
+                </div>
+                <div class="stat-box" style="border-left-color: #8b5cf6;">
+                    <div class="stat-label">Crime Rate</div>
+                    <div class="stat-value" id="crimeValue">12%</div>
+                </div>
+            </div>
+
+            <div class="meter-container">
+                <div class="meter-header">
+                    <span>Power Capacity</span>
+                    <span id="powerValue">45/100 MW</span>
+                </div>
+                <div class="meter-bar">
+                    <div class="meter-fill" id="powerBar" style="width: 45%; background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div>
+                </div>
+            </div>
+
+            <div class="meter-container">
+                <div class="meter-header">
+                    <span>Water Supply</span>
+                    <span id="waterValue">78/100 ML</span>
+                </div>
+                <div class="meter-bar">
+                    <div class="meter-fill" id="waterBar" style="width: 78%; background: linear-gradient(90deg, #0ea5e9, #38bdf8);"></div>
+                </div>
+            </div>
+
+            <div class="meter-container">
+                <div class="meter-header">
+                    <span>City Happiness</span>
+                    <span id="happinessValue">65%</span>
+                </div>
+                <div class="meter-bar">
+                    <div class="meter-fill" id="happinessBar" style="width: 65%; background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);"></div>
+                </div>
+            </div>
+
+            <div class="meter-container">
+                <div class="meter-header">
+                    <span>Pollution Level</span>
+                    <span id="pollutionValue">22%</span>
+                </div>
+                <div class="meter-bar">
+                    <div class="meter-fill" id="pollutionBar" style="width: 22%; background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444);"></div>
+                </div>
+            </div>
+
+            <div id="emergencyAlert" class="emergency-alert" style="display: none;">
+                <div class="alert-message" id="alertMessage"></div>
+            </div>
+
+            <div class="city-log scrollbar">
+                <div class="log-entry">
+                    <span class="log-timestamp">12:30</span>
+                    City founded. Initial population: 1,000
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">12:32</span>
+                    Residential zone planned. Construction started
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">12:35</span>
+                    Power plant operational. Grid capacity: 45 MW
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">12:40</span>
+                    Water treatment facility completed
+                </div>
+            </div>
+
+            <div class="time-display">
+                <div class="current-time" id="gameTime">12:45 PM</div>
+                <div class="game-date" id="gameDate">Year 1, Month 1, Day 15</div>
+                <div style="font-size: 10px; color: #94a3b8; margin-top: 4px;">
+                    Game Speed: <span id="gameSpeed">1x</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-center game-area">
+            <canvas id="cityCanvas"></canvas>
+            <div class="grid-overlay"></div>
+
+            <div class="mode-selector">
+                <button class="mode-btn active" id="buildModeBtn">🏗️ Zone</button>
+                <button class="mode-btn" id="selectModeBtn">🔍 Inspect</button>
+                <button class="mode-btn" id="bulldozeModeBtn">🚜 Bulldoze</button>
+                <button class="mode-btn" id="policiesModeBtn">📜 Policies</button>
+            </div>
+
+            <div class="game-controls">
+                <button class="control-btn" onclick="toggleGameSpeed()">
+                    ⏸️ <span id="pauseText">Pause</span>
+                </button>
+                <button class="control-btn primary" onclick="saveGame()">
+                    💾 Save City
+                </button>
+                <button class="control-btn" onclick="showCityReport()">
+                    📊 Report
+                </button>
+                <button class="control-btn warning" onclick="confirmDisaster()">
+                    ⚠️ Disaster
+                </button>
+            </div>
+
+            <div class="city-info-box" id="cityInfoBox" style="display: none;">
+                <div class="info-title" id="infoTitle">Building Info</div>
+                <div class="info-stats" id="infoStats"></div>
+            </div>
+        </div>
+
+        <div class="panel panel-right scrollbar">
+            <div class="header">
+                <h3 style="color: #60a5fa; margin-bottom: 8px;">Construction Panel</h3>
+                <div style="font-size: 11px; color: #94a3b8;">
+                    Budget: <span id="constructionBudget">$47,500</span>
+                    | Zone Cost: <span id="zoneCost">$1,000</span>
+                </div>
+            </div>
+
+            <div class="category-tabs">
+                <button class="tab active" onclick="showZoneType('residential')">🏠 Residential</button>
+                <button class="tab" onclick="showZoneType('commercial')">🏪 Commercial</button>
+                <button class="tab" onclick="showZoneType('industrial')">🏭 Industrial</button>
+                <button class="tab" onclick="showZoneType('utilities')">⚡ Utilities</button>
+                <button class="tab" onclick="showZoneType('services')">🏥 Services</button>
+                <button class="tab" onclick="showZoneType('parks')">🌳 Parks</button>
+            </div>
+
+            <div class="buildings-grid" id="buildingsContainer">
+                <div class="building-card" data-type="residential" onclick="selectBuilding('low_density_res')">
+                    <div class="building-icon">🏘️</div>
+                    <div class="building-name">Low Density Residential</div>
+                    <div class="building-cost">$1,000 per zone</div>
+                    <div class="building-stats">
+                        <span>👥 20-50 people</span>
+                        <span>💼 5-10 jobs</span>
+                        <span>💰 $200 tax</span>
+                    </div>
+                </div>
+
+                <div class="building-card" data-type="residential" onclick="selectBuilding('medium_density_res')">
+                    <div class="building-icon">🏢</div>
+                    <div class="building-name">Medium Density Apt</div>
+                    <div class="building-cost">$2,500 per zone</div>
+                    <div class="building-stats">
+                        <span>👥 50-150 people</span>
+                        <span>💼 15-30 jobs</span>
+                        <span>💰 $600 tax</span>
+                    </div>
+                </div>
+
+                <div class="building-card" data-type="commercial" onclick="selectBuilding('small_commercial')">
+                    <div class="building-icon">🏪</div>
+                    <div class="building-name">Small Business Zone</div>
+                    <div class="building-cost">$2,000 per zone</div>
+                    <div class="building-stats">
+                        <span>💼 10-20 jobs</span>
+                        <span>💰 $400 tax</span>
+                        <span>😊 +5 happiness</span>
+                    </div>
+                </div>
+
+                <div class="building-card" data-type="industrial" onclick="selectBuilding('light_industrial')">
+                    <div class="building-icon">🏭</div>
+                    <div class="building-name">Light Industry</div>
+                    <div class="building-cost">$3,000 per zone</div>
+                    <div class="building-stats">
+                        <span>💼 30-60 jobs</span>
+                        <span>💰 $800 tax</span>
+                        <span>☁️ +15 pollution</span>
+                    </div>
+                </div>
+
+                <div class="building-card" data-type="utilities" onclick="selectBuilding('coal_power')">
+                    <div class="building-icon">🏭</div>
+                    <div class="building-name">Coal Power Plant</div>
+                    <div class="building-cost">$15,000</div>
+                    <div class="building-stats">
+                        <span>⚡ 100 MW capacity</span>
+                        <span>☁️ +50 pollution</span>
+                        <span>⏱️ 6 months build</span>
+                    </div>
+                </div>
+
+                <div class="building-card" data-type="utilities" onclick="selectBuilding('solar_farm')">
+                    <div class="building-icon">☀️</div>
+                    <div class="building-name">Solar Farm</div>
+                    <div class="building-cost">$25,000</div>
+                    <div class="building-stats">
+                        <span>⚡ 40 MW capacity</span>
+                        <span>🌿 Clean energy</span>
+                        <span>⏱️ 8 months build</span>
+                    </div>
+                </div>
+
+                <div class="building-card" data-type="utilities" onclick="selectBuilding('water_treatment')">
+                    <div class="building-icon">💧</div>
+                    <div class="building-name">Water Plant</div>
+                    <div class="building-cost">$12,000</div>
+                    <div class="building-stats">
+                        <span>💧 100 ML capacity</span>
+                        <span>🚰 +20 happiness</span>
+                        <span>⏱️ 4 months build</span>
+                    </div>
+                </div>
+
+                <div class="building-card" data-type="services" onclick="selectBuilding('police_station')">
+                    <div class="building-icon">🚓</div>
+                    <div class="building-name">Police Station</div>
+                    <div class="building-cost">$8,000</div>
+                    <div class="building-stats">
+                        <span>🛡️ -20% crime</span>
+                        <span>💰 $200 upkeep</span>
+                        <span>⏱️ 3 months build</span>
+                    </div>
+                </div>
+
+                <div class="building-card" data-type="services" onclick="selectBuilding('hospital')">
+                    <div class="building-icon">🏥</div>
+                    <div class="building-name">Hospital</div>
+                    <div class="building-cost">$20,000</div>
+                    <div class="building-stats">
+                        <span>❤️ +30 happiness</span>
+                        <span>💰 $500 upkeep</span>
+                        <span>⏱️ 10 months build</span>
+                    </div>
+                </div>
+
+                <div class="building-card" data-type="parks" onclick="selectBuilding('small_park')">
+                    <div class="building-icon">🌳</div>
+                    <div class="building-name">Neighborhood Park</div>
+                    <div class="building-cost">$5,000</div>
+                    <div class="building-stats">
+                        <span>😊 +15 happiness</span>
+                        <span>🌿 -5 pollution</span>
+                        <span>💰 $50 upkeep</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding: 12px; background: rgba(51, 65, 85, 0.5); border-radius: 8px;">
+                <div style="font-size: 12px; font-weight: 600; color: #60a5fa; margin-bottom: 8px;">
+                    Construction Queue
+                </div>
+                <div id="constructionQueue" style="font-size: 11px; color: #94a3b8;">
+                    No ongoing constructions
+                </div>
+            </div>
+
+            <div style="margin-top: 12px; font-size: 10px; color: #64748b; padding: 8px; background: rgba(30, 41, 59, 0.5); border-radius: 6px;">
+                <div style="margin-bottom: 4px;">💡 Zone Planning Tips:</div>
+                <div>• Residential near parks increases land value</div>
+                <div>• Keep industry downwind from residential areas</div>
+                <div>• Commercial zones need good road access</div>
+                <div>• Services reduce crime and increase happiness</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="delete-confirm" id="deleteConfirm" style="display: none;">
+        <div class="delete-box">
+            <div style="font-size: 16px; font-weight: 600; color: #ef4444; margin-bottom: 8px;">
+                ⚠️ Confirm Demolition
+            </div>
+            <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 16px;" id="deleteMessage">
+                Are you sure you want to demolish this building? This action cannot be undone.
+            </div>
+            <div class="delete-buttons">
+                <button class="delete-btn cancel" onclick="cancelDelete()">Cancel</button>
+                <button class="delete-btn confirm" onclick="confirmDelete()">Demolish</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationArea"></div>
+
+    <div class="tooltip" id="tooltip" style="display: none;"></div>
+
+    <script>
+        let cityData = {
+            name: "New EcoCity",
+            population: 1000,
+            treasury: 50000,
+            taxRate: 9,
+            happiness: 65,
+            pollution: 22,
+            crime: 12,
+            employment: 45,
+            growth: 2.1,
+            gameSpeed: 1,
+            isPaused: false,
+            gameTime: {
+                hour: 12,
+                minute: 45,
+                day: 15,
+                month: 1,
+                year: 1
+            },
+            budget: {
+                income: 0,
+                expenses: 0,
+                taxRevenue: 0
+            }
+        };
+
+        let canvas, ctx;
+        let selectedBuilding = null;
+        let currentMode = 'build';
+        let gridSize = 40;
+        let buildings = [];
+        let zones = [];
+        let constructionQueue = [];
+        let gameInterval;
+        let mousePos = { x: -1, y: -1 };
+        let selectedObject = null;
+        let deleteQueue = null;
+        let tooltipTimeout;
+        let lastMouseGridX = -1;
+        let lastMouseGridY = -1;
+        let lastRenderTime = 0;
+        const RENDER_THROTTLE_MS = 16;
+        let needsRender = false;
+        let isDragging = false;
+        let gridPattern = null;
+
+        const buildingTypes = {
+            low_density_res: {
+                name: "Low Density Residential",
+                type: "residential",
+                cost: 1000,
+                population: [20, 50],
+                jobs: [5, 10],
+                tax: 200,
+                pollution: 0,
+                happiness: 5,
+                icon: "🏘️",
+                buildTime: 2,
+                upkeep: 50,
+                size: 1
+            },
+            medium_density_res: {
+                name: "Medium Density Apartment",
+                type: "residential",
+                cost: 2500,
+                population: [50, 150],
+                jobs: [15, 30],
+                tax: 600,
+                pollution: 2,
+                happiness: 10,
+                icon: "🏢",
+                buildTime: 4,
+                upkeep: 120,
+                size: 1
+            },
+            small_commercial: {
+                name: "Small Business Zone",
+                type: "commercial",
+                cost: 2000,
+                population: 0,
+                jobs: [10, 20],
+                tax: 400,
+                pollution: 5,
+                happiness: 5,
+                icon: "🏪",
+                buildTime: 3,
+                upkeep: 80,
+                size: 1
+            },
+            light_industrial: {
+                name: "Light Industry",
+                type: "industrial",
+                cost: 3000,
+                population: 0,
+                jobs: [30, 60],
+                tax: 800,
+                pollution: 15,
+                happiness: -10,
+                icon: "🏭",
+                buildTime: 5,
+                upkeep: 150,
+                size: 2
+            },
+            coal_power: {
+                name: "Coal Power Plant",
+                type: "utility",
+                cost: 15000,
+                population: 0,
+                jobs: [50, 80],
+                tax: 1200,
+                pollution: 50,
+                happiness: -20,
+                icon: "🏭",
+                buildTime: 24,
+                upkeep: 500,
+                size: 4,
+                powerOutput: 100
+            },
+            solar_farm: {
+                name: "Solar Farm",
+                type: "utility",
+                cost: 25000,
+                population: 0,
+                jobs: [10, 15],
+                tax: 300,
+                pollution: -5,
+                happiness: 15,
+                icon: "☀️",
+                buildTime: 24,
+                upkeep: 100,
+                size: 6,
+                powerOutput: 40
+            },
+            water_treatment: {
+                name: "Water Treatment Plant",
+                type: "utility",
+                cost: 12000,
+                population: 0,
+                jobs: [20, 30],
+                tax: 400,
+                pollution: -10,
+                happiness: 20,
+                icon: "💧",
+                buildTime: 12,
+                upkeep: 300,
+                size: 3,
+                waterOutput: 100
+            },
+            police_station: {
+                name: "Police Station",
+                type: "service",
+                cost: 8000,
+                population: 0,
+                jobs: [30, 40],
+                tax: 200,
+                pollution: 0,
+                happiness: 10,
+                icon: "🚓",
+                buildTime: 9,
+                upkeep: 200,
+                size: 2,
+                crimeReduction: 20
+            },
+            hospital: {
+                name: "Hospital",
+                type: "service",
+                cost: 20000,
+                population: 0,
+                jobs: [80, 120],
+                tax: 500,
+                pollution: 0,
+                happiness: 30,
+                icon: "🏥",
+                buildTime: 30,
+                upkeep: 500,
+                size: 4
+            },
+            small_park: {
+                name: "Neighborhood Park",
+                type: "park",
+                cost: 5000,
+                population: 0,
+                jobs: [2, 5],
+                tax: 50,
+                pollution: -5,
+                happiness: 15,
+                icon: "🌳",
+                buildTime: 4,
+                upkeep: 50,
+                size: 2
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            canvas = document.getElementById('cityCanvas');
+            ctx = canvas.getContext('2d');
+            
+            resizeCanvas();
+            initializeGame();
+            
+            window.addEventListener('resize', resizeCanvas);
+            setupEventListeners();
+            
+            startGameLoop();
+            
+            showNotification("Welcome to EcoSim City Builder! Start by zoning residential areas near roads.", "info");
+        });
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            
+            gridPattern = null;
+            
+            renderCity();
+        }
+
+        function initializeGame() {
+            const savedGame = localStorage.getItem('ecosim_save');
+            if (savedGame) {
+                try {
+                    const data = JSON.parse(savedGame);
+                    cityData = { ...cityData, ...data };
+                    updateUI();
+                } catch (e) {
+                    console.log("No valid save found, starting new game");
+                }
+            }
+            
+            addBuilding({
+                type: "coal_power",
+                x: 5,
+                y: 5,
+                progress: 100,
+                operational: true
+            });
+            
+            addBuilding({
+                type: "water_treatment",
+                x: 10,
+                y: 5,
+                progress: 100,
+                operational: true
+            });
+            
+            updateSpatialGrid();
+            
+            updateStats();
+        }
+
+        function setupEventListeners() {
+            canvas.onmousemove = handleMouseMove;
+            canvas.onclick = handleCanvasClick;
+            canvas.oncontextmenu = function(e) {
+                e.preventDefault();
+                cancelPlacement();
+            };
+            
+            canvas.onmousedown = function(e) {
+                isDragging = true;
+                if (currentMode === 'build' && selectedBuilding && e.button === 0) {
+                    const gridX = Math.floor(mousePos.x / gridSize);
+                    const gridY = Math.floor(mousePos.y / gridSize);
+                    placeBuilding(gridX, gridY);
+                }
+            };
+            
+            canvas.onmouseup = function() {
+                isDragging = false;
+            };
+            
+            canvas.onmouseleave = function() {
+                mousePos.x = -1;
+                mousePos.y = -1;
+                lastMouseGridX = -1;
+                lastMouseGridY = -1;
+                renderCity();
+            };
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    cancelPlacement();
+                } else if (e.key === 'Delete' && currentMode === 'bulldoze' && selectedObject) {
+                    showDeleteConfirm(lastMouseGridX, lastMouseGridY);
+                } else if (e.key === 'r') {
+                    setMode('build');
+                } else if (e.key === 's') {
+                    setMode('select');
+                } else if (e.key === 'd') {
+                    setMode('bulldoze');
+                } else if (e.key === 'p') {
+                    setMode('policies');
+                }
+            });
+            
+            document.getElementById('cityNameInput').addEventListener('change', updateCityName);
+            
+            document.getElementById('taxRateSlider').addEventListener('input', updateTaxRate);
+            
+            document.getElementById('buildModeBtn').addEventListener('click', () => setMode('build'));
+            document.getElementById('selectModeBtn').addEventListener('click', () => setMode('select'));
+            document.getElementById('bulldozeModeBtn').addEventListener('click', () => setMode('bulldoze'));
+            document.getElementById('policiesModeBtn').addEventListener('click', () => setMode('policies'));
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`${mode}ModeBtn`).classList.add('active');
+            
+            switch(mode) {
+                case 'build':
+                    canvas.style.cursor = selectedBuilding ? 'crosshair' : 'default';
+                    if (selectedBuilding) {
+                        showNotification("Build Mode: Click to place. Drag for multiple placements.", "info");
+                    } else {
+                        showNotification("Build Mode: Select a building first.", "info");
+                    }
+                    break;
+                case 'select':
+                    canvas.style.cursor = 'pointer';
+                    showNotification("Inspect Mode: Click on buildings for details", "info");
+                    break;
+                case 'bulldoze':
+                    canvas.style.cursor = 'url(\'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M4 4 L28 28 M28 4 L4 28" stroke="%23ef4444" stroke-width="3"/></svg>\') 16 16, no-drop';
+                    showNotification("Bulldoze Mode: Click on buildings to demolish (or press Delete)", "warning");
+                    break;
+                case 'policies':
+                    canvas.style.cursor = 'default';
+                    showNotification("Policies Mode: Manage city ordinances", "info");
+                    break;
+            }
+            
+            if (mode !== 'build') {
+                cancelPlacement();
+            }
+            
+            renderCity();
+        }        
+        function showZoneType(type) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const buildingCards = document.querySelectorAll('.building-card');
+            buildingCards.forEach(card => {
+                card.style.display = card.dataset.type === type ? 'block' : 'none';
+            });
+        }
+
+        function selectBuilding(buildingType) {
+            selectedBuilding = buildingType;
+            setMode('build');
+            
+            document.querySelectorAll('.building-card').forEach(card => {
+                card.classList.remove('selected');
+                if (card.onclick && card.onclick.toString().includes(buildingType)) {
+                    card.classList.add('selected');
+                }
+            });
+            
+            showNotification(`Selected: ${buildingTypes[buildingType].name}. Click on grid to place.`, "info");
+        }
+
+        function cancelPlacement() {
+            selectedBuilding = null;
+            document.querySelectorAll('.building-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            renderCity();
+        }
+
+        function handleMouseMove(event) {
+            const rect = canvas.getBoundingClientRect();
+            mousePos.x = event.clientX - rect.left;
+            mousePos.y = event.clientY - rect.top;
+            
+            const gridX = Math.floor(mousePos.x / gridSize);
+            const gridY = Math.floor(mousePos.y / gridSize);
+            
+            if (gridX !== lastMouseGridX || gridY !== lastMouseGridY) {
+                lastMouseGridX = gridX;
+                lastMouseGridY = gridY;
+                
+                clearTimeout(tooltipTimeout);
+                tooltipTimeout = setTimeout(() => {
+                    showTooltip(gridX, gridY);
+                }, 300);
+                
+                const now = Date.now();
+                if (now - lastRenderTime >= RENDER_THROTTLE_MS) {
+                    lastRenderTime = now;
+                    renderCity();
+                    needsRender = false;
+                } else {
+                    needsRender = true;
+                }
+            }
+        }
+
+        function checkPendingRender() {
+            if (needsRender && Date.now() - lastRenderTime >= RENDER_THROTTLE_MS) {
+                lastRenderTime = Date.now();
+                renderCity();
+                needsRender = false;
+            }
+        }
+
+        function handleCanvasClick(event) {
+            const gridX = Math.floor(mousePos.x / gridSize);
+            const gridY = Math.floor(mousePos.y / gridSize);
+            
+            if (currentMode === 'build' && selectedBuilding) {
+            } else if (currentMode === 'select') {
+                selectObject(gridX, gridY);
+            } else if (currentMode === 'bulldoze') {
+                if (event.button === 0) {
+                    showDeleteConfirm(gridX, gridY);
+                }
+            }
+        }
+        function placeBuilding(gridX, gridY) {
+            if (!selectedBuilding) return;
+            
+            const buildingType = buildingTypes[selectedBuilding];
+            const cost = buildingType.cost;
+            
+            if (cityData.treasury < cost) {
+                showNotification("Insufficient funds!", "error");
+                return;
+            }
+            
+            if (!isValidPosition(gridX, gridY, buildingType.size)) {
+                showNotification("Invalid location! Check space requirements.", "warning");
+                return;
+            }
+            
+            cityData.treasury -= cost;
+            
+            const construction = {
+                type: selectedBuilding,
+                x: gridX,
+                y: gridY,
+                progress: 0,
+                totalTime: buildingType.buildTime * 30,
+                operational: false
+            };
+            
+            constructionQueue.push(construction);
+            updateConstructionQueue();
+            updateSpatialGrid();
+            
+            showNotification(`${buildingType.name} construction started! Completion in ${buildingType.buildTime} months.`, "success");
+            updateUI();
+            renderCity();
+            cancelPlacement();
+        }
+
+        function isValidPosition(x, y, size) {
+            const maxX = Math.floor(canvas.width / gridSize) - size;
+            const maxY = Math.floor(canvas.height / gridSize) - size;
+            
+            if (x < 0 || y < 0 || x > maxX || y > maxY) {
+                return false;
+            }
+            
+            const startCellX = Math.floor(x / SPATIAL_CELL_SIZE);
+            const startCellY = Math.floor(y / SPATIAL_CELL_SIZE);
+            const endCellX = Math.floor((x + size - 1) / SPATIAL_CELL_SIZE);
+            const endCellY = Math.floor((y + size - 1) / SPATIAL_CELL_SIZE);
+            
+            for (let cellX = startCellX; cellX <= endCellX; cellX++) {
+                for (let cellY = startCellY; cellY <= endCellY; cellY++) {
+                    if (spatialGrid[cellX] && spatialGrid[cellX][cellY]) {
+                        const objects = spatialGrid[cellX][cellY];
+                        
+                        for (const obj of objects) {
+                            if (!(x >= obj.x + obj.size || 
+                                  x + size <= obj.x || 
+                                  y >= obj.y + obj.size || 
+                                  y + size <= obj.y)) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+        function addBuilding(building) {
+            buildings.push(building);
+            updateSpatialGrid();
+            updateStats();
+        }
+
+        function selectObject(gridX, gridY) {
+            for (const building of buildings) {
+                const bType = buildingTypes[building.type];
+                for (let dx = 0; dx < bType.size; dx++) {
+                    for (let dy = 0; dy < bType.size; dy++) {
+                        if (building.x + dx === gridX && building.y + dy === gridY) {
+                            showBuildingInfo(building);
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            for (const site of constructionQueue) {
+                const sType = buildingTypes[site.type];
+                for (let dx = 0; dx < sType.size; dx++) {
+                    for (let dy = 0; dy < sType.size; dy++) {
+                        if (site.x + dx === gridX && site.y + dy === gridY) {
+                            showConstructionInfo(site);
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            hideInfoBox();
+        }
+
+        let spatialGrid = {};
+        const SPATIAL_CELL_SIZE = 10;
+
+        function updateSpatialGrid() {
+            spatialGrid = {};
+            
+            buildings.forEach(building => {
+                const bType = buildingTypes[building.type];
+                const cellX = Math.floor(building.x / SPATIAL_CELL_SIZE);
+                const cellY = Math.floor(building.y / SPATIAL_CELL_SIZE);
+                
+                if (!spatialGrid[cellX]) spatialGrid[cellX] = {};
+                if (!spatialGrid[cellX][cellY]) spatialGrid[cellX][cellY] = [];
+                
+                spatialGrid[cellX][cellY].push({
+                    x: building.x,
+                    y: building.y,
+                    size: bType.size,
+                    building: building
+                });
+            });
+            
+            constructionQueue.forEach(site => {
+                const bType = buildingTypes[site.type];
+                const cellX = Math.floor(site.x / SPATIAL_CELL_SIZE);
+                const cellY = Math.floor(site.y / SPATIAL_CELL_SIZE);
+                
+                if (!spatialGrid[cellX]) spatialGrid[cellX] = {};
+                if (!spatialGrid[cellX][cellY]) spatialGrid[cellX][cellY] = [];
+                
+                spatialGrid[cellX][cellY].push({
+                    x: site.x,
+                    y: site.y,
+                    size: bType.size,
+                    isConstruction: true
+                });
+            });
+        }
+
+        function showBuildingInfo(building) {
+            const bType = buildingTypes[building.type];
+            const infoBox = document.getElementById('cityInfoBox');
+            const title = document.getElementById('infoTitle');
+            const stats = document.getElementById('infoStats');
+            
+            selectedObject = building;
+            
+            title.textContent = bType.name;
+            stats.innerHTML = `
+                Type: ${bType.type.toUpperCase()}<br>
+                Status: ${building.operational ? 'Operational' : 'Under Construction'}<br>
+                Tax Revenue: $${bType.tax}/month<br>
+                Upkeep: $${bType.upkeep}/month<br>
+                Happiness Effect: ${bType.happiness > 0 ? '+' : ''}${bType.happiness}<br>
+                Pollution: ${bType.pollution > 0 ? '+' : ''}${bType.pollution}<br>
+                ${bType.powerOutput ? `Power Output: ${bType.powerOutput} MW<br>` : ''}
+                ${bType.waterOutput ? `Water Output: ${bType.waterOutput} ML<br>` : ''}
+                ${bType.crimeReduction ? `Crime Reduction: ${bType.crimeReduction}%<br>` : ''}
+            `;
+            
+            infoBox.style.display = 'block';
+            infoBox.style.left = (mousePos.x + 20) + 'px';
+            infoBox.style.top = (mousePos.y + 20) + 'px';
+        }
+
+        function showConstructionInfo(site) {
+            const bType = buildingTypes[site.type];
+            const infoBox = document.getElementById('cityInfoBox');
+            const title = document.getElementById('infoTitle');
+            const stats = document.getElementById('infoStats');
+            
+            selectedObject = site;
+            
+            const progressPercent = Math.floor((site.progress / site.totalTime) * 100);
+            const daysLeft = site.totalTime - site.progress;
+            
+            title.textContent = `Construction: ${bType.name}`;
+            stats.innerHTML = `
+                Progress: ${progressPercent}%<br>
+                Time Remaining: ${daysLeft} days<br>
+                Cost: $${bType.cost}<br>
+                Monthly Upkeep: $${bType.upkeep}<br>
+                Click to cancel construction
+            `;
+            
+            infoBox.style.display = 'block';
+            infoBox.style.left = (mousePos.x + 20) + 'px';
+            infoBox.style.top = (mousePos.y + 20) + 'px';
+        }
+
+        function hideInfoBox() {
+            document.getElementById('cityInfoBox').style.display = 'none';
+            selectedObject = null;
+        }
+
+        function showDeleteConfirm(gridX, gridY) {
+            for (const building of buildings) {
+                const bType = buildingTypes[building.type];
+                for (let dx = 0; dx < bType.size; dx++) {
+                    for (let dy = 0; dy < bType.size; dy++) {
+                        if (building.x + dx === gridX && building.y + dy === gridY) {
+                            deleteQueue = building;
+                            const message = `Demolish ${bType.name}? You'll receive 50% refund: $${Math.floor(bType.cost * 0.5)}`;
+                            document.getElementById('deleteMessage').textContent = message;
+                            document.getElementById('deleteConfirm').style.display = 'flex';
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            for (let i = 0; i < constructionQueue.length; i++) {
+                const site = constructionQueue[i];
+                const sType = buildingTypes[site.type];
+                for (let dx = 0; dx < sType.size; dx++) {
+                    for (let dy = 0; dy < sType.size; dy++) {
+                        if (site.x + dx === gridX && site.y + dy === gridY) {
+                            deleteQueue = { type: 'construction', index: i, site: site };
+                            const refund = Math.floor(sType.cost * (site.progress / site.totalTime));
+                            const message = `Cancel ${sType.name} construction? Refund: $${refund}`;
+                            document.getElementById('deleteMessage').textContent = message;
+                            document.getElementById('deleteConfirm').style.display = 'flex';
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            showNotification("No building found at this location", "warning");
+        }
+
+        function confirmDelete() {
+            if (!deleteQueue) return;
+            
+            if (deleteQueue.type === 'construction') {
+                const site = deleteQueue.site;
+                const bType = buildingTypes[site.type];
+                const refund = Math.floor(bType.cost * (site.progress / site.totalTime));
+                
+                cityData.treasury += refund;
+                constructionQueue.splice(deleteQueue.index, 1);
+                
+                showNotification(`Construction cancelled. Refunded: $${refund}`, "info");
+            } else {
+                const building = deleteQueue;
+                const bType = buildingTypes[building.type];
+                const refund = Math.floor(bType.cost * 0.5);
+                
+                cityData.treasury += refund;
+                buildings = buildings.filter(b => b !== building);
+                
+                showNotification(`Building demolished. Refunded: $${refund}`, "info");
+            }
+            
+            updateSpatialGrid();
+            updateConstructionQueue();
+            updateUI();
+            renderCity();
+            cancelDelete();
+        }
+
+        function cancelDelete() {
+            deleteQueue = null;
+            document.getElementById('deleteConfirm').style.display = 'none';
+        }
+
+        function showTooltip(gridX, gridY) {
+            const tooltip = document.getElementById('tooltip');
+            
+            let tooltipText = "";
+            
+            for (const building of buildings) {
+                const bType = buildingTypes[building.type];
+                for (let dx = 0; dx < bType.size; dx++) {
+                    for (let dy = 0; dy < bType.size; dy++) {
+                        if (building.x + dx === gridX && building.y + dy === gridY) {
+                            tooltipText = `${bType.name} (${building.operational ? 'Operational' : 'Construction'})`;
+                            break;
+                        }
+                    }
+                    if (tooltipText) break;
+                }
+                if (tooltipText) break;
+            }
+            
+            if (!tooltipText) {
+                for (const site of constructionQueue) {
+                    const sType = buildingTypes[site.type];
+                    for (let dx = 0; dx < sType.size; dx++) {
+                        for (let dy = 0; dy < sType.size; dy++) {
+                            if (site.x + dx === gridX && site.y + dy === gridY) {
+                                const progress = Math.floor((site.progress / site.totalTime) * 100);
+                                tooltipText = `Construction: ${sType.name} (${progress}%)`;
+                                break;
+                            }
+                        }
+                        if (tooltipText) break;
+                    }
+                    if (tooltipText) break;
+                }
+            }
+            
+            if (!tooltipText) {
+                tooltipText = `Zone: ${gridX},${gridY} | Click to place`;
+            }
+            
+            tooltip.textContent = tooltipText;
+            tooltip.style.left = (mousePos.x + 15) + 'px';
+            tooltip.style.top = (mousePos.y + 15) + 'px';
+            tooltip.style.display = 'block';
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').style.display = 'none';
+        }
+
+        function drawPreview(gridX, gridY) {
+            if (!selectedBuilding) return;
+            
+            const bType = buildingTypes[selectedBuilding];
+            const isValid = isValidPosition(gridX, gridY, bType.size);
+            
+            ctx.save();
+            
+            for (let dx = 0; dx < bType.size; dx++) {
+                for (let dy = 0; dy < bType.size; dy++) {
+                    const cellX = gridX + dx;
+                    const cellY = gridY + dy;
+                    
+                    let cellValid = true;
+                    
+                    const checkX = cellX * gridSize;
+                    const checkY = cellY * gridSize;
+                    
+                    if (checkX < 0 || checkX >= canvas.width || checkY < 0 || checkY >= canvas.height) {
+                        cellValid = false;
+                    }
+                    
+                    ctx.globalAlpha = cellValid ? 0.4 : 0.2;
+                    ctx.fillStyle = cellValid && isValid ? '#10b981' : '#ef4444';
+                    ctx.fillRect(checkX, checkY, gridSize, gridSize);
+                    
+                    ctx.globalAlpha = 0.8;
+                    ctx.strokeStyle = cellValid && isValid ? '#10b981' : '#ef4444';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(checkX, checkY, gridSize, gridSize);
+                }
+            }
+            
+            ctx.globalAlpha = 0.9;
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = isValid ? '#10b981' : '#ef4444';
+            
+            const centerX = (gridX + bType.size / 2) * gridSize;
+            const centerY = (gridY + bType.size / 2) * gridSize;
+            
+            ctx.fillText(bType.icon, centerX, centerY);
+            
+            if (!isValid) {
+                ctx.font = '12px Arial';
+                ctx.fillText('Invalid', centerX, centerY + 20);
+            }
+            
+            ctx.restore();
+        }
+
+        function renderCity() {
+            requestAnimationFrame(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                drawGrid();
+                
+                buildings.forEach(building => {
+                    drawBuilding(building);
+                });
+                
+                constructionQueue.forEach(site => {
+                    drawConstructionSite(site);
+                });
+                
+                if (selectedBuilding && currentMode === 'build' && mousePos.x >= 0 && mousePos.y >= 0) {
+                    const gridX = Math.floor(mousePos.x / gridSize);
+                    const gridY = Math.floor(mousePos.y / gridSize);
+                    drawPreview(gridX, gridY);
+                }
+            });
+        }
+
+        function drawGrid() {
+            if (!gridPattern) {
+                const patternCanvas = document.createElement('canvas');
+                patternCanvas.width = gridSize;
+                patternCanvas.height = gridSize;
+                const patternCtx = patternCanvas.getContext('2d');
+                
+                patternCtx.strokeStyle = 'rgba(100, 116, 139, 0.2)';
+                patternCtx.lineWidth = 1;
+                
+                patternCtx.beginPath();
+                patternCtx.moveTo(gridSize, 0);
+                patternCtx.lineTo(gridSize, gridSize);
+                patternCtx.moveTo(0, gridSize);
+                patternCtx.lineTo(gridSize, gridSize);
+                patternCtx.stroke();
+                
+                gridPattern = ctx.createPattern(patternCanvas, 'repeat');
+            }
+            
+            ctx.fillStyle = gridPattern;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawBuilding(building) {
+            const bType = buildingTypes[building.type];
+            const color = getBuildingColor(building.type);
+            
+            ctx.save();
+            
+            for (let dx = 0; dx < bType.size; dx++) {
+                for (let dy = 0; dy < bType.size; dy++) {
+                    const x = (building.x + dx) * gridSize;
+                    const y = (building.y + dy) * gridSize;
+                    
+                    ctx.fillStyle = color + '40';
+                    ctx.fillRect(x, y, gridSize, gridSize);
+                    
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x, y, gridSize, gridSize);
+                }
+            }
+            
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = color;
+            ctx.fillText(bType.icon, 
+                (building.x + bType.size/2) * gridSize, 
+                (building.y + bType.size/2) * gridSize);
+            
+            if (bType.pollution > 10 && building.operational) {
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.3)';
+                ctx.beginPath();
+                ctx.arc(
+                    (building.x + bType.size/2) * gridSize,
+                    (building.y + bType.size/2) * gridSize - 10,
+                    8, 0, Math.PI * 2
+                );
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
+
+        function drawConstructionSite(site) {
+            const bType = buildingTypes[site.type];
+            const progress = site.progress / site.totalTime;
+            
+            ctx.save();
+            
+            for (let dx = 0; dx < bType.size; dx++) {
+                for (let dy = 0; dy < bType.size; dy++) {
+                    const x = (site.x + dx) * gridSize;
+                    const y = (site.y + dy) * gridSize;
+                    
+                    ctx.fillStyle = 'rgba(245, 158, 11, 0.2)';
+                    ctx.fillRect(x, y, gridSize, gridSize);
+                    
+                    ctx.strokeStyle = '#f59e0b';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(x, y, gridSize, gridSize);
+                }
+            }
+            
+            const centerX = (site.x + bType.size/2) * gridSize;
+            const centerY = (site.y + bType.size/2) * gridSize;
+            const barWidth = bType.size * gridSize * 0.8;
+            const barHeight = 6;
+            
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(centerX - barWidth/2, centerY + 20, barWidth, barHeight);
+            
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillRect(centerX - barWidth/2, centerY + 20, barWidth * progress, barHeight);
+            
+            ctx.font = '20px Arial';
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillText('🏗️', centerX, centerY);
+            
+            ctx.font = '10px Arial';
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillText(`${Math.floor(progress * 100)}%`, centerX, centerY + 35);
+            
+            ctx.restore();
+        }
+
+        function getBuildingColor(buildingType) {
+            const type = buildingTypes[buildingType].type;
+            switch(type) {
+                case 'residential': return '#3b82f6';
+                case 'commercial': return '#8b5cf6';
+                case 'industrial': return '#ef4444';
+                case 'utility': return '#f59e0b';
+                case 'service': return '#10b981';
+                case 'park': return '#22c55e';
+                default: return '#94a3b8';
+            }
+        }
+
+        function startGameLoop() {
+            gameInterval = setInterval(() => {
+                updateGame();
+                checkPendingRender();
+            }, 1000);
+        }
+
+        function updateGame() {
+            if (cityData.isPaused) return;
+            
+            updateGameTime();
+            
+            updateConstructions();
+            
+            updateStats();
+            
+            checkRandomEvents();
+            
+            updateUI();
+            
+            if (cityData.gameTime.minute % 5 === 0) {
+                saveGame();
+            }
+        }
+
+        function updateGameTime() {
+            cityData.gameTime.minute += cityData.gameSpeed;
+            
+            if (cityData.gameTime.minute >= 60) {
+                cityData.gameTime.minute = 0;
+                cityData.gameTime.hour++;
+                
+                if (cityData.gameTime.hour >= 24) {
+                    cityData.gameTime.hour = 0;
+                    cityData.gameTime.day++;
+                    
+                    if (cityData.gameTime.day > 30) {
+                        cityData.gameTime.day = 1;
+                        cityData.gameTime.month++;
+                        
+                        if (cityData.gameTime.month > 12) {
+                            cityData.gameTime.month = 1;
+                            cityData.gameTime.year++;
+                        }
+                        
+                        updateMonthly();
+                    }
+                }
+            }
+            
+            const ampm = cityData.gameTime.hour >= 12 ? 'PM' : 'AM';
+            const hour12 = cityData.gameTime.hour % 12 || 12;
+            document.getElementById('gameTime').textContent = 
+                `${hour12}:${cityData.gameTime.minute.toString().padStart(2, '0')} ${ampm}`;
+            
+            document.getElementById('gameDate').textContent = 
+                `Year ${cityData.gameTime.year}, Month ${cityData.gameTime.month}, Day ${cityData.gameTime.day}`;
+        }
+
+        function updateConstructions() {
+            constructionQueue.forEach(site => {
+                site.progress += cityData.gameSpeed;
+                
+                if (site.progress >= site.totalTime && !site.operational) {
+                    site.operational = true;
+                    buildings.push({ ...site });
+                    
+                    showNotification(`${buildingTypes[site.type].name} construction completed!`, "success");
+                    updateConstructionQueue();
+                }
+            });
+            
+            constructionQueue = constructionQueue.filter(site => !site.operational);
+        }
+
+        function updateStats() {
+            let totalPopulation = 1000;
+            let totalJobs = 0;
+            let totalTax = 0;
+            let totalUpkeep = 0;
+            let totalPollution = 0;
+            let totalHappiness = 0;
+            let totalPower = 0;
+            let totalWater = 0;
+            let crimeReduction = 0;
+            
+            buildings.forEach(building => {
+                if (building.operational) {
+                    const bType = buildingTypes[building.type];
+                    
+                    if (bType.type === 'residential') {
+                        const pop = bType.population[0] + Math.random() * (bType.population[1] - bType.population[0]);
+                        totalPopulation += Math.floor(pop);
+                    }
+                    
+                    if (bType.jobs && bType.jobs.length === 2) {
+                        const jobs = bType.jobs[0] + Math.random() * (bType.jobs[1] - bType.jobs[0]);
+                        totalJobs += Math.floor(jobs);
+                    }
+                    
+                    totalTax += bType.tax;
+                    totalUpkeep += bType.upkeep;
+                    totalPollution += bType.pollution;
+                    totalHappiness += bType.happiness;
+                    
+                    if (bType.powerOutput) totalPower += bType.powerOutput;
+                    if (bType.waterOutput) totalWater += bType.waterOutput;
+                    if (bType.crimeReduction) crimeReduction += bType.crimeReduction;
+                }
+            });
+            
+            const employmentRate = totalJobs > 0 ? Math.min(95, Math.floor((totalJobs / totalPopulation) * 100)) : 0;
+            
+            let happiness = 50 + totalHappiness;
+            happiness -= Math.max(0, totalPollution / 10);
+            happiness -= cityData.crime;
+            happiness -= (cityData.taxRate - 5) * 2;
+            
+            let crime = 20 - crimeReduction;
+            crime += Math.min(30, totalPopulation / 50000 * 10);
+            crime = Math.max(5, Math.min(95, crime));
+            
+            let growth = 0;
+            growth += (happiness - 50) / 10;
+            growth += (employmentRate - 50) / 10;
+            growth -= (cityData.taxRate - 10) / 5;
+            growth = Math.max(-5, Math.min(10, growth));
+            
+            cityData.population = Math.floor(totalPopulation * (1 + growth/100));
+            cityData.employment = Math.floor(employmentRate);
+            cityData.happiness = Math.max(0, Math.min(100, Math.floor(happiness)));
+            cityData.pollution = Math.max(0, Math.min(100, Math.floor(totalPollution)));
+            cityData.crime = Math.floor(crime);
+            cityData.growth = Math.round(growth * 10) / 10;
+            
+            const taxRevenue = Math.floor(totalPopulation * cityData.taxRate);
+            cityData.budget.taxRevenue = taxRevenue;
+            cityData.budget.income = taxRevenue + totalTax;
+            cityData.budget.expenses = totalUpkeep;
+            
+            cityData.treasury += Math.floor((cityData.budget.income - cityData.budget.expenses) / 30);
+            
+            checkEmergencies();
+        }
+
+        function updateMonthly() {
+            const monthlyNet = cityData.budget.income - cityData.budget.expenses;
+            cityData.treasury += monthlyNet;
+            
+            addToLog(`Monthly Report: ${monthlyNet >= 0 ? 'Surplus' : 'Deficit'} of $${Math.abs(monthlyNet)}`);
+            
+            const events = [
+                { chance: 0.1, message: "Tourism boom! Increased revenue this month.", effect: () => cityData.treasury += 5000 },
+                { chance: 0.05, message: "Economic downturn. Tax revenue decreased.", effect: () => cityData.treasury -= 3000 },
+                { chance: 0.03, message: "Natural disaster relief costs.", effect: () => cityData.treasury -= 10000 },
+                { chance: 0.07, message: "Federal infrastructure grant received.", effect: () => cityData.treasury += 15000 }
+            ];
+            
+            events.forEach(event => {
+                if (Math.random() < event.chance) {
+                    event.effect();
+                    addToLog(event.message);
+                    showNotification(event.message, "info");
+                }
+            });
+        }
+
+        function checkEmergencies() {
+            const alertDiv = document.getElementById('emergencyAlert');
+            const alertMsg = document.getElementById('alertMessage');
+            
+            if (cityData.treasury < 0) {
+                alertMsg.textContent = "BANKRUPTCY WARNING: City treasury is negative!";
+                alertDiv.style.display = 'block';
+            } else if (cityData.happiness < 30) {
+                alertMsg.textContent = "CIVIL UNREST: Happiness critically low!";
+                alertDiv.style.display = 'block';
+            } else if (cityData.pollution > 70) {
+                alertMsg.textContent = "ENVIRONMENTAL CRISIS: Extreme pollution levels!";
+                alertDiv.style.display = 'block';
+            } else if (cityData.crime > 60) {
+                alertMsg.textContent = "CRIME WAVE: Police presence needed!";
+                alertDiv.style.display = 'block';
+            } else {
+                alertDiv.style.display = 'none';
+            }
+        }
+
+        function checkRandomEvents() {
+            if (Math.random() < 0.01) {
+                const events = [
+                    { 
+                        message: "Construction workers go on strike! Construction halted for 3 days.", 
+                        effect: () => {
+                            constructionQueue.forEach(site => site.progress -= 3);
+                            showNotification("Strike resolved after 3 days", "warning");
+                        }
+                    },
+                    { 
+                        message: "Power plant maintenance required. Reduced output for 2 days.", 
+                        effect: () => {
+                            addToLog("Power plant maintenance completed");
+                        }
+                    },
+                    { 
+                        message: "Community festival boosts happiness!", 
+                        effect: () => {
+                            cityData.happiness = Math.min(100, cityData.happiness + 10);
+                        }
+                    }
+                ];
+                
+                const event = events[Math.floor(Math.random() * events.length)];
+                showNotification(event.message, "warning");
+                setTimeout(event.effect, 3000);
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('cityNameDisplay').textContent = cityData.name;
+            document.getElementById('populationValue').textContent = cityData.population.toLocaleString();
+            document.getElementById('employmentValue').textContent = cityData.employment + '%';
+            document.getElementById('happinessValue').textContent = cityData.happiness + '%';
+            document.getElementById('pollutionValue').textContent = cityData.pollution + '%';
+            document.getElementById('crimeValue').textContent = cityData.crime + '%';
+            document.getElementById('growthValue').textContent = (cityData.growth > 0 ? '+' : '') + cityData.growth + '%';
+            
+            document.getElementById('monthlyIncome').textContent = '$' + cityData.budget.income.toLocaleString();
+            document.getElementById('monthlyExpenses').textContent = '$' + cityData.budget.expenses.toLocaleString();
+            document.getElementById('cityTreasury').textContent = '$' + Math.floor(cityData.treasury).toLocaleString();
+            document.getElementById('taxRevenue').textContent = '$' + cityData.budget.taxRevenue.toLocaleString();
+            
+            document.getElementById('constructionBudget').textContent = '$' + Math.floor(cityData.treasury).toLocaleString();
+            
+            document.getElementById('taxRateValue').textContent = cityData.taxRate + '%';
+            document.getElementById('taxRateSlider').value = cityData.taxRate;
+            
+            document.getElementById('gameSpeed').textContent = cityData.gameSpeed + 'x';
+            document.getElementById('pauseText').textContent = cityData.isPaused ? 'Play' : 'Pause';
+            
+            const totalZones = Math.floor((canvas.width / gridSize) * (canvas.height / gridSize));
+            const usedZones = buildings.reduce((total, b) => total + Math.pow(buildingTypes[b.type].size, 2), 0);
+            document.getElementById('zoneIndicator').textContent = `${usedZones}/${totalZones}`;
+            
+            const density = usedZones / totalZones;
+            document.getElementById('densityIndicator').textContent = 
+                density < 0.1 ? 'Very Low' : 
+                density < 0.3 ? 'Low' : 
+                density < 0.6 ? 'Medium' : 
+                density < 0.8 ? 'High' : 'Very High';
+            
+            document.getElementById('happinessBar').style.width = cityData.happiness + '%';
+            document.getElementById('pollutionBar').style.width = cityData.pollution + '%';
+        }
+
+        function updateConstructionQueue() {
+            const queueDiv = document.getElementById('constructionQueue');
+            
+            if (constructionQueue.length === 0) {
+                queueDiv.innerHTML = 'No ongoing constructions';
+                return;
+            }
+            
+            let html = '';
+            constructionQueue.forEach((site, index) => {
+                const bType = buildingTypes[site.type];
+                const progress = Math.floor((site.progress / site.totalTime) * 100);
+                const daysLeft = Math.ceil((site.totalTime - site.progress) / 30);
+                
+                html += `<div style="margin-bottom: 4px; padding: 4px; background: rgba(59, 130, 246, 0.1); border-radius: 4px;">
+                    ${bType.icon} ${bType.name} - ${progress}% (${daysLeft} month${daysLeft !== 1 ? 's' : ''} left)
+                </div>`;
+            });
+            
+            queueDiv.innerHTML = html;
+        }
+
+        function updateCityName() {
+            const input = document.getElementById('cityNameInput');
+            const newName = input.value.trim();
+            
+            if (newName) {
+                cityData.name = newName;
+                document.getElementById('cityNameDisplay').textContent = newName;
+                addToLog(`City renamed to "${newName}"`);
+                showNotification(`City renamed to "${newName}"`, "success");
+            }
+        }
+
+        function updateTaxRate() {
+            const slider = document.getElementById('taxRateSlider');
+            cityData.taxRate = parseInt(slider.value);
+            
+            document.getElementById('taxRateValue').textContent = cityData.taxRate + '%';
+            addToLog(`Tax rate adjusted to ${cityData.taxRate}%`);
+            
+            updateStats();
+            updateUI();
+        }
+
+        function toggleGameSpeed() {
+            if (cityData.gameSpeed === 0) {
+                cityData.gameSpeed = 1;
+                cityData.isPaused = false;
+            } else if (cityData.gameSpeed === 1) {
+                cityData.gameSpeed = 3;
+            } else if (cityData.gameSpeed === 3) {
+                cityData.gameSpeed = 10;
+            } else {
+                cityData.gameSpeed = 0;
+                cityData.isPaused = true;
+            }
+            
+            updateUI();
+            showNotification(`Game speed: ${cityData.gameSpeed}x`, "info");
+        }
+
+        function saveGame() {
+            const saveData = {
+                cityData: cityData,
+                buildings: buildings,
+                constructionQueue: constructionQueue,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('ecosim_save', JSON.stringify(saveData));
+            
+            if (arguments.length === 0) {
+                showNotification("Game saved successfully!", "success");
+            }
+        }
+
+        function showCityReport() {
+            const report = `
+                CITY REPORT - ${cityData.name}
+                
+                Population: ${cityData.population.toLocaleString()}
+                Employment Rate: ${cityData.employment}%
+                Happiness: ${cityData.happiness}/100
+                Pollution: ${cityData.pollution}/100
+                Crime Rate: ${cityData.crime}%
+                Monthly Growth: ${cityData.growth > 0 ? '+' : ''}${cityData.growth}%
+                
+                FINANCES
+                Treasury: $${Math.floor(cityData.treasury).toLocaleString()}
+                Monthly Income: $${cityData.budget.income.toLocaleString()}
+                Monthly Expenses: $${cityData.budget.expenses.toLocaleString()}
+                Net Monthly: $${(cityData.budget.income - cityData.budget.expenses).toLocaleString()}
+                Tax Rate: ${cityData.taxRate}%
+                
+                INFRASTRUCTURE
+                Buildings: ${buildings.length}
+                Under Construction: ${constructionQueue.length}
+                Zones Developed: ${document.getElementById('zoneIndicator').textContent}
+                
+                Generated: ${new Date().toLocaleString()}
+            `;
+            
+            showNotification("City report generated in console", "info");
+            console.log(report);
+        }
+
+        function confirmDisaster() {
+            if (confirm("Trigger a random disaster? This will test your city's resilience!")) {
+                triggerDisaster();
+            }
+        }
+
+        function triggerDisaster() {
+            const disasters = [
+                {
+                    name: "Earthquake",
+                    effect: () => {
+                        const toDestroy = Math.floor(buildings.length * 0.3);
+                        for (let i = 0; i < toDestroy; i++) {
+                            if (buildings.length > 0) {
+                                const index = Math.floor(Math.random() * buildings.length);
+                                buildings.splice(index, 1);
+                            }
+                        }
+                        showNotification("💥 MAJOR EARTHQUAKE! Buildings destroyed.", "error");
+                    }
+                },
+                {
+                    name: "Economic Crash",
+                    effect: () => {
+                        cityData.treasury *= 0.5;
+                        cityData.happiness -= 20;
+                        showNotification("📉 ECONOMIC CRASH! Treasury halved, happiness decreased.", "error");
+                    }
+                },
+                {
+                    name: "Tornado",
+                    effect: () => {
+                        const pathLength = 5;
+                        for (let i = 0; i < pathLength; i++) {
+                            const x = Math.floor(Math.random() * canvas.width / gridSize);
+                            const y = Math.floor(Math.random() * canvas.height / gridSize);
+                            
+                            buildings = buildings.filter(b => {
+                                const bType = buildingTypes[b.type];
+                                return !(b.x <= x + 1 && b.x + bType.size >= x && 
+                                        b.y <= y + 1 && b.y + bType.size >= y);
+                            });
+                        }
+                        showNotification("🌪️ TORNADO! Buildings in path destroyed.", "error");
+                    }
+                },
+                {
+                    name: "Power Grid Failure",
+                    effect: () => {
+                        cityData.happiness -= 15;
+                        showNotification("⚡ POWER GRID FAILURE! Widespread blackouts, happiness decreased.", "error");
+                    }
+                }
+            ];
+            
+            const disaster = disasters[Math.floor(Math.random() * disasters.length)];
+            disaster.effect();
+            
+            updateStats();
+            updateUI();
+            renderCity();
+        }
+
+        function showNotification(message, type = "info") {
+            const notificationArea = document.getElementById('notificationArea');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = message;
+            
+            notificationArea.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+            
+            addToLog(message.replace(/<[^>]*>/g, ''));
+        }
+
+        function addToLog(message) {
+            const log = document.querySelector('.city-log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const now = new Date();
+            const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            entry.innerHTML = `<span class="log-timestamp">${time}</span> ${message}`;
+            
+            log.insertBefore(entry, log.firstChild);
+            
+            while (log.children.length > 50) {
+                log.removeChild(log.lastChild);
+            }
+            
+            log.scrollTop = 0;
+        }
+
+        showZoneType('residential');
+    </script>
+</body>
+</html>

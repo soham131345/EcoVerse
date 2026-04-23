@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NEXUS :: EcoTwin Core</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #00ffea;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 255, 234, 0.03) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+
+        .grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 234, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 234, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .glitch {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 2;
+            animation: glitch 8s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.15; }
+        }
+
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .tutorial-box {
+            background: rgba(10, 25, 47, 0.95);
+            border: 2px solid #00ffea;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 0 50px rgba(0, 255, 234, 0.3);
+            position: relative;
+        }
+
+        .tutorial-box h1 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #00ffea;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .tutorial-steps {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .tutorial-step {
+            background: rgba(0, 255, 234, 0.1);
+            border: 1px solid rgba(0, 255, 234, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .step-number {
+            color: #ff00ff;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            color: #00ffea;
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .step-desc {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .tutorial-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .tutorial-btn {
+            background: transparent;
+            border: 2px solid #00ffea;
+            color: #00ffea;
+            padding: 15px 40px;
+            font-family: 'Courier New';
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tutorial-btn:hover {
+            background: rgba(0, 255, 234, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 234, 0.4);
+        }
+
+        .tutorial-btn.primary {
+            background: #00ffea;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .tutorial-btn.primary:hover {
+            background: #ff00ff;
+            border-color: #ff00ff;
+        }
+
+        .skip-tutorial {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .skip-tutorial a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .skip-tutorial a:hover {
+            color: #00ffea;
+        }
+        .nexus-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            height: 100vh;
+            padding: 20px;
+            gap: 20px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .panel {
+            background: rgba(10, 25, 47, 0.85);
+            border: 1px solid rgba(0, 255, 234, 0.3);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ffea, #ff00ff, #00ffea);
+            z-index: -1;
+            animation: borderPulse 3s infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .panel:hover {
+            border-color: #00ffea;
+            box-shadow: 0 0 30px rgba(0, 255, 234, 0.2);
+        }
+
+        .panel-title {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: #00ffea;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .panel-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: #00ffea;
+        }
+        .stats-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 255, 234, 0.05);
+            border: 1px solid rgba(0, 255, 234, 0.1);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(0, 255, 234, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0, 255, 234, 0.5);
+        }
+
+        .xp-bar {
+            height: 4px;
+            background: rgba(0, 255, 234, 0.1);
+            margin-top: 10px;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffea, #ff00ff);
+            border-radius: 2px;
+            transition: width 1s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .avatar-display {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #avatarCanvas {
+            width: 300px;
+            height: 400px;
+            image-rendering: crisp-edges;
+            filter: drop-shadow(0 0 30px rgba(0, 255, 234, 0.3));
+        }
+
+        .aura-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 350px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 234, 0.1) 0%, transparent 70%);
+            animation: auraPulse 3s infinite;
+        }
+
+        @keyframes auraPulse {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.05); }
+        }
+        .customization-panel {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 50px);
+        }
+
+        .customization-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+            max-height: calc(100vh - 200px);
+        }
+        .customization-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .customization-content::-webkit-scrollbar-track {
+            background: rgba(0, 40, 80, 0.3);
+            border-radius: 3px;
+        }
+
+        .customization-content::-webkit-scrollbar-thumb {
+            background: #00ffea;
+            border-radius: 3px;
+        }
+
+        .customization-content::-webkit-scrollbar-thumb:hover {
+            background: #ff00ff;
+        }
+
+        .customization-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .style-option {
+            background: rgba(0, 30, 60, 0.5);
+            border: 1px solid rgba(0, 255, 234, 0.2);
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            position: relative;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .style-option:hover {
+            background: rgba(0, 100, 200, 0.3);
+            border-color: #00ffea;
+            transform: translateY(-2px);
+        }
+
+        .style-option.selected {
+            background: rgba(0, 255, 234, 0.1);
+            border-color: #00ffea;
+            box-shadow: 0 0 20px rgba(0, 255, 234, 0.3);
+        }
+
+        .style-option.locked {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .style-option.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            color: #ff0000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .style-name {
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        .style-cost {
+            font-size: 11px;
+            color: #ff00ff;
+        }
+
+        .style-level {
+            font-size: 10px;
+            color: rgba(0, 255, 234, 0.7);
+        }
+
+        .execute-btn {
+            background: linear-gradient(45deg, #000, #00ffea);
+            border: none;
+            color: #000;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .execute-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .execute-btn:hover::before {
+            left: 100%;
+        }
+
+        .execute-btn:hover {
+            background: linear-gradient(45deg, #00ffea, #000);
+            box-shadow: 0 0 40px rgba(0, 255, 234, 0.5);
+            transform: scale(1.02);
+        }
+
+        .execute-btn:active {
+            transform: scale(0.98);
+        }
+        .nav {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid #00ffea;
+            color: #00ffea;
+            padding: 10px 20px;
+            font-family: 'Courier New';
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 255, 234, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 234, 0.3);
+        }
+
+        .terminal {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffea;
+            padding: 15px;
+            font-family: 'Courier New';
+            font-size: 12px;
+            color: #00ff00;
+            max-width: 400px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .terminal-line {
+            margin-bottom: 5px;
+        }
+
+        .logo {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ffea;
+            z-index: 1001;
+        }
+
+        .logo span {
+            color: #ff00ff;
+        }
+
+        .category-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 20px 0 10px 0;
+            color: #00ffea;
+            position: relative;
+            padding-top: 10px;
+            border-top: 1px solid rgba(0, 255, 234, 0.2);
+        }
+
+        .help-bubble {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 255, 234, 0.2);
+            color: #00ffea;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: help;
+            transition: all 0.3s;
+        }
+
+        .help-bubble:hover {
+            background: rgba(0, 255, 234, 0.4);
+            transform: scale(1.1);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ffea;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            max-width: 200px;
+            z-index: 10000;
+            border: 1px solid #00ffea;
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 220px;
+            background: rgba(10, 25, 47, 0.95);
+            border: 1px solid #00ffea;
+            padding: 15px 25px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            backdrop-filter: blur(10px);
+            max-width: 300px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+    <div class="grid"></div>
+    <div class="glitch"></div>
+    {% if not tutorial_seen %}
+    <div class="tutorial-overlay" id="tutorialOverlay">
+        <div class="tutorial-box">
+            <h1>🌌 NEXUS CORE :: AVATAR SYSTEM</h1>
+            <p style="text-align: center; margin-bottom: 30px; color: rgba(255, 255, 255, 0.8);">
+                Welcome to your digital EcoTwin. This is your sustainable identity in the virtual world.
+            </p>
+            
+            <div class="tutorial-steps">
+                <div class="tutorial-step">
+                    <div class="step-number">01</div>
+                    <div class="step-title">DIGITAL REPRESENTATION</div>
+                    <div class="step-desc">
+                        Your EcoTwin is a digital avatar that evolves based on your real-world sustainability actions.
+                    </div>
+                </div>
+                
+                <div class="tutorial-step">
+                    <div class="step-number">02</div>
+                    <div class="step-title">EARN TOKENS</div>
+                    <div class="step-desc">
+                        Play EcoWorld Simulator and make sustainable choices to earn GreenTokens for customization.
+                    </div>
+                </div>
+                
+                <div class="tutorial-step">
+                    <div class="step-number">03</div>
+                    <div class="step-title">CUSTOMIZE</div>
+                    <div class="step-desc">
+                        Change skin colors, outfits, hairstyles, and effects. Unlock new styles as you level up.
+                    </div>
+                </div>
+                
+                <div class="tutorial-step">
+                    <div class="step-number">04</div>
+                    <div class="step-title">LEVEL UP</div>
+                    <div class="step-desc">
+                        Your avatar levels up based on your eco-score. Higher levels unlock premium customization options.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tutorial-buttons">
+                <button class="tutorial-btn" onclick="skipTutorial()">SKIP TUTORIAL</button>
+                <button class="tutorial-btn primary" onclick="startTutorial()">BEGIN CUSTOMIZATION</button>
+            </div>
+            
+            <div class="skip-tutorial">
+                <a href="#" onclick="skipTutorial()">I already know how this works</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="logo">NEXUS<span>::</span>ECOTWIN</div>
+    
+    <div class="nav">
+        <button class="nav-btn" onclick="location.href='/dashboard'">DASHBOARD</button>
+        <button class="nav-btn" onclick="location.href='/ecoworld'">ECOWORLD</button>
+        <button class="nav-btn" onclick="showTutorial()">HELP</button>
+    </div>
+    
+    <div class="terminal" id="terminal">
+        <div>> SYSTEM: NEXUS CORE ONLINE</div>
+        <div>> USER: {{ user.username|upper }} AUTHENTICATED</div>
+        <div>> AVATAR STATUS: ACTIVE</div>
+        <div>> LEVEL: {{ user.avatar_level }}</div>
+    </div>
+    
+    <div class="nexus-container">
+        <div class="panel">
+            <div class="panel-title">USER STATS</div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">TOKEN RESERVE</div>
+                    <div class="stat-value" id="tokenDisplay">{{ user.token_balance|int }}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">USER LEVEL</div>
+                    <div class="stat-value">{{ user.level }}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">AVATAR LEVEL</div>
+                    <div class="stat-value" id="levelDisplay">{{ user.avatar_level }}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">ECO SCORE</div>
+                    <div class="stat-value">{{ user.eco_score }}</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <div class="stat-label">LEVEL PROGRESSION</div>
+                <div class="xp-bar">
+                    <div class="xp-fill" id="xpBar" 
+                         style="width: {{ (user.avatar_xp / (user.avatar_level * 100)) * 100 if user.avatar_level * 100 > 0 else 0 }}%"></div>
+                </div>
+                <div style="font-size: 11px; margin-top: 5px; color: rgba(0, 255, 234, 0.7);">
+                    <span id="xpText">{{ user.avatar_xp }}/{{ user.avatar_level * 100 }} XP</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <div class="panel-title">CURRENT CONFIG</div>
+                <div id="currentConfig" style="font-size: 12px; line-height: 1.8;">
+                    <div>SKIN: <span style="color:#00ffea">{{ user.avatar_skin|upper }}</span></div>
+                    <div>OUTFIT: <span style="color:#00ffea">{{ user.avatar_outfit|upper }}</span></div>
+                    <div>HAIR: <span style="color:#00ffea">{{ user.avatar_hair|upper }}</span></div>
+                    <div>EFFECT: <span style="color:#00ffea">{{ user.avatar_aura|upper }}</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="avatar-display">
+                <div class="aura-effect"></div>
+                <canvas id="avatarCanvas"></canvas>
+                <div class="help-bubble" title="Click on customization options to preview changes">?</div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="execute-btn" onclick="saveConfiguration()">
+                    EXECUTE CONFIGURATION
+                </button>
+                <div style="font-size: 12px; margin-top: 10px; color: rgba(0, 255, 234, 0.7);">
+                    COST: <span id="totalCost" style="color: #ff00ff;">0</span> TOKENS
+                </div>
+            </div>
+        </div>
+        <div class="panel customization-panel">
+            <div class="panel-title">CUSTOMIZATION MATRIX</div>
+            
+            <div class="customization-content">
+                <div class="category-title">SKIN COLOR</div>
+                <div class="help-bubble" title="Your avatar's base appearance. Higher levels unlock premium skins.">?</div>
+                <div class="customization-grid" id="skinOptions">
+                </div>
+                <div class="category-title">OUTFIT STYLE</div>
+                <div class="help-bubble" title="Different outfits provide different visual effects and bonuses.">?</div>
+                <div class="customization-grid" id="outfitOptions">
+                </div>
+                
+                <div class="category-title">HAIR STYLE</div>
+                <div class="help-bubble" title="Hairstyles add personality to your avatar. Some have particle effects.">?</div>
+                <div class="customization-grid" id="hairOptions">
+                </div>
+                
+                <div class="category-title">EFFECTS</div>
+                <div class="help-bubble" title="Visual effects that make your avatar stand out. High-level only.">?</div>
+                <div class="customization-grid" id="effectOptions">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationArea"></div>
+
+    <script>
+        let config = {
+            skin: '{{ user.avatar_skin }}',
+            outfit: '{{ user.avatar_outfit }}',
+            hair: '{{ user.avatar_hair }}',
+            effect: '{{ user.avatar_aura }}',
+            tokens: {{ user.token_balance }},
+            level: {{ user.level }},
+            avatarLevel: {{ user.avatar_level }},
+            xp: {{ user.avatar_xp }}
+        };
+        
+        let selected = {
+            skin: {value: config.skin, cost: 0},
+            outfit: {value: config.outfit, cost: 0},
+            hair: {value: config.hair, cost: 0},
+            effect: {value: config.effect, cost: 0}
+        };
+        const styles = {
+            skin: [
+                {id: 'green', name: 'GREEN', cost: 0, level: 1, color: '#2ecc71'},
+                {id: 'blue', name: 'BLUE', cost: 50, level: 2, color: '#3498db'},
+                {id: 'earth', name: 'EARTH', cost: 100, level: 5, color: '#8b4513'},
+                {id: 'solar', name: 'SOLAR', cost: 200, level: 10, color: '#f1c40f'},
+                {id: 'void', name: 'VOID', cost: 500, level: 15, color: '#000000'},
+                {id: 'quantum', name: 'QUANTUM', cost: 1000, level: 25, color: '#9b59b6'}
+            ],
+            outfit: [
+                {id: 'basic', name: 'BASIC', cost: 0, level: 1, icon: '👕'},
+                {id: 'recycle', name: 'RECYCLER', cost: 75, level: 3, icon: '♻️'},
+                {id: 'solar', name: 'SOLAR SUIT', cost: 150, level: 7, icon: '☀️'},
+                {id: 'eco', name: 'ECO HERO', cost: 300, level: 15, icon: '🌍'},
+                {id: 'matrix', name: 'MATRIX', cost: 500, level: 20, icon: '💠'},
+                {id: 'nexus', name: 'NEXUS', cost: 1000, level: 30, icon: '🌀'}
+            ],
+            hair: [
+                {id: 'default', name: 'DEFAULT', cost: 0, level: 1, icon: '💇'},
+                {id: 'wind', name: 'WIND', cost: 40, level: 2, icon: '💨'},
+                {id: 'leaf', name: 'LEAF CROWN', cost: 90, level: 6, icon: '🍃'},
+                {id: 'energy', name: 'ENERGY FLOW', cost: 180, level: 12, icon: '⚡'},
+                {id: 'neural', name: 'NEURAL', cost: 350, level: 20, icon: '🧠'},
+                {id: 'voidstrand', name: 'VOID STRAND', cost: 600, level: 25, icon: '🌑'}
+            ],
+            effect: [
+                {id: 'none', name: 'NONE', cost: 0, level: 1, icon: '✨'},
+                {id: 'glow', name: 'ECO GLOW', cost: 60, level: 4, icon: '🌟'},
+                {id: 'particles', name: 'PARTICLES', cost: 120, level: 8, icon: '💫'},
+                {id: 'aura', name: 'AURA', cost: 250, level: 20, icon: '🌀'},
+                {id: 'singularity', name: 'SINGULARITY', cost: 500, level: 30, icon: '⚫'},
+                {id: 'quantum', name: 'QUANTUM FIELD', cost: 800, level: 35, icon: '🔮'}
+            ]
+        };
+        
+        let canvas, ctx;
+        document.addEventListener('DOMContentLoaded', function() {
+            canvas = document.getElementById('avatarCanvas');
+            ctx = canvas.getContext('2d');
+            canvas.width = 300;
+            canvas.height = 400;
+            
+            loadAvatarData();
+            createStyleOptions();
+            updateAvatarPreview();
+            updateTotalCost();
+            setupHelpTooltips();
+            updateTerminal('AVATAR SYSTEM READY');
+            updateTerminal(`TOKENS: ${config.tokens}`);
+            updateTerminal(`LEVEL: ${config.avatarLevel}`);
+        });
+        function startTutorial() {
+            document.getElementById('tutorialOverlay').style.display = 'none';
+            document.cookie = "avatar_tutorial_seen=true; path=/; max-age=31536000"; // 1 year
+            updateTerminal('TUTORIAL COMPLETE');
+        }
+        
+        function skipTutorial() {
+            document.getElementById('tutorialOverlay').style.display = 'none';
+            document.cookie = "avatar_tutorial_seen=true; path=/; max-age=31536000";
+            updateTerminal('TUTORIAL SKIPPED');
+        }
+        
+        function showTutorial() {
+            document.getElementById('tutorialOverlay').style.display = 'flex';
+        }
+        async function loadAvatarData() {
+            try {
+                const response = await fetch('/avatar/data');
+                const data = await response.json();
+                
+                if (data) {
+                    config.skin = data.skin || 'green';
+                    config.outfit = data.outfit || 'basic';
+                    config.hair = data.hair || 'default';
+                    config.effect = data.aura || 'none';
+                    config.tokens = data.tokens || {{ user.token_balance }};
+                    config.avatarLevel = data.level || {{ user.avatar_level }};
+                    config.xp = data.xp || {{ user.avatar_xp }};
+                    
+                    selected.skin.value = config.skin;
+                    selected.outfit.value = config.outfit;
+                    selected.hair.value = config.hair;
+                    selected.effect.value = config.effect;
+                    
+                    updateCurrentConfig();
+                    updateXPBar();
+                    updateSelectedCards();
+                }
+            } catch (error) {
+                console.error('Error loading avatar data:', error);
+            }
+        }
+        
+        function createStyleOptions() {
+            for (const category in styles) {
+                const container = document.getElementById(category + 'Options');
+                if (!container) continue;
+                
+                container.innerHTML = '';
+                
+                styles[category].forEach(style => {
+                    const div = document.createElement('div');
+                    div.className = 'style-option';
+                    div.dataset.category = category;
+                    div.dataset.value = style.id;
+                    div.dataset.cost = style.cost;
+                    div.dataset.level = style.level;
+                    
+                    if (style.id === config[category]) {
+                        div.classList.add('selected');
+                    }
+                    
+                    if (style.level > config.level) {
+                        div.classList.add('locked');
+                    }
+                    
+                    let content = '';
+                    if (style.color) {
+                        content = `<div style="color:${style.color}; font-size:20px; margin-bottom: 5px;">●</div>`;
+                    } else if (style.icon) {
+                        content = `<div style="font-size:20px; margin-bottom: 5px;">${style.icon}</div>`;
+                    }
+                    
+                    content += `
+                        <div class="style-name">${style.name}</div>
+                        <div class="style-cost">${style.cost} TOKENS</div>
+                        <div class="style-level">LEVEL ${style.level}</div>
+                    `;
+                    
+                    div.innerHTML = content;
+                    div.onclick = () => selectStyle(category, style.id, style.cost, style.level);
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        function selectStyle(category, value, cost, requiredLevel) {
+            if (requiredLevel > config.level) {
+                showNotification(`LEVEL ${requiredLevel} REQUIRED`, 'error');
+                return;
+            }
+            
+            if (cost > config.tokens) {
+                showNotification('INSUFFICIENT TOKENS', 'error');
+                return;
+            }
+            
+            selected[category] = {value, cost};
+
+            updateSelectedCards();
+            updateAvatarPreview();
+            updateTotalCost();
+            updateCurrentConfig();
+            
+            updateTerminal(`${category.toUpperCase()}: ${value.toUpperCase()} SELECTED`);
+            showNotification(`${category.toUpperCase()} selected: ${value.toUpperCase()}`, 'info');
+        }
+
+        function updateSelectedCards() {
+            document.querySelectorAll('.style-option').forEach(card => {
+                const category = card.dataset.category;
+                const value = card.dataset.value;
+                const requiredLevel = parseInt(card.dataset.level) || 1;
+                
+                card.classList.remove('selected');
+                if (selected[category] && selected[category].value === value) {
+                    card.classList.add('selected');
+                }
+                
+                card.classList.toggle('locked', requiredLevel > config.level);
+            });
+        }
+
+        function updateAvatarPreview() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const time = Date.now() * 0.001;
+            drawCyberAvatar(centerX, centerY, time);
+        }
+        
+        function drawCyberAvatar(x, y, time) {
+            const skinStyle = styles.skin.find(s => s.id === selected.skin.value) || styles.skin[0];
+            const skinColor = skinStyle.color || '#2ecc71';
+            ctx.fillStyle = skinColor;
+            ctx.beginPath();
+            ctx.arc(x, y - 50, 40, 0, Math.PI * 2);
+            ctx.fill();           
+            ctx.fillStyle = skinColor + '80';
+            ctx.fillRect(x - 30, y - 10, 60, 80);
+            const outfitStyle = styles.outfit.find(o => o.id === selected.outfit.value);
+            if (outfitStyle && outfitStyle.id !== 'basic') {
+                ctx.font = '40px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(outfitStyle.icon, x, y + 10);
+            }
+
+            const hairStyle = styles.hair.find(h => h.id === selected.hair.value);
+            if (hairStyle && hairStyle.id !== 'default') {
+                ctx.font = '30px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(hairStyle.icon, x, y - 90);
+            }
+
+            const effectStyle = styles.effect.find(e => e.id === selected.effect.value);
+            if (effectStyle && effectStyle.id !== 'none') {
+                ctx.font = '50px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.globalAlpha = 0.5;
+                
+                if (effectStyle.id === 'aura') {
+                    ctx.fillText('🌀', x, y);
+                } else if (effectStyle.id === 'glow') {
+                    ctx.fillText('🌟', x, y);
+                    ctx.beginPath();
+                    ctx.arc(x, y, 60 + Math.sin(time * 2) * 10, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#00ffea' + '40';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                } else if (effectStyle.id === 'particles') {
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2 + time;
+                        const radius = 50 + Math.sin(time * 3 + i) * 20;
+                        const px = x + Math.cos(angle) * radius;
+                        const py = y + Math.sin(angle) * radius;
+                        ctx.fillText('•', px, py);
+                    }
+                }
+                
+                ctx.globalAlpha = 1;
+            }
+
+            ctx.strokeStyle = '#00ffea' + '20';
+            ctx.lineWidth = 1;
+            for (let i = -30; i <= 30; i += 10) {
+                ctx.beginPath();
+                ctx.moveTo(x + i, y - 10);
+                ctx.lineTo(x + i, y + 70);
+                ctx.stroke();
+            }
+        }
+
+        function updateCurrentConfig() {
+            const configEl = document.getElementById('currentConfig');
+            configEl.innerHTML = `
+                <div>SKIN: <span style="color:#00ffea">${selected.skin.value.toUpperCase()}</span></div>
+                <div>OUTFIT: <span style="color:#00ffea">${selected.outfit.value.toUpperCase()}</span></div>
+                <div>HAIR: <span style="color:#00ffea">${selected.hair.value.toUpperCase()}</span></div>
+                <div>EFFECT: <span style="color:#00ffea">${selected.effect.value.toUpperCase()}</span></div>
+            `;
+        }
+
+        function updateXPBar() {
+            const xpPercent = (config.xp / (config.avatarLevel * 100)) * 100;
+            document.getElementById('xpBar').style.width = `${xpPercent}%`;
+            document.getElementById('xpText').textContent = `${config.xp}/${config.avatarLevel * 100} XP`;
+        }
+
+        function updateTotalCost() {
+            let total = 0;
+            for (const key in selected) {
+                total += selected[key].cost;
+            }
+            document.getElementById('totalCost').textContent = total;
+        }
+
+        async function saveConfiguration() {
+            const totalCost = parseInt(document.getElementById('totalCost').textContent);
+            
+            if (totalCost > config.tokens) {
+                showNotification('ERROR: INSUFFICIENT TOKENS', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/avatar/save', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        skin: selected.skin.value,
+                        hair: selected.hair.value,
+                        outfit: selected.outfit.value,
+                        aura: selected.effect.value,
+                        accessories: [],
+                        cost: totalCost
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    config.tokens = data.tokens;
+                    document.getElementById('tokenDisplay').textContent = Math.floor(data.tokens);
+
+                    if (data.level_up) {
+                        config.avatarLevel = data.level;
+                        document.getElementById('levelDisplay').textContent = data.level;
+                        showNotification(`LEVEL UP: ${data.level}`, 'success');
+                        updateTerminal(`LEVEL UP: ${data.level}`);
+                    }
+                    
+                    showNotification('CONFIGURATION SAVED', 'success');
+                    updateTerminal('CONFIGURATION SAVED');
+
+                    config.xp = data.xp;
+                    updateXPBar();
+                    
+                } else {
+                    showNotification('ERROR: ' + data.message, 'error');
+                    updateTerminal('ERROR: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error saving:', error);
+                showNotification('NETWORK ERROR', 'error');
+                updateTerminal('NETWORK ERROR');
+            }
+        }
+
+        function updateTerminal(message) {
+            const terminal = document.getElementById('terminal');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.textContent = `> ${message}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.borderColor = type === 'error' ? '#ff0000' : 
+                                           type === 'info' ? '#3498db' : '#00ffea';
+            notification.style.background = type === 'error' ? 'rgba(255, 0, 0, 0.1)' : 
+                                           type === 'info' ? 'rgba(52, 152, 219, 0.1)' : 'rgba(0, 255, 234, 0.1)';
+            notification.textContent = message;
+            document.getElementById('notificationArea').appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        function setupHelpTooltips() {
+            document.querySelectorAll('.help-bubble').forEach(bubble => {
+                bubble.addEventListener('mouseenter', function(e) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.textContent = this.title;
+                    tooltip.style.left = e.clientX + 'px';
+                    tooltip.style.top = e.clientY + 'px';
+                    document.body.appendChild(tooltip);
+                    
+                    this.tooltip = tooltip;
+                });
+                
+                bubble.addEventListener('mousemove', function(e) {
+                    if (this.tooltip) {
+                        this.tooltip.style.left = e.clientX + 15 + 'px';
+                        this.tooltip.style.top = e.clientY + 15 + 'px';
+                    }
+                });
+                
+                bubble.addEventListener('mouseleave', function() {
+                    if (this.tooltip) {
+                        this.tooltip.remove();
+                        this.tooltip = null;
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

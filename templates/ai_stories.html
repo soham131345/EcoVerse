@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ai StoriesecoVerse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a1929, #1a3a5f);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .header h1 {
+            font-size: 36px;
+            background: linear-gradient(90deg, #2ecc71, #3498db);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #2ecc71;
+            color: #2ecc71;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(46, 204, 113, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .generator-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #2ecc71;
+        }
+
+        .story-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .story-type-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+
+        .story-type-card:hover {
+            transform: translateY(-5px);
+            border-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
+        }
+
+        .story-type-card.selected {
+            border-color: #3498db;
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .story-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .story-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .story-desc {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+        }
+
+        .story-level {
+            font-size: 12px;
+            color: #f39c12;
+            background: rgba(243, 156, 18, 0.1);
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .generate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .history-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .history-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .history-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .history-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2ecc71;
+        }
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 15px;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: #2ecc71;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #2ecc71;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .ai-progress {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .progress-step.active {
+            opacity: 1;
+        }
+
+        .progress-step.completed {
+            opacity: 0.8;
+        }
+
+        .step-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 10px;
+        }
+
+        .progress-step.active .step-icon {
+            background: #3498db;
+            animation: pulse 1s infinite;
+        }
+
+        .progress-step.completed .step-icon {
+            background: #2ecc71;
+        }
+
+        .step-text {
+            font-size: 14px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .export-options {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .story-types {
+                grid-template-columns: 1fr;
+            }
+            
+            .history-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Story Generator</h1>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="location.href='/dashboard'">Dashboard</button>
+                <button class="nav-btn" onclick="location.href='/avatar'">EcoTwin</button>
+                <button class="nav-btn" onclick="location.href='/ecoworld'">EcoWorld</button>
+                <button class="nav-btn" onclick="location.href='/logout'">Logout</button>
+            </div>
+        </div>
+
+        <div class="generator-section">
+            <h2 class="section-title">Create Your Personalized Eco-Story</h2>
+            <p style="margin-bottom: 20px; color: rgba(255, 255, 255, 0.8);">
+                AI will create a personalized animated story based on your sustainability journey, achievements, and emotions.
+            </p>
+            
+            <div class="story-types" id="storyTypes">
+            </div>
+            
+            <div class="ai-progress" id="aiProgress">
+                <div class="progress-step" id="step1">
+                    <div class="step-icon">1</div>
+                    <div class="step-text">Analyzing your eco-data...</div>
+                </div>
+                <div class="progress-step" id="step2">
+                    <div class="step-icon">2</div>
+                    <div class="step-text">Generating story with OpenAI...</div>
+                </div>
+                <div class="progress-step" id="step3">
+                    <div class="step-icon">3</div>
+                    <div class="step-text">Creating visual elements...</div>
+                </div>
+                <div class="progress-step" id="step4">
+                    <div class="step-icon">4</div>
+                    <div class="step-text">Preparing animation...</div>
+                </div>
+                <div class="progress-step" id="step5">
+                    <div class="step-icon">5</div>
+                    <div class="step-text">Finalizing your story...</div>
+                </div>
+            </div>
+            
+            <button class="generate-btn" id="generateBtn" onclick="generateStory()">
+                Generate AI Story (50 Tokens)
+            </button>
+            
+            <div class="export-options" id="exportOptions">
+                <h3 style="color: #2ecc71; margin-bottom: 15px;">Your Story is Ready!</h3>
+                <p style="margin-bottom: 15px; color: rgba(255, 255, 255, 0.8);">
+                    Now you can:
+                </p>
+                <div class="export-buttons">
+                    <button class="action-btn" onclick="playGeneratedStory()" style="background: #2ecc71;">
+                        Play Story
+                    </button>
+                    <button class="action-btn" onclick="exportGeneratedStory()" style="background: #3498db;">
+                        Export Video
+                    </button>
+                    <button class="action-btn" onclick="shareGeneratedStory()" style="background: #9b59b6;">
+                        Share
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h2 class="section-title">Your Story History</h2>
+            <div class="history-grid" id="historyGrid">
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3 style="margin-bottom: 10px;" id="loadingTitle">AI is creating your story...</h3>
+            <p id="loadingMessage">Please wait while we generate your personalized narrative</p>
+        </div>
+    </div>
+
+    <script>
+        let selectedStoryType = 'weekly';
+        let currentStory = null;
+        let generatedStoryId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStoryTypes();
+            loadStoryHistory();
+        });
+
+        function loadStoryTypes() {
+            const types = [
+                {
+                    id: 'weekly',
+                    name: 'Weekly Eco-Journey',
+                    description: 'Personalized summary of your sustainability journey this week',
+                    icon: '📊',
+                    level: 1,
+                    tokens: 50
+                },
+                {
+                    id: 'future',
+                    name: 'Future Vision 2050',
+                    description: 'See what your sustainable future could look like',
+                    icon: '🔮',
+                    level: 5,
+                    tokens: 100
+                }
+            ];
+
+            const container = document.getElementById('storyTypes');
+            container.innerHTML = '';
+
+            const userLevel = {{ user.level }};
+
+            types.forEach(type => {
+                const card = document.createElement('div');
+                card.className = `story-type-card ${type.id === selectedStoryType ? 'selected' : ''}`;
+                card.dataset.type = type.id;
+                
+                const isLocked = type.level > userLevel;
+                
+                card.innerHTML = `
+                    <div class="story-icon">${type.icon}</div>
+                    <div class="story-name">${type.name}</div>
+                    <div class="story-desc">${type.description}</div>
+                    <div style="margin-bottom: 10px; color: #2ecc71;">
+                        ${type.tokens} Tokens
+                    </div>
+                    ${isLocked ? 
+                        `<div class="story-level">Level ${type.level}+ required</div>` : 
+                        `<div class="story-level">Level ${type.level}+ unlocked</div>`
+                    }
+                `;
+
+                if (!isLocked) {
+                    card.onclick = () => selectStoryType(type.id);
+                } else {
+                    card.style.opacity = '0.5';
+                    card.style.cursor = 'not-allowed';
+                }
+
+                container.appendChild(card);
+            });
+        }
+
+        function selectStoryType(type) {
+            selectedStoryType = type;
+            
+            document.querySelectorAll('.story-type-card').forEach(card => {
+                card.classList.remove('selected');
+                if (card.dataset.type === type) {
+                    card.classList.add('selected');
+                }
+            });
+
+            const tokens = type === 'weekly' ? 50 : 
+                          type === 'achievement' ? 75 : 
+                          type === 'educational' ? 60 :
+                          type === 'future' ? 100 : 80;
+            
+            document.getElementById('generateBtn').innerHTML = 
+                `Generate ${type.charAt(0).toUpperCase() + type.slice(1)} Story (${tokens} Tokens)`;
+        }
+
+        async function generateStory() {
+            const userTokens = {{ user.token_balance }};
+            const requiredTokens = selectedStoryType === 'weekly' ? 50 : 
+                                  selectedStoryType === 'achievement' ? 75 : 
+                                  selectedStoryType === 'educational' ? 60 :
+                                  selectedStoryType === 'future' ? 100 : 80;
+            
+            if (userTokens < requiredTokens) {
+                alert(`Insufficient tokens! You need ${requiredTokens} tokens. You have ${userTokens}.`);
+                return;
+            }
+
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const aiProgress = document.getElementById('aiProgress');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            loadingOverlay.style.display = 'flex';
+            aiProgress.style.display = 'block';
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+
+            for (let i = 1; i <= 5; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.classList.remove('active', 'completed');
+            }
+
+            try {
+                updateProgressStep(1, 'active');
+                await sleep(1000);
+                updateProgressStep(1, 'completed');
+                updateProgressStep(2, 'active');
+
+                const response = await fetch('/api/ai-stories/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        type: selectedStoryType,
+                        user_id: '{{ user.id }}'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateProgressStep(2, 'completed');
+                    updateProgressStep(3, 'active');
+                    await sleep(500);
+                    updateProgressStep(3, 'completed');
+                    
+                    updateProgressStep(4, 'active');
+                    await sleep(500);
+                    updateProgressStep(4, 'completed');
+                    
+                    updateProgressStep(5, 'active');
+                    await sleep(500);
+                    updateProgressStep(5, 'completed');
+
+                    currentStory = data.story;
+                    generatedStoryId = data.story.id;
+                    
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                        aiProgress.style.display = 'none';
+                        generateBtn.disabled = false;
+                        generateBtn.textContent = 'Generate Another Story';
+                        
+                        document.getElementById('exportOptions').style.display = 'block';
+                        
+                        loadStoryHistory();
+                        
+                        showNotification(`Story generated successfully! +50 Tokens earned.`, 'success');
+                        
+                    }, 1000);
+                    
+                } else {
+                    throw new Error(data.message || 'Failed to generate story');
+                }
+                
+            } catch (error) {
+                console.error('Error generating story:', error);
+                
+                loadingOverlay.style.display = 'none';
+                aiProgress.style.display = 'none';
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate AI Story (50 Tokens)';
+                
+                alert('Error generating story: ' + error.message);
+            }
+        }
+
+        function updateProgressStep(stepNumber, status) {
+            const step = document.getElementById(`step${stepNumber}`);
+            step.classList.remove('active', 'completed');
+            if (status) {
+                step.classList.add(status);
+            }
+        }
+
+        function playGeneratedStory() {
+            if (generatedStoryId) {
+                if (window.currentAudio) {
+                    window.currentAudio.pause();
+                    window.currentAudio = null;
+                }
+                
+                window.location.href = `/ai-stories/play/${generatedStoryId}`;
+            }
+        }
+
+        function preloadAudioFiles() {
+            const audioFiles = [
+                '/static/h1.mp3',
+                '/static/h2.mp3', 
+                '/static/h3.mp3',
+                '/static/u1.mp3',
+                '/static/u2.mp3',
+                '/static/u3.mp3'
+            ];
+            
+            audioFiles.forEach(url => {
+                const audio = new Audio();
+                audio.src = url;
+                audio.preload = 'metadata';
+            });
+            
+            console.log('Audio files preloaded');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            preloadAudioFiles();
+        });
+
+        function exportGeneratedStory() {
+            if (generatedStoryId) {
+                window.location.href = `/ai-stories/export/${generatedStoryId}/video`;
+            }
+        }
+
+        function shareGeneratedStory() {
+            if (generatedStoryId) {
+                const url = `${window.location.origin}/ai-stories/play/${generatedStoryId}`;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Story link copied to clipboard! Share it with friends!');
+                });
+            }
+        }
+
+        async function loadStoryHistory() {
+            try {
+                const response = await fetch('/api/ai-stories/history');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const container = document.getElementById('historyGrid');
+                    
+                    if (data.stories.length === 0) {
+                        container.innerHTML = `
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: rgba(255, 255, 255, 0.5);">
+                                <div style="font-size: 48px; margin-bottom: 20px;">📖</div>
+                                <h3>No stories yet</h3>
+                                <p>Generate your first AI story to see it here!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    container.innerHTML = data.stories.map(story => `
+                        <div class="history-card">
+                            <div class="history-title">${story.title}</div>
+                            <div class="history-meta">
+                                <span>${story.type ? story.type.charAt(0).toUpperCase() + story.type.slice(1) : 'Story'}</span>
+                                <span>${story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Recently'}</span>
+                            </div>
+                            <div style="margin-bottom: 15px; font-size: 14px; color: rgba(255, 255, 255, 0.8);">
+                                Duration: ${story.duration || 60}s | Tokens: +${story.tokens_earned || 50}
+                            </div>
+                            <div class="history-actions">
+                                <button class="action-btn" onclick="viewStory('${story.id}')">
+                                    View
+                                </button>
+                                <button class="action-btn" onclick="exportStory('${story.id}')">
+                                    Export
+                                </button>
+                                <button class="action-btn" onclick="shareStory('${story.id}')">
+                                    Share
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+
+        function viewStory(storyId) {
+            window.location.href = `/ai-stories/play/${storyId}`;
+        }
+
+        function exportStory(storyId) {
+            window.location.href = `/ai-stories/export/${storyId}/video`;
+        }
+
+        function shareStory(storyId) {
+            const url = `${window.location.origin}/ai-stories/play/${storyId}`;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Story link copied to clipboard!');
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.padding = '15px 20px';
+            notification.style.background = type === 'success' ? '#27ae60' : '#e74c3c';
+            notification.style.color = 'white';
+            notification.style.borderRadius = '10px';
+            notification.style.zIndex = '10000';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
