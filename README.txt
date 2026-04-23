@@ -41,3 +41,7 @@ To reset the database, quit the flask server then delete the folder: instance. R
 
 6. NOTE:
 Please note that this application includes some unused HTML files. 
+
+*© 2026 Soham Bhole. All rights reserved.*
+
+*This code may not be copied, modified, or distributed without permission.*
